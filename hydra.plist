@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>hy</string>
+	</array>
+	<key>name</key>
+	<string>hydra</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>comment</key>
+			<string>keywords like 'from' 0 'to' 10 'do'...</string>
+			<key>match</key>
+			<string>\b(spawn|if|else|then|for|while|do|not|and|or|from|to|by|function|end|module|class|import|export|super|this|return|operator|extends)\b</string>
+			<key>name</key>
+			<string>keyword.control.source.hydra</string>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>\(((\w+(\=\w+)?)(,\s*\w+(\=\w+)?)*)\)\{</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>variable.parameter.source.hydra</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>(?&lt;=\{)</string>
+			<key>name</key>
+			<string>variable.complex.source.hydra</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>operators + - /...</string>
+			<key>match</key>
+			<string>(\+|-|=|\*|/|%)</string>
+			<key>name</key>
+			<string>keyword.operator.source.hydra</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>strings: 'dfsdfg' </string>
+			<key>match</key>
+			<string>\'.*\' | ".*"</string>
+			<key>name</key>
+			<string>keyword.operator.source.hydra</string>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.hydra</string>
+	<key>uuid</key>
+	<string>bc954012-51f2-4fb7-af12-34819861d560</string>
+</dict>
+</plist>
