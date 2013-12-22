@@ -54,17 +54,76 @@ const (
 	LBRACKET                              // '['
 	RBRACKET                              // ']'
 	STRING_LITERAL                        // "mystring" or 'mystring'
-	NUM_LITERAL                           // '0435.345'
+	NUM_LITERAL                           // '123' or '0435.345'
 	MULTILINE_COMMENT                     // '/* some comment */'
 	SINGLELINE_COMMENT                    // '// some comment '
 	FUNC_KEYWORD                          // 'function'
 	SPAWN_KEYWORD                         // 'spawn'
-	KEYWORD                               // 'do end for function...etc'
+	IF_KEYWORD                            // 'if'
+	ELSE_KEYWORD                          // 'else'
+	THEN_KEYWORD                          // 'then'
+	FOR_KEYWORD                           // 'for'
+	IN_KEYWORD                            // 'in'
+	WHILE_KEYWORD                         // 'while'
+	DO_KEYWORD                            // 'do'
+	NOT_KEYWORD                           // 'not'
+	AND_KEYWORD                           // 'and'
+	OR_KEYWORD                            // 'or'
+	FROM_KEYWORD                          // 'from'
+	TO_KEYWORD                            // 'to'
+	BY_KEYWORD                            // 'by'
+	END_KEYWORD                           // 'end'
+	MODULE_KEYWORD                        // 'module'
+	CLASS_KEYWORD                         // 'class'
+	IMPORT_KEYWORD                        // 'import'
+	EXPORT_KEYWORD                        // 'export'
+	SUPER_KEYWORD                         // 'super'
+	THIS_KEYWORD                          // 'this'
+	RETURN_KEYWORD                        // 'return'
+	OPERATOR_KEYWORD                      // 'operator'
+	EXTENDS_KEYWORD                       // 'extends'
+	PRIVATE_KEYWORD                       // 'private'
+	EITHER_KEYWORD                        // 'either'
+	WAIT_FOR_KEYWORD                      // 'wait_for'
+	BREAK_KEYWORD                         // 'break'
+	GIVEN_KEYWORD                         // 'given'
+	IS_KEYWORD                            // 'is'
+	EXCEPT_KEYWORD                        // 'except'
 )
 
 var KeywordMap = map[string]Token_Class{
 	"function": FUNC_KEYWORD,
 	"spawn":    SPAWN_KEYWORD,
+	"if":       IF_KEYWORD,
+	"else":     ELSE_KEYWORD,
+	"then":     THEN_KEYWORD,
+	"for":      FOR_KEYWORD,
+	"in":       IN_KEYWORD,
+	"while":    WHILE_KEYWORD,
+	"do":       DO_KEYWORD,
+	"not":      NOT_KEYWORD,
+	"and":      AND_KEYWORD,
+	"or":       OR_KEYWORD,
+	"from":     FROM_KEYWORD,
+	"to":       TO_KEYWORD,
+	"by":       BY_KEYWORD,
+	"end":      END_KEYWORD,
+	"module":   MODULE_KEYWORD,
+	"class":    CLASS_KEYWORD,
+	"import":   IMPORT_KEYWORD,
+	"export":   EXPORT_KEYWORD,
+	"super":    SUPER_KEYWORD,
+	"this":     THIS_KEYWORD,
+	"return":   RETURN_KEYWORD,
+	"operator": OPERATOR_KEYWORD,
+	"extends":  EXTENDS_KEYWORD,
+	"private":  PRIVATE_KEYWORD,
+	"either":   EITHER_KEYWORD,
+	"wait_for": WAIT_FOR_KEYWORD,
+	"break":    BREAK_KEYWORD,
+	"given":    GIVEN_KEYWORD,
+	"is":       IS_KEYWORD,
+	"except":   EXCEPT_KEYWORD,
 }
 
 func New(val string, class Token_Class, line int, col int) *Token {
@@ -157,14 +216,76 @@ func (this *Token) classString() string {
 		return "STRING_LITERAL"
 	case NUM_LITERAL:
 		return "NUM_LITERAL"
-	case KEYWORD:
-		return "KEYWORD"
 	case MULTILINE_COMMENT:
 		return "MULTILINE_COMMENT"
 	case SINGLELINE_COMMENT:
 		return "SINGLELINE_COMMENT"
 	case RANGE:
 		return "RANGE"
+	case FUNC_KEYWORD:
+		return "FUNC_KEYWORD"
+	case SPAWN_KEYWORD:
+		return "SPAWN_KEYWORD"
+	case IF_KEYWORD:
+		return "IF_KEYWORD"
+	case ELSE_KEYWORD:
+		return "ELSE_KEYWORD"
+	case THEN_KEYWORD:
+		return "THEN_KEYWORD"
+	case FOR_KEYWORD:
+		return "FOR_KEYWORD"
+	case IN_KEYWORD:
+		return "IN_KEYWORD"
+	case WHILE_KEYWORD:
+		return "WHILE_KEYWORD"
+	case DO_KEYWORD:
+		return "DO_KEYWORD"
+	case NOT_KEYWORD:
+		return "NOT_KEYWORD"
+	case AND_KEYWORD:
+		return "AND_KEYWORD"
+	case OR_KEYWORD:
+		return "OR_KEYWORD"
+	case FROM_KEYWORD:
+		return "FROM_KEYWORD"
+	case TO_KEYWORD:
+		return "TO_KEYWORD"
+	case BY_KEYWORD:
+		return "BY_KEYWORD"
+	case END_KEYWORD:
+		return "END_KEYWORD"
+	case MODULE_KEYWORD:
+		return "MODULE_KEYWORD"
+	case CLASS_KEYWORD:
+		return "CLASS_KEYWORD"
+	case IMPORT_KEYWORD:
+		return "IMPORT_KEYWORD"
+	case EXPORT_KEYWORD:
+		return "EXPORT_KEYWORD"
+	case SUPER_KEYWORD:
+		return "SUPER_KEYWORD"
+	case THIS_KEYWORD:
+		return "THIS_KEYWORD"
+	case RETURN_KEYWORD:
+		return "RETURN_KEYWORD"
+	case OPERATOR_KEYWORD:
+		return "OPERATOR_KEYWORD"
+	case EXTENDS_KEYWORD:
+		return "EXTENDS_KEYWORD"
+	case PRIVATE_KEYWORD:
+		return "PRIVATE_KEYWORD"
+	case EITHER_KEYWORD:
+		return "EITHER_KEYWORD"
+	case WAIT_FOR_KEYWORD:
+		return "WAIT_FOR_KEYWORD"
+	case BREAK_KEYWORD:
+		return "BREAK_KEYWORD"
+	case GIVEN_KEYWORD:
+		return "GIVEN_KEYWORD"
+	case IS_KEYWORD:
+		return "IS_KEYWORD"
+	case EXCEPT_KEYWORD:
+		return "EXCEPT_KEYWORD"
 	}
 	return ""
 }

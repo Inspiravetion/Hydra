@@ -379,13 +379,20 @@ func (this *Scanner) identifier_or_keyword(start rune) *token.Token {
 				buffer.WriteString(string(r))
 			} else {
 				this.rewind()
-				//TODO should have lookup here for keywords
-				return token.New(buffer.String(), token.IDENTIFIER, this.line_num, this.col_num)
+				break
 			}
 		} else {
-			return token.New(buffer.String(), token.IDENTIFIER, this.line_num, this.col_num)
+			break
 		}
 	}
+
+	tok_str := buffer.String()
+
+	if tok_type, found := token.KeywordMap[tok_str]; found {
+		return token.New(tok_str, tok_type, this.line_num, this.col_num)
+	}
+
+	return token.New(tok_str, token.IDENTIFIER, this.line_num, this.col_num)
 }
 
 func (this *Scanner) astrick_in_comment(buffer *bytes.Buffer) *token.Token {
