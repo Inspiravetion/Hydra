@@ -59,7 +59,6 @@ func New(in_file string) *Scanner {
 
 func (this *Scanner) init(in_file string) *Scanner {
 
-	//open input file
 	input, err := os.Open(in_file)
 	if err != nil {
 		panic(err)
@@ -75,10 +74,6 @@ func (this *Scanner) init(in_file string) *Scanner {
 	this.buff = make([]byte, this.buff_len)
 
 	return this
-}
-
-func (this *Scanner) destroy() {
-	this.input.Close()
 }
 
 func (this *Scanner) get_next_char() (string, error) {
@@ -475,10 +470,15 @@ func (this *Scanner) consume_whitespace() {
 	}
 }
 
-//Public Function
-//==============================================================================
+func (this *Scanner) stream_tokens(out_chan chan *token.Token) {
+	for tok := this.get_next_token(); tok != nil; tok = this.get_next_token() {
+		out_chan <- tok
+	}
+	close(out_chan)
+	this.input.Close()
+}
 
-func (this *Scanner) Get_Next_Token() *token.Token {
+func (this *Scanner) get_next_token() *token.Token {
 
 	this.consume_whitespace()
 
@@ -588,4 +588,13 @@ func (this *Scanner) Get_Next_Token() *token.Token {
 	}
 
 	return nil //EOF
+}
+
+//Public Function
+//==============================================================================
+
+func (this *Scanner) Run() <-chan *token.Token {
+	c := make(chan *token.Token, 50)
+	go this.stream_tokens(c)
+	return c
 }

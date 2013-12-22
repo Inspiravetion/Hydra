@@ -7,11 +7,11 @@ import (
 )
 
 func main() {
-	scanr := scanner.New(os.Args[1])
+	tokens := scanner.New(os.Args[1]).Run()
 
 	fmt.Printf("os.Args[0]: %s\n", os.Args[1])
 
-	for tok := scanr.Get_Next_Token(); tok != nil; tok = scanr.Get_Next_Token() {
+	for tok := range tokens {
 		fmt.Printf("%+v\n", tok)
 	}
 
