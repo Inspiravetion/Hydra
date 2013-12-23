@@ -336,9 +336,17 @@ class Control
     }
 
     macro for(item) in(container, blk) do
-      while var unquote(item) = unquote(container).for_in() do
+      while unquote(item), done = unquote(container).for_in(); !done do 
         unquote_blk(blk)();
       do
+    end
+
+  }
+
+  function code_gen(){
+
+    for op in [#+, #*, #&, #|] do //not sure if this is needed...def not for first release
+      eval(#(op (a, b, c) = op (op (a, b), c))
     end
 
   }
