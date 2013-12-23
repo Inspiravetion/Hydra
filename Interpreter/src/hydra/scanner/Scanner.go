@@ -30,8 +30,8 @@ func isAlnum(r rune) bool {
 	return unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_'
 }
 
-func to_rune(s string) rune {
-	r, _ := utf8.DecodeRuneInString(s)
+func to_rune(str string) rune {
+	r, _ := utf8.DecodeRuneInString(str)
 	return r
 }
 

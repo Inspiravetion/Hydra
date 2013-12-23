@@ -13,15 +13,15 @@ const (
 //Individual Error Types
 //==============================================================================
 
-type unknown_char_error struct {
+type Unknown_Char_Err struct {
 	unkown_char string
 }
 
-func newUnknownCharErr(char string) unknown_char_error {
-	return unknown_char_error{char}
+func New_Unknown_Char_Err(char string) Unknown_Char_Err {
+	return Unknown_Char_Err{char}
 }
 
-func (this unknown_char_error) Error() string {
+func (this Unknown_Char_Err) Error() string {
 	return fmt.Sprint("Scanner Error: encounted unknown character %s", this.unkown_char)
 }
 
@@ -31,6 +31,6 @@ func (this unknown_char_error) Error() string {
 func Throw(err_type Error_Type, cause string) {
 	switch err_type {
 	case UNKNOWN_CHARACTER:
-		panic(newUnknownCharErr(cause))
+		panic(New_Unknown_Char_Err(cause))
 	}
 }
