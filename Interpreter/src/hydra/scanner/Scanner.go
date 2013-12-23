@@ -2,10 +2,10 @@ package scanner
 
 import (
 	"bytes"
-	"fmt"
+	"hydra/err"
+	"hydra/scanner/token"
 	"io"
 	"os"
-	"scanner/token"
 	"unicode"
 	"unicode/utf8"
 )
@@ -35,27 +35,8 @@ func to_rune(s string) rune {
 	return r
 }
 
-//Errors
-//==============================================================================
-
-type unknown_char_error struct {
-	unkown_char string
-}
-
-func newUnknownCharErr(char string) unknown_char_error {
-	return unknown_char_error{char}
-}
-
-func (this unknown_char_error) Error() string {
-	return fmt.Sprint("Scanner Error: encounted unknown character %s", this.unkown_char)
-}
-
 //Scanner
 //==============================================================================
-
-func New(in_file string) *Scanner {
-	return new(Scanner).init(in_file)
-}
 
 func (this *Scanner) init(in_file string) *Scanner {
 
@@ -482,7 +463,7 @@ func (this *Scanner) get_next_token() *token.Token {
 
 	this.consume_whitespace()
 
-	if curr_char, err := this.get_next_char(); err == nil {
+	if curr_char, char_err := this.get_next_char(); char_err == nil {
 
 		if curr_char == "," {
 			return token.New(",", token.COMMA, this.line_num, this.col_num)
@@ -584,7 +565,7 @@ func (this *Scanner) get_next_token() *token.Token {
 			return this.identifier_or_keyword(r)
 		}
 
-		panic(newUnknownCharErr(curr_char))
+		err.Throw(err.UNKNOWN_CHARACTER, curr_char)
 	}
 
 	return nil //EOF
@@ -592,6 +573,10 @@ func (this *Scanner) get_next_token() *token.Token {
 
 //Public Function
 //==============================================================================
+
+func New(in_file string) *Scanner {
+	return new(Scanner).init(in_file)
+}
 
 func (this *Scanner) Run() <-chan *token.Token {
 	c := make(chan *token.Token, 50)
