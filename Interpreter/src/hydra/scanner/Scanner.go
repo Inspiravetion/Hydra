@@ -21,6 +21,13 @@ type Scanner struct {
 	buff             []byte
 }
 
+type Input_Type int
+
+const (
+	FILE Input_Type = iota
+	STRING
+)
+
 var default_buff_len = 1024
 
 //Helpers
@@ -38,44 +45,57 @@ func to_rune(str string) rune {
 //Scanner
 //==============================================================================
 
-func (this *Scanner) init(in_file string) *Scanner {
+func (this *Scanner) init(in_type Input_Type, input string) *Scanner {
 
-	input, err := os.Open(in_file)
-	if err != nil {
-		panic(err)
+	if in_type == FILE {
+		input, err := os.Open(input)
+		if err != nil {
+			panic(err)
+		}
+		this.input = input
+		this.buff_len = default_buff_len
+		this.buff_pos = this.buff_len
+		this.peek_buff = make([]byte, 2) //max consecutive rewinds
+		this.buff = make([]byte, this.buff_len)
+	}
+
+	if in_type == STRING {
+		this.input = nil
+		this.buff = []byte(input)
+		this.buff_len = len(this.buff)
 	}
 
 	this.line_num = 1
 	this.col_num = 1
 	this.last_line_length = 1
-	this.input = input
-	this.buff_len = default_buff_len
-	this.buff_pos = this.buff_len
-	this.peek_buff = make([]byte, 2) //max consecutive rewinds
-	this.buff = make([]byte, this.buff_len)
 
 	return this
 }
 
 func (this *Scanner) get_next_char() (string, error) {
-	if this.buff_pos == this.buff_len {
-		copy(this.peek_buff, this.buff[this.buff_len-len(this.peek_buff):])
-
-		num_read, err := this.input.Read(this.buff)
-
-		if err == io.EOF {
-			return "", err
-		}
-
-		if err != nil {
-			panic(err)
-		}
-
-		this.buff_len = num_read
-		this.buff_pos = 0
-	}
 
 	var char string
+
+	if this.buff_pos == this.buff_len {
+		if this.input != nil {
+			copy(this.peek_buff, this.buff[this.buff_len-len(this.peek_buff):])
+
+			num_read, err := this.input.Read(this.buff)
+
+			if err == io.EOF {
+				return "", err
+			}
+
+			if err != nil {
+				panic(err)
+			}
+
+			this.buff_len = num_read
+			this.buff_pos = 0
+		} else {
+			return "", io.EOF
+		}
+	}
 
 	if this.buff_pos < 0 {
 		char = string(this.peek_buff[len(this.peek_buff)-this.buff_pos])
@@ -456,7 +476,10 @@ func (this *Scanner) stream_tokens(out_chan chan *token.Token) {
 		out_chan <- tok
 	}
 	close(out_chan)
-	this.input.Close()
+
+	if this.input != nil {
+		this.input.Close()
+	}
 }
 
 func (this *Scanner) get_next_token() *token.Token {
@@ -574,8 +597,8 @@ func (this *Scanner) get_next_token() *token.Token {
 //Public Function
 //==============================================================================
 
-func New(in_file string) *Scanner {
-	return new(Scanner).init(in_file)
+func New(in_type Input_Type, input string) *Scanner {
+	return new(Scanner).init(in_type, input)
 }
 
 func (this *Scanner) Run() <-chan *token.Token {
