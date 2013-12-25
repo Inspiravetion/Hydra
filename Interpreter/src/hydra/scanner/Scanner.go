@@ -140,9 +140,14 @@ func (this *Scanner) less_than_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.LESS_THAN_LIT, token.LESS_THAN, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.LESS_THAN_LIT, token.LESS_THAN, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) greater_than_token() *token.Token {
@@ -158,9 +163,14 @@ func (this *Scanner) greater_than_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.GREATER_THAN_LIT, token.GREATER_THAN, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.GREATER_THAN_LIT, token.GREATER_THAN, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) ampersand_token() *token.Token {
@@ -172,9 +182,14 @@ func (this *Scanner) ampersand_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.BIT_AND_LIT, token.BIT_AND, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.BIT_AND_LIT, token.BIT_AND, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) pipe_token() *token.Token {
@@ -190,9 +205,14 @@ func (this *Scanner) pipe_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.BIT_OR_LIT, token.BIT_OR, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.BIT_OR_LIT, token.BIT_OR, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) equal_token() *token.Token {
@@ -204,9 +224,14 @@ func (this *Scanner) equal_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.ASSIGN_LIT, token.ASSIGN, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.ASSIGN_LIT, token.ASSIGN, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) plus_token() *token.Token {
@@ -222,9 +247,14 @@ func (this *Scanner) plus_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.ADD_OP_LIT, token.ADD_OP, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.ADD_OP_LIT, token.ADD_OP, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) minus_token() *token.Token {
@@ -240,9 +270,14 @@ func (this *Scanner) minus_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.MIN_OP_LIT, token.MIN_OP, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.MIN_OP_LIT, token.MIN_OP, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) mult_token() *token.Token {
@@ -258,9 +293,14 @@ func (this *Scanner) mult_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.MULT_OP_LIT, token.MULT_OP, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.MULT_OP_LIT, token.MULT_OP, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) div_token() *token.Token {
@@ -282,9 +322,14 @@ func (this *Scanner) div_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.DIV_OP_LIT, token.DIV_OP, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.DIV_OP_LIT, token.DIV_OP, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) mod_token() *token.Token {
@@ -296,9 +341,14 @@ func (this *Scanner) mod_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.MOD_OP_LIT, token.MOD_OP, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.MOD_OP_LIT, token.MOD_OP, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) string_literal_token(quote_char string) *token.Token {
@@ -313,6 +363,7 @@ func (this *Scanner) string_literal_token(quote_char string) *token.Token {
 				return token.New(buffer.String(), token.STRING_LITERAL, this.line_num, this.col_num)
 			}
 		} else {
+			//think about throwing error here for unfinished string
 			return nil
 		}
 	}
@@ -360,6 +411,11 @@ func (this *Scanner) num_literal_token(start rune) *token.Token {
 			return token.New(buffer.String(), token.NUM_LITERAL, this.line_num, this.col_num)
 		}
 	} else {
+
+		if err == io.EOF {
+			return token.New(buffer.String(), token.NUM_LITERAL, this.line_num, this.col_num)
+		}
+
 		return nil
 	}
 }
@@ -404,6 +460,7 @@ func (this *Scanner) astrick_in_comment(buffer *bytes.Buffer) *token.Token {
 				return this.astrick_in_comment(buffer)
 			}
 		} else {
+			//think about panicing here...theres no end to the comment
 			return nil
 		}
 	}
@@ -421,6 +478,7 @@ func (this *Scanner) multi_line_comment() *token.Token {
 				return this.astrick_in_comment(&buffer)
 			}
 		} else {
+			//think about panicing here...no end to the comment
 			return nil
 		}
 	}
@@ -439,6 +497,10 @@ func (this *Scanner) single_line_comment() *token.Token {
 				buffer.WriteString(char)
 			}
 		} else {
+			if err == io.EOF {
+				return token.New(buffer.String(), token.SINGLELINE_COMMENT, this.line_num, this.col_num)
+			}
+
 			return nil
 		}
 	}
@@ -453,9 +515,14 @@ func (this *Scanner) period_token() *token.Token {
 
 		this.rewind()
 		return token.New(token.PERIOD_LIT, token.PERIOD, this.line_num, this.col_num)
-	}
+	} else {
 
-	return nil
+		if err == io.EOF {
+			return token.New(token.PERIOD_LIT, token.PERIOD, this.line_num, this.col_num)
+		}
+
+		return nil
+	}
 }
 
 func (this *Scanner) consume_whitespace() {
