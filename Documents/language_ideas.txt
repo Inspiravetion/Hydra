@@ -1,0 +1,169 @@
+HIGH LEVEL DESIGN===============================================================
+    1.GoRoutine-esque async functions
+        =>.circumvent GIL problem
+            a. Have one instance of a reentrent interpreter so that you can have 
+            multiple OSThreads running different code managed solely by saved interpreter
+            state (pc, symbol table etc.)
+                ->can memory be shared across cores?
+                    =>getcontext(ucontext_t *ucp); //get current register/stack info
+                    =>setcontext(const ucontext_t *ucp); //restore register/stack info
+                    =>need to figure out how to give interpreter variables instead of values
+                        a.give it a parse tree with variables(pointers)...have it run parse tree
+                        which would let it create new channels/goroutines but also let it use the channels
+                        it already has
+                        b.essentially all os threads but the first one would be running 
+                        interpret_parse_tree(ParseTree* p, SymbolTable* s) //symbol table my cause data races***
+                            ->(would technically have to be a void func(void*))
+                        c.*** I think closures should capture values at evaluation time and use those as to not 
+                        cause unwanted side effects ***
+        =>memory optimization(could have hundreds to thousands of them running at once)
+            a. Segmented stacks
+            b. Closures alow for variables to be referenced multiple places but only one place in mem
+                ->could cause data races if abused
+            c. allow abstraction for limiting number of real OSThreads
+        =>speed optimization
+            a.cacheable functions
+                ->can be called in main thread or closures / goroutines
+                ->save results for pure calculations with the same inputs
+                    =>if cacheable function is called somewhere with some input
+                    and then again in another thread, goroutine, main thread, 
+                    the function will only have to return a lookup of the result
+                    ...very fast but potentially very memory inefficient
+                ->allow abstraction for limit on cache size
+    2.Compiled runtime that takes care of Memory Managment , System Calls, 
+    goroutine scheduling/communication
+
+SCHEDULER========================================================================
+
+1. Abstractions:
+    =>P : Processor
+        ->cache on it
+        ->Waiting Head Queue
+        ->Access to available System Threads
+    =>M : System Threads
+        ->running heads can be readily switched out for channel communication
+    =H : Head
+        ->either pointer to user code or AST/Syntax tree
+        ->thread context information for if it needs to be swapped out/in
+    =>MaxProcessors
+        ->the max between the number of physical processors and the user defined
+        MaxProcessors
+2. Policies:
+    =>to run a head you must have a P and an M so P is the bottle neck
+    =>any head that is spawned on a P is added to the back of that P's Head queue
+        ->gives us locality for the cache and for channel communication
+    =>if P run's out of Heads to run they randomly steal Heads from the balk half 
+    of another P's Queue
+
+SYNTAX==========================================================================
+
+def (a)is_divisable_by(b)
+    return a % b == 0;
+end
+
+function my_func()
+    this.a = 1234;
+    this.b = [];
+
+    if this.a is_divisable_by this.b then
+        print 'yayyyy it worked'
+    else 
+        print 'aww shucks'
+    end
+
+    b.map((i, val){ return val + i * 2 });
+
+    this.on_load = (gui){ 
+        gui.render() 
+    }
+
+    for(i = 0 to 100 by 10){
+        //iterate at 0, 10, 20, 30 etc...
+    }
+end
+
+a.is_divisable_by(b) //a has method is_divisable_by()
+a.is_divisable_by b //a has method is_divisable_by()
+a::is_divisable_by::b  //top level function ()is_divisable_by()
+a::is_divisable_by::b::and_smaller_than::c //top level function
+
+if (a < b) or (b > 3) and (a > 9) then
+
+verb_function variable1 to variable2 => variable2 = variable2 verb_function variable1... just an idea
+
+a or= b => a = a || b
+FEATURES========================================================================
+
+1.dynamically typed
+2.option to compile to bytecode / llvm ?
+3.multithreaded built in
+    ->multithreaded runtime
+    ->user level threading (real threads running on different hardware)
+        =>avoid python(GIL) problem
+            >>generate code for function to run in thread and then run 
+            that without giving up interpreter
+4.native constructs for concurancy
+    ->threadable var registry = {}
+        =>registry.lock(); var event = registry.get('key'); registry.unlock();
+    ->run myFunc(); //another thread
+    ->threadable func a(){}
+        =>if returns, puts returned object into queue held by the thread that spun it off
+5. Native Exceptions, Arrays, Enums, Function(anonymous, named, closures), Maps, Strings, Integer, Chan/Pipe?, and Pointer Types
+6.Multiple inheritence through composition
+    -> class a extends b, c, d
+        =>a is_a b //true
+        =>a is_a c //true
+        =>a is_a d //true
+7.operator overloading
+8.{} denotes new scope (function or otherwise)
+9.tuples 
+10. destructuring
+11.thruthy/falsy values for everything
+12. import / module keywords
+13.metaprogramming
+14.explicit disposeof keyword to circumvent gc and directly free objects
+15.Ocaml like recursive syntax
+16.have cacheable functions...'var myFunc = cacheable function(){}'
+    ->lets you forgoe expensive computations of pure functions
+    ->consider using futures
+17.SYNTAX: be able to sprinkle parameters throughout function declaration 'link(a)with(b)then_stop(c)''
+    or something of the like
+18. Event.emit = condition.signal Event.broadcast = condition.broadcast ?...not sure about this one
+19.loadbalance multithreading across cores
+20.error handling?...exceptions?...defer?...panic/recover?
+21.consider having 2 levels of concurrency...sometype of lightweight thread that is multiplexed(loadbalanced) 
+over a changeable number of real threads(default to numcores)...and processes
+22.tail call recursion optimization
+23.dynamic sized stacks on go routines to optimize memory management
+24.user definable operators...iff text allowed could effectively let users define keywords
+    ->define on class
+        => operator left '[]~' right = some_defined_func(left, right)
+        => operator left '[' index ']~' right = some_defined_func(left, index, func)
+25. expect keyword to work like assert 
+    -> function dynamic(a, b, c, d){
+        expect typeof a tobe A 
+        expect typeof b tobe B, typeof c tobe C, and typeof d tobe D  // ',' acts as implicit 'and'
+    }
+26. C extensions like pythons ctypes...ctypes.Structure / ctypes.Union classes...users can extend them to 
+    use structs with c code nd what not
+27. function overriding of superclass methods
+    =>mechanism for calling superclass method
+28. generators
+    =>let users define them as well so that they can make special 'for in' compattable classes ie. 'for node, val in btree'
+//GOALS=========================================================================
+    1.As terse and easy to write as JS
+    2.As readable as ruby (words for opperators and such)
+    3.Type system similar to rubys
+    4.concurrency semantics/implementation like GO
+    5.flexible...think of programer as user...let the programer define operators and have macros
+
+//TERMINOLOGY===================================================================
+    Name: Hydra (multiple headed monster ;P)
+    Start Goroutine : spawn head
+    File Extension: .hy
+    packages? gem/module/recipe?
+
+//TO RESOLVE====================================================================
+    1.See how go handles closures, values vs references
+        ->references = unwanted race condition abusing
+        ->values = more memory and less flexibility

@@ -5,10 +5,10 @@ import (
 )
 
 type Token struct {
-	line   int
-	column int
-	text   string
-	class  Token_Type
+	Line   int
+	Column int
+	Text   string
+	Class  Token_Type
 }
 
 type Token_Type int
@@ -131,11 +131,11 @@ func New(val string, class Token_Type, line int, col int) *Token {
 }
 
 func (this *Token) String() string {
-	return fmt.Sprintf("{ line: %d, column: %d, val: %s, class: %s }", this.line, this.column, this.text, this.classString())
+	return fmt.Sprintf("{ line: %d, column: %d, val: %s, class: %s }", this.Line, this.Column, this.Text, this.classString())
 }
 
 func (this *Token) classString() string {
-	switch this.class {
+	switch this.Class {
 	case IDENTIFIER:
 		return "IDENTIFIER"
 	case PERIOD:
