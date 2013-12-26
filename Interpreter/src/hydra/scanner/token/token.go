@@ -131,11 +131,11 @@ func New(val string, class Token_Type, line int, col int) *Token {
 }
 
 func (this *Token) String() string {
-	return fmt.Sprintf("{ line: %d, column: %d, val: %s, class: %s }", this.Line, this.Column, this.Text, this.classString())
+	return fmt.Sprintf("{ line: %d, column: %d, val: %s, class: %s }", this.Line, this.Column, this.Text, this.Class)
 }
 
-func (this *Token) classString() string {
-	switch this.Class {
+func (this Token_Type) String() string {
+	switch this {
 	case IDENTIFIER:
 		return "IDENTIFIER"
 	case PERIOD:
