@@ -1,7 +1,7 @@
 package scanner_test
 
 import (
-	"fmt"
+	// "fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "hydra/scanner"
@@ -142,9 +142,9 @@ var mocks = []mock_input{
 		},
 	},
 	{
-		`this.func_call() /* comment /****/`,
+		`this.func_call() /* comment /*****/`,
 		[]token.Token_Type{
-			token.IDENTIFIER,
+			token.THIS_KEYWORD,
 			token.PERIOD,
 			token.IDENTIFIER,
 			token.LPAREN,
@@ -198,7 +198,6 @@ var _ = Describe("Scanner", func() {
 
 			It("should produce a/an '"+test_data.literal+"' token", func() {
 				scanner := New(STRING, test_data.literal)
-				fmt.Printf("%s", test_data.literal)
 				Expect((<-(scanner.Run())).Class).To(Equal(test_data.class))
 			})
 
@@ -219,7 +218,6 @@ var _ = Describe("Scanner", func() {
 				for tok := range tokens {
 					Expect(tok.Class).To(Equal(mock.correct_tokens[i]))
 					i++
-					fmt.Printf("tok passed : %s\n", tok.Class)
 				}
 
 				Expect(i).To(Equal(len(mock.correct_tokens)))
