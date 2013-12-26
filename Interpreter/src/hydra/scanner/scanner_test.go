@@ -23,6 +23,14 @@ func bound_mock_input_range(col []mock_input, iter func(data mock_input)) {
 	}
 }
 
+type Collection []interface{}
+
+func bound_range(col Collection, iter func(data interface{})) {
+	for _, val := range col {
+		iter(val)
+	}
+}
+
 // Individual Token Test Setup
 //==============================================================================
 
@@ -124,32 +132,60 @@ var mocks = []mock_input{
        print(i)
      }`,
 		[]token.Token_Type{
-			token.NUM_LITERAL,
-			token.RANGE,
-			token.NUM_LITERAL,
-			token.BY_KEYWORD,
-			token.NUM_LITERAL,
-			token.DO_KEYWORD,
-			token.LPAREN,
-			token.IDENTIFIER,
-			token.RPAREN,
-			token.LCURLY,
-			token.IDENTIFIER,
-			token.LPAREN,
-			token.IDENTIFIER,
-			token.RPAREN,
-			token.RCURLY,
+			token.NUM_LITERAL, token.RANGE, token.NUM_LITERAL,
+			token.BY_KEYWORD, token.NUM_LITERAL, token.DO_KEYWORD,
+			token.LPAREN, token.IDENTIFIER, token.RPAREN,
+			token.LCURLY, token.IDENTIFIER, token.LPAREN,
+			token.IDENTIFIER, token.RPAREN, token.RCURLY,
 		},
 	},
 	{
 		`this.func_call() /* comment /*****/`,
 		[]token.Token_Type{
-			token.THIS_KEYWORD,
-			token.PERIOD,
-			token.IDENTIFIER,
-			token.LPAREN,
-			token.RPAREN,
-			token.MULTILINE_COMMENT,
+			token.THIS_KEYWORD, token.PERIOD, token.IDENTIFIER,
+			token.LPAREN, token.RPAREN, token.MULTILINE_COMMENT,
+		},
+	},
+	{
+		`new(a,b){
+       this.super()
+       this.c = a ? (a | b) : (b & a);
+     }`,
+		[]token.Token_Type{
+			token.IDENTIFIER, //should change to NEW_KEYWORD
+			token.LPAREN, token.IDENTIFIER, token.COMMA,
+			token.IDENTIFIER, token.RPAREN, token.LCURLY,
+			token.THIS_KEYWORD, token.PERIOD, token.SUPER_KEYWORD,
+			token.LPAREN, token.RPAREN, token.THIS_KEYWORD,
+			token.PERIOD, token.IDENTIFIER, token.ASSIGN,
+			token.IDENTIFIER, token.QUESTION, token.LPAREN,
+			token.IDENTIFIER, token.BIT_OR, token.IDENTIFIER,
+			token.RPAREN, token.COLON, token.LPAREN,
+			token.IDENTIFIER, token.BIT_AND, token.IDENTIFIER,
+			token.RPAREN, token.SEMICOLON, token.RCURLY,
+		},
+	},
+	{
+		`f(){
+       return a * b + c / d - e % f
+     }`,
+		[]token.Token_Type{
+			token.IDENTIFIER, token.LPAREN, token.RPAREN,
+			token.LCURLY, token.RETURN_KEYWORD, token.IDENTIFIER,
+			token.MULT_OP, token.IDENTIFIER, token.ADD_OP,
+			token.IDENTIFIER, token.DIV_OP, token.IDENTIFIER,
+			token.MIN_OP, token.IDENTIFIER, token.MOD_OP,
+			token.IDENTIFIER, token.RCURLY,
+		},
+	},
+	{
+		`((a++)--)**1 == b || c && d`,
+		[]token.Token_Type{
+			token.LPAREN, token.LPAREN, token.IDENTIFIER,
+			token.INCREMENT, token.RPAREN, token.DECREMENT,
+			token.RPAREN, token.POWER_OP, token.NUM_LITERAL,
+			token.EQUAL, token.IDENTIFIER, token.OR,
+			token.IDENTIFIER, token.AND, token.IDENTIFIER,
 		},
 	},
 }
