@@ -200,7 +200,7 @@ func (this *Scanner) pipe_token() *token.Token {
 		}
 
 		if char == token.ASSIGN_LIT {
-			return token.New(token.OR_EQUAL_LIT, token.OR_EQUAL, this.line_num, this.col_num)
+			return token.New(token.OR_EQ_LIT, token.OR_EQ, this.line_num, this.col_num)
 		}
 
 		this.rewind()

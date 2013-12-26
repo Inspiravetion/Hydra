@@ -107,7 +107,7 @@ var indiv_test_data_pairs = []token_pair{
 	{"||", token.OR},
 	{"&&", token.AND},
 	{"..", token.RANGE},
-	{"|=", token.OR_EQUAL},
+	{"|=", token.OR_EQ},
 	{"<<", token.LSHOVEL},
 	{">>", token.RSHOVEL},
 	{"{", token.LCURLY},
@@ -188,6 +188,39 @@ var mocks = []mock_input{
 			token.IDENTIFIER, token.AND, token.IDENTIFIER,
 		},
 	},
+	{
+		`return (a += 2, b *= 2, c -= 2, d /= 2, e %= 2)`,
+		[]token.Token_Type{
+			token.RETURN_KEYWORD, token.LPAREN, token.IDENTIFIER,
+			token.PLUS_EQ, token.NUM_LITERAL, token.COMMA,
+			token.IDENTIFIER, token.TIMES_EQ, token.NUM_LITERAL,
+			token.COMMA, token.IDENTIFIER, token.MIN_EQ,
+			token.NUM_LITERAL, token.COMMA, token.IDENTIFIER,
+			token.DIV_EQ, token.NUM_LITERAL, token.COMMA,
+			token.IDENTIFIER, token.MOD_EQ, token.NUM_LITERAL,
+			token.RPAREN,
+		},
+	},
+	{
+		`a[1] |= (<< my_chan) >> 2`,
+		[]token.Token_Type{
+			token.IDENTIFIER, token.LBRACKET, token.NUM_LITERAL,
+			token.RBRACKET, token.OR_EQ, token.LPAREN,
+			token.LSHOVEL, token.IDENTIFIER, token.RPAREN,
+			token.RSHOVEL, token.NUM_LITERAL,
+		},
+	},
+	{
+		`return a < b || b > c || c <= d || d >= e`,
+		[]token.Token_Type{
+			token.RETURN_KEYWORD, token.IDENTIFIER, token.LESS_THAN,
+			token.IDENTIFIER, token.OR, token.IDENTIFIER,
+			token.GREATER_THAN, token.IDENTIFIER, token.OR,
+			token.IDENTIFIER, token.LESS_THAN_EQ, token.IDENTIFIER,
+			token.OR, token.IDENTIFIER, token.GREATER_THAN_EQ,
+			token.IDENTIFIER,
+		},
+	},
 }
 
 // Test Suite
@@ -256,7 +289,9 @@ var _ = Describe("Scanner", func() {
 					i++
 				}
 
-				Expect(i).To(Equal(len(mock.correct_tokens)))
+				It("should produce all of the tokens in the given input", func() {
+					Expect(i).To(Equal(len(mock.correct_tokens)))
+				})
 
 			})
 

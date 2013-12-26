@@ -30,7 +30,7 @@ const (
 	OR_LIT                      = "||"
 	AND_LIT                     = "&&"
 	RANGE_LIT                   = ".."
-	OR_EQUAL_LIT                = "|="
+	OR_EQ_LIT                   = "|="
 	LSHOVEL_LIT                 = "<<"
 	RSHOVEL_LIT                 = ">>"
 	LCURLY_LIT                  = "{"

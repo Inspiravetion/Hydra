@@ -44,7 +44,7 @@ const (
 	OR                                   // '||'
 	AND                                  // '&&'
 	RANGE                                // '..'
-	OR_EQUAL                             // '|='
+	OR_EQ                                // '|='
 	LSHOVEL                              // '<<'
 	RSHOVEL                              // '>>'
 	LCURLY                               // '{'
@@ -194,8 +194,8 @@ func (this Token_Type) String() string {
 		return "OR"
 	case AND:
 		return "AND"
-	case OR_EQUAL:
-		return "OR_EQUAL"
+	case OR_EQ:
+		return "OR_EQ"
 	case LSHOVEL:
 		return "LSHOVEL"
 	case RSHOVEL:
