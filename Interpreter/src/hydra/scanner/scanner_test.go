@@ -23,14 +23,6 @@ func bound_mock_input_range(col []mock_input, iter func(data mock_input)) {
 	}
 }
 
-type Collection []interface{}
-
-func bound_range(col Collection, iter func(data interface{})) {
-	for _, val := range col {
-		iter(val)
-	}
-}
-
 // Individual Token Test Setup
 //==============================================================================
 
