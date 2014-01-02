@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "hydra/scanner"
 	"hydra/scanner/token"
+	"hydra/util"
 )
 
 //Helper functions
@@ -255,7 +256,9 @@ var _ = Describe("Scanner", func() {
 
 	Describe("Individual Token Tests", func() {
 
-		bound_token_pair_range(indiv_test_data_pairs, func(test_data token_pair) {
+		util.For_Each(indiv_test_data_pairs, func(data interface{}) {
+
+			test_data, _ := data.(token_pair)
 
 			It("should produce a/an '"+test_data.literal+"' token", func() {
 				scanner := New(STRING, test_data.literal)
@@ -268,7 +271,9 @@ var _ = Describe("Scanner", func() {
 
 	Describe("Real World Token Tests", func() {
 
-		bound_mock_input_range(mocks, func(mock mock_input) {
+		util.For_Each(mocks, func(data interface{}) {
+
+			mock, _ := data.(mock_input)
 
 			It("should produce all of the correct tokens for the string "+mock.expr, func() {
 				scanner := New(STRING, mock.expr)

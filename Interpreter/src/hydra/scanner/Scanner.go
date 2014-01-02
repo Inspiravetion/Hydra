@@ -2,8 +2,9 @@ package scanner
 
 import (
 	"bytes"
-	"hydra/err"
+	"fmt"
 	"hydra/scanner/token"
+	"hydra/util"
 	"io"
 	"os"
 	"unicode"
@@ -40,6 +41,13 @@ func isAlnum(r rune) bool {
 func to_rune(str string) rune {
 	r, _ := utf8.DecodeRuneInString(str)
 	return r
+}
+
+//Errors
+//==============================================================================
+
+func Unknown_Char_Err(char string) string {
+	return fmt.Sprint("Scanner encounted unknown character '%s'", char)
 }
 
 //Scanner
@@ -655,7 +663,7 @@ func (this *Scanner) get_next_token() *token.Token {
 			return this.identifier_or_keyword(r)
 		}
 
-		err.Throw(err.UNKNOWN_CHARACTER, curr_char)
+		util.Throw(Unknown_Char_Err(curr_char))
 	}
 
 	return nil //EOF

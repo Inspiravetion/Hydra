@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 
-`cd ../Interpreter`
 curr_dir = `pwd`
 
 cmd = "export GOPATH=#{curr_dir}"
 
+puts "cmd: " + cmd
+
 if system(cmd) then
-    build_cmd = "go build ../playground/#{ARGV[0]}.go"
+    build_cmd = "go build #{ARGV[0]}.go"
     puts(system(build_cmd) ? "successful build...": "unsucessful build...")
 else
     puts "couldnt set gopath..."
