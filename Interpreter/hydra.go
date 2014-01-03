@@ -29,4 +29,8 @@ func main() {
 	util.Log("Hello from the logger")
 	util.Debug("Debugging string")
 	util.Error("AWWWW SHIZNIT")
+
+	util.Logf("%s : %d", "asdfasdf", 546)
+	util.Debugf("%s : %d", "asdfasdf", 546)
+	util.Errorf("%s : %d", "asdfasdf", 546)
 }

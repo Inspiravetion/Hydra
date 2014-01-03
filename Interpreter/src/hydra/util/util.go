@@ -24,12 +24,24 @@ func Log(info string) {
 	logger.Print(logger.Info_Stream, info)
 }
 
+func Logf(format string, args ...interface{}) {
+	logger.Printf(logger.Info_Stream, format, args...)
+}
+
 func Debug(info string) {
 	logger.Print(logger.Debug_Stream, info)
 }
 
+func Debugf(format string, args ...interface{}) {
+	logger.Printf(logger.Debug_Stream, format, args...)
+}
+
 func Error(info string) {
 	logger.Print(logger.Err_Stream, info)
+}
+
+func Errorf(format string, args ...interface{}) {
+	logger.Printf(logger.Err_Stream, format, args...)
 }
 
 func For_Each(container interface{}, iter func(interface{})) {

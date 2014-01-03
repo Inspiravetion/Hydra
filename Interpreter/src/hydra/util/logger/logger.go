@@ -37,3 +37,14 @@ func Print(out_stream *log.Logger, info string) {
 		out_stream.Println(header, info)
 	}
 }
+
+func Printf(out_stream *log.Logger, format string, args ...interface{}) {
+	_, file, line, ok := runtime.Caller(2)
+
+	if ok {
+		header := format_header(file, line)
+		info := fmt.Sprintf(format, args...)
+
+		out_stream.Println(header, info)
+	}
+}
