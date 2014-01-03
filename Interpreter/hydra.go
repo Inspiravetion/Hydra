@@ -33,4 +33,8 @@ func main() {
 	util.Logf("%s : %d", "asdfasdf", 546)
 	util.Debugf("%s : %d", "asdfasdf", 546)
 	util.Errorf("%s : %d", "asdfasdf", 546)
+
+	util.For_Each("dfg", func(data interface{}) {
+
+	})
 }

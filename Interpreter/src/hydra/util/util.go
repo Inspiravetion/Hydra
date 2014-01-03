@@ -70,5 +70,12 @@ func For_Each(container interface{}, iter func(interface{})) {
 		return
 	}
 
-	//throw something here
+	Throw(Unknown_Container_Err("util.For_Each"))
+}
+
+//Errors
+//==============================================================================
+
+func Unknown_Container_Err(fn string) string {
+	return "Passed '" + fn + "' something that is not a container"
 }
