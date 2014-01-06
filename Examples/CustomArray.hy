@@ -2,17 +2,38 @@ module Custom_BuiltIns
 
 class CustomArray extends Array
 
-  operator /[(\d+)]\s*=\s*(\w+)/ = set($0, $1) end             //cusArr[0] = 2
+  operator [] do //cusArr[0] = 2
+    type : 'circumfix'
+    assigmnent : true
+    action : (index, newval){
+      this.set(index, newval)
+    }
+  end
 
-  operator /[(\d+)]/             = get($0) end                 //cusArr[3]
+  operator [] do //cusArr[3]
+    type : 'circumfix'
+    action : (index){
+      return this.get(index)
+    }
+  end
 
-  operator /[(\d+):(\d+)]/       = subset($0, $1) end          //cusArr[2:5]
-
-  operator /[(\d+):]/            = subset($0, this.length) end //cusArr[2:]
-
-  operator /[:(\d+)]/            = subset(0, $0) end           //cusArr[:5]
-
-  operator /[:]/                 = copy() end                  //cusArr[:]
+  operator [] do //cusArr[2:5], cusArr[2:], cusArr[:5], cusArr[:]
+    type : 'circumfix'
+    delim : ':'
+    argc : 2 //if this is positive then the delimited args will be positional and thus they
+             //will get passed into the action function in their given order
+    action : (first, last){
+      if first and last then 
+        return this.subset(first, last)
+      else if first then
+        return this.subset(first)
+      else if last then
+        return this.subset(0, last)
+      else
+        return this.copy()
+      end
+    }
+  end
 
   function new(){
     super(this);

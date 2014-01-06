@@ -35,6 +35,12 @@ func main() {
 	util.Errorf("%s : %d", "asdfasdf", 546)
 
 	util.For_Each("dfg", func(data interface{}) {
+		str, ok := data.(string)
 
+		if !ok {
+			util.Error("not a string!")
+		}
+
+		util.Log(str)
 	})
 }
