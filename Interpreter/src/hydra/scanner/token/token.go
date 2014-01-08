@@ -27,9 +27,9 @@ const (
 	MULT_OP                              // '*'
 	DIV_OP                               // '/'
 	MOD_OP                               // '%'
+	POWER_OP                             // '^'
 	INCREMENT                            // '++'
 	DECREMENT                            // '--'
-	POWER_OP                             // '**'
 	LESS_THAN                            // '<'
 	GREATER_THAN                         // '>'
 	ASSIGN                               // '='
@@ -41,10 +41,13 @@ const (
 	TIMES_EQ                             // '*='
 	DIV_EQ                               // '/='
 	MOD_EQ                               // '%='
+	POWER_EQ                             // '^='
+	BIT_OR_EQ                            // '|='
+	OR_EQ                                // '||='
+	BIT_AND_EQ                           // '&='
 	OR                                   // '||'
 	AND                                  // '&&'
 	RANGE                                // '..'
-	OR_EQ                                // '|='
 	LSHOVEL                              // '<<'
 	RSHOVEL                              // '>>'
 	LCURLY                               // '{'
@@ -127,7 +130,7 @@ var KeywordMap = map[string]Token_Type{
 }
 
 func New(val string, class Token_Type, line int, col int) *Token {
-	return &Token{line, col - len(val), val, class}
+	return &Token{line, col, val, class}
 }
 
 func (this *Token) String() string {
@@ -168,6 +171,8 @@ func (this Token_Type) String() string {
 		return "DECREMENT"
 	case POWER_OP:
 		return "POWER_OP"
+	case POWER_EQ:
+		return "POWER_EQ"
 	case LESS_THAN:
 		return "LESS_THAN"
 	case GREATER_THAN:
@@ -196,6 +201,10 @@ func (this Token_Type) String() string {
 		return "AND"
 	case OR_EQ:
 		return "OR_EQ"
+	case BIT_OR_EQ:
+		return "BIT_OR_EQ"
+	case BIT_AND_EQ:
+		return "BIT_AND_EQ"
 	case LSHOVEL:
 		return "LSHOVEL"
 	case RSHOVEL:

@@ -15,7 +15,7 @@ AnonFuncDef => '(' OpIdentList ')' '{' Stmts '}'
 //private generator function asdaf(a,b,c){ return a + b * c }
 TLFuncDef   => FuncDecor 'function' Ident '(' OpIdentList ')' '{' Stmts '}'
 
-//any permutation of 'private generator'
+//'private generator', 'private', or 'generator'
 FuncDecor   => PrivFuncDec GenFuncDec
 
 //private or empty
@@ -38,5 +38,16 @@ IdentList   => Ident IdentList!
 IdentList!  => ',' IdentList
             |  empty
 
+//1234 57 9 
+IntLit      => [0-9]+
+
+//9087.0 98786.886
+FloatLit    => IntLit '.' IntLit
+
+//0xDeAdB33f
+HexLit      => '0' ('x' | 'X') HexDigit+
+HexDigit    => [0-9a-fA-F]
+
+StringLit   => '"' [^"]* '"' | "'" [^']* "'"  //"'
 
 Todo: Stmts, FuncCall
