@@ -226,22 +226,9 @@ func (this *Scanner) ampersand_token() *token.Token {
 }
 
 func (this *Scanner) or_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.OR_EQ_LIT, token.OR_EQ)
-		}
-
-		this.rewind()
-		return this.tok(token.OR_LIT, token.OR)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.OR_LIT, token.OR)
-		}
-
-		return nil
-	}
+	return this.default_or_assign_token(
+		token.OR_LIT, token.OR, token.OR_EQ_LIT, token.OR_EQ,
+	)
 }
 
 func (this *Scanner) pipe_token() *token.Token {
@@ -268,22 +255,9 @@ func (this *Scanner) pipe_token() *token.Token {
 }
 
 func (this *Scanner) equal_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.EQUAL_LIT, token.EQUAL)
-		}
-
-		this.rewind()
-		return this.tok(token.ASSIGN_LIT, token.ASSIGN)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.ASSIGN_LIT, token.ASSIGN)
-		}
-
-		return nil
-	}
+	return this.default_or_assign_token(
+		token.ASSIGN_LIT, token.ASSIGN, token.EQUAL_LIT, token.EQUAL,
+	)
 }
 
 func (this *Scanner) plus_token() *token.Token {
@@ -333,22 +307,9 @@ func (this *Scanner) minus_token() *token.Token {
 }
 
 func (this *Scanner) mult_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.TIMES_EQ_LIT, token.TIMES_EQ)
-		}
-
-		this.rewind()
-		return this.tok(token.MULT_OP_LIT, token.MULT_OP)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.MULT_OP_LIT, token.MULT_OP)
-		}
-
-		return nil
-	}
+	return this.default_or_assign_token(
+		token.MULT_OP_LIT, token.MULT_OP, token.TIMES_EQ_LIT, token.TIMES_EQ,
+	)
 }
 
 func (this *Scanner) div_token() *token.Token {
@@ -384,38 +345,31 @@ func (this *Scanner) div_token() *token.Token {
 }
 
 func (this *Scanner) mod_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.MOD_EQ_LIT, token.MOD_EQ)
-		}
-
-		this.rewind()
-		return this.tok(token.MOD_OP_LIT, token.MOD_OP)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.MOD_OP_LIT, token.MOD_OP)
-		}
-
-		return nil
-	}
+	return this.default_or_assign_token(
+		token.MOD_OP_LIT, token.MOD_OP, token.MOD_EQ_LIT, token.MOD_EQ,
+	)
 }
 
-//TODO refactor out this senseless code duplication
 func (this *Scanner) power_token() *token.Token {
+	return this.default_or_assign_token(
+		token.POWER_OP_LIT, token.POWER_OP, token.POWER_EQ_LIT, token.POWER_EQ,
+	)
+}
+
+func (this *Scanner) default_or_assign_token(def_lit string, def_type token.Token_Type,
+	ass_lit string, ass_type token.Token_Type) *token.Token {
 
 	if char, err := this.get_next_char(); err == nil {
 		if char == token.ASSIGN_LIT {
-			return this.tok(token.POWER_EQ_LIT, token.POWER_EQ)
+			return this.tok(ass_lit, ass_type)
 		}
 
 		this.rewind()
-		return this.tok(token.POWER_OP_LIT, token.POWER_OP)
+		return this.tok(def_lit, def_type)
 	} else {
 
 		if err == io.EOF {
-			return this.tok(token.POWER_OP_LIT, token.POWER_OP)
+			return this.tok(def_lit, def_type)
 		}
 
 		return nil
@@ -434,7 +388,7 @@ func (this *Scanner) string_literal_token(quote_char string) *token.Token {
 				return this.tok(buffer.String(), token.STRING_LITERAL)
 			}
 		} else {
-			//think about throwing error here for unfinished string
+			//think about throwing error here for unfinished string TODO
 			return nil
 		}
 	}

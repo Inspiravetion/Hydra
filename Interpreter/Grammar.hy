@@ -48,6 +48,8 @@ FloatLit    => IntLit '.' IntLit
 HexLit      => '0' ('x' | 'X') HexDigit+
 HexDigit    => [0-9a-fA-F]
 
-StringLit   => '"' [^"]* '"' | "'" [^']* "'"  //"'
+StringLit   => '"' [^"]* '"' | "'" [^']* "'"  //"' <- for syntax highliting sanity
 
+//Operators
+//'&' '|' '+' '-' '*' '/' '%' '^' '++' '--' '<' '>' '=' '<=' '>=' '==' '+=' '-=' '*=' '/=' '%=' '^=' '|=' '||=' '&=' '||' '&&' '..' '<<' '>>' 
 Todo: Stmts, FuncCall
