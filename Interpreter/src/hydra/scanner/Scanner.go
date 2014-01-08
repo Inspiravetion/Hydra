@@ -160,78 +160,118 @@ func (this *Scanner) rewind() {
 	this.buff_pos--
 }
 
-func (this *Scanner) less_than_token() *token.Token {
+func (this *Scanner) three_tier_token(def_lit string, def_type token.Token_Type,
+	ass_lit string, ass_type token.Token_Type,
+	double_lit string, double_type token.Token_Type) *token.Token {
 
 	if char, err := this.get_next_char(); err == nil {
 		if char == token.ASSIGN_LIT {
-			return this.tok(token.LESS_THAN_EQ_LIT, token.LESS_THAN_EQ)
+			return this.tok(ass_lit, ass_type)
 		}
 
-		if char == token.LESS_THAN_LIT {
-			return this.tok(token.LSHOVEL_LIT, token.LSHOVEL)
+		if char == def_lit {
+			return this.tok(double_lit, double_type)
 		}
 
 		this.rewind()
-		return this.tok(token.LESS_THAN_LIT, token.LESS_THAN)
+		return this.tok(def_lit, def_type)
 	} else {
 
 		if err == io.EOF {
-			return this.tok(token.LESS_THAN_LIT, token.LESS_THAN)
+			return this.tok(def_lit, def_type)
 		}
 
 		return nil
 	}
+}
+
+func (this *Scanner) default_or_assign_token(def_lit string, def_type token.Token_Type,
+	ass_lit string, ass_type token.Token_Type) *token.Token {
+
+	if char, err := this.get_next_char(); err == nil {
+		if char == token.ASSIGN_LIT {
+			return this.tok(ass_lit, ass_type)
+		}
+
+		this.rewind()
+		return this.tok(def_lit, def_type)
+	} else {
+
+		if err == io.EOF {
+			return this.tok(def_lit, def_type)
+		}
+
+		return nil
+	}
+}
+
+func (this *Scanner) plus_token() *token.Token {
+	return this.three_tier_token(
+		token.ADD_OP_LIT, token.ADD_OP,
+		token.PLUS_EQ_LIT, token.PLUS_EQ,
+		token.INCREMENT_LIT, token.INCREMENT,
+	)
+}
+
+func (this *Scanner) minus_token() *token.Token {
+	return this.three_tier_token(
+		token.MIN_OP_LIT, token.MIN_OP,
+		token.MIN_EQ_LIT, token.MIN_EQ,
+		token.DECREMENT_LIT, token.DECREMENT,
+	)
+}
+
+func (this *Scanner) less_than_token() *token.Token {
+	return this.three_tier_token(
+		token.LESS_THAN_LIT, token.LESS_THAN,
+		token.LESS_THAN_EQ_LIT, token.LESS_THAN_EQ,
+		token.LSHOVEL_LIT, token.LSHOVEL,
+	)
 }
 
 func (this *Scanner) greater_than_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.GREATER_THAN_EQ_LIT, token.GREATER_THAN_EQ)
-		}
-
-		if char == token.GREATER_THAN_LIT {
-			return this.tok(token.RSHOVEL_LIT, token.RSHOVEL)
-		}
-
-		this.rewind()
-		return this.tok(token.GREATER_THAN_LIT, token.GREATER_THAN)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.GREATER_THAN_LIT, token.GREATER_THAN)
-		}
-
-		return nil
-	}
+	return this.three_tier_token(
+		token.GREATER_THAN_LIT, token.GREATER_THAN,
+		token.GREATER_THAN_EQ_LIT, token.GREATER_THAN_EQ,
+		token.RSHOVEL_LIT, token.RSHOVEL,
+	)
 }
 
 func (this *Scanner) ampersand_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.BIT_AND_LIT {
-			return this.tok(token.AND_LIT, token.AND)
-		}
-
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.BIT_AND_EQ_LIT, token.BIT_AND_EQ)
-		}
-
-		this.rewind()
-		return this.tok(token.BIT_AND_LIT, token.BIT_AND)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.BIT_AND_LIT, token.BIT_AND)
-		}
-
-		return nil
-	}
+	return this.three_tier_token(
+		token.BIT_AND_LIT, token.BIT_AND,
+		token.BIT_AND_EQ_LIT, token.BIT_AND_EQ,
+		token.AND_LIT, token.AND,
+	)
 }
 
 func (this *Scanner) or_token() *token.Token {
 	return this.default_or_assign_token(
 		token.OR_LIT, token.OR, token.OR_EQ_LIT, token.OR_EQ,
+	)
+}
+
+func (this *Scanner) mult_token() *token.Token {
+	return this.default_or_assign_token(
+		token.MULT_OP_LIT, token.MULT_OP, token.TIMES_EQ_LIT, token.TIMES_EQ,
+	)
+}
+
+func (this *Scanner) mod_token() *token.Token {
+	return this.default_or_assign_token(
+		token.MOD_OP_LIT, token.MOD_OP, token.MOD_EQ_LIT, token.MOD_EQ,
+	)
+}
+
+func (this *Scanner) power_token() *token.Token {
+	return this.default_or_assign_token(
+		token.POWER_OP_LIT, token.POWER_OP, token.POWER_EQ_LIT, token.POWER_EQ,
+	)
+}
+
+func (this *Scanner) equal_token() *token.Token {
+	return this.default_or_assign_token(
+		token.ASSIGN_LIT, token.ASSIGN, token.EQUAL_LIT, token.EQUAL,
 	)
 }
 
@@ -256,64 +296,6 @@ func (this *Scanner) pipe_token() *token.Token {
 
 		return nil
 	}
-}
-
-func (this *Scanner) equal_token() *token.Token {
-	return this.default_or_assign_token(
-		token.ASSIGN_LIT, token.ASSIGN, token.EQUAL_LIT, token.EQUAL,
-	)
-}
-
-func (this *Scanner) plus_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.PLUS_EQ_LIT, token.PLUS_EQ)
-		}
-
-		if char == token.ADD_OP_LIT {
-			return this.tok(token.INCREMENT_LIT, token.INCREMENT)
-		}
-
-		this.rewind()
-		return this.tok(token.ADD_OP_LIT, token.ADD_OP)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.ADD_OP_LIT, token.ADD_OP)
-		}
-
-		return nil
-	}
-}
-
-func (this *Scanner) minus_token() *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(token.MIN_EQ_LIT, token.MIN_EQ)
-		}
-
-		if char == token.MIN_OP_LIT {
-			return this.tok(token.DECREMENT_LIT, token.DECREMENT)
-		}
-
-		this.rewind()
-		return this.tok(token.MIN_OP_LIT, token.MIN_OP)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(token.MIN_OP_LIT, token.MIN_OP)
-		}
-
-		return nil
-	}
-}
-
-func (this *Scanner) mult_token() *token.Token {
-	return this.default_or_assign_token(
-		token.MULT_OP_LIT, token.MULT_OP, token.TIMES_EQ_LIT, token.TIMES_EQ,
-	)
 }
 
 func (this *Scanner) div_token() *token.Token {
@@ -342,38 +324,6 @@ func (this *Scanner) div_token() *token.Token {
 
 		if err == io.EOF {
 			return this.tok(token.DIV_OP_LIT, token.DIV_OP)
-		}
-
-		return nil
-	}
-}
-
-func (this *Scanner) mod_token() *token.Token {
-	return this.default_or_assign_token(
-		token.MOD_OP_LIT, token.MOD_OP, token.MOD_EQ_LIT, token.MOD_EQ,
-	)
-}
-
-func (this *Scanner) power_token() *token.Token {
-	return this.default_or_assign_token(
-		token.POWER_OP_LIT, token.POWER_OP, token.POWER_EQ_LIT, token.POWER_EQ,
-	)
-}
-
-func (this *Scanner) default_or_assign_token(def_lit string, def_type token.Token_Type,
-	ass_lit string, ass_type token.Token_Type) *token.Token {
-
-	if char, err := this.get_next_char(); err == nil {
-		if char == token.ASSIGN_LIT {
-			return this.tok(ass_lit, ass_type)
-		}
-
-		this.rewind()
-		return this.tok(def_lit, def_type)
-	} else {
-
-		if err == io.EOF {
-			return this.tok(def_lit, def_type)
 		}
 
 		return nil
