@@ -71,6 +71,10 @@ func Unterminated_Comment_Err(line, col int) string {
 	return fmt.Sprintf("Comment starting at line: %d and column: %d is never terminated", line, col)
 }
 
+func Unterminated_String_Err(line, col int) string {
+	return fmt.Sprintf("String starting at line: %d and column: %d is never terminated", line, col)
+}
+
 //Scanner
 //==============================================================================
 
@@ -381,6 +385,8 @@ func (this *Scanner) string_literal_token(quote_char string) *token.Token {
 
 	buffer.WriteString(quote_char)
 
+	line, col := this.line_num, this.col_num-len(quote_char)
+
 	for {
 		if char, err := this.get_next_char(); err == nil {
 			buffer.WriteString(char)
@@ -388,8 +394,7 @@ func (this *Scanner) string_literal_token(quote_char string) *token.Token {
 				return this.tok(buffer.String(), token.STRING_LITERAL)
 			}
 		} else {
-			//think about throwing error here for unfinished string TODO
-			return nil
+			util.Throw(Unterminated_String_Err(line, col))
 		}
 	}
 }
