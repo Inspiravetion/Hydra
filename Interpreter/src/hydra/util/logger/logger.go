@@ -22,7 +22,12 @@ var (
 	Err_Stream   = log.New(os.Stdout, err_color_dark+"ERROR:", 0)
 )
 
-func format_header(file_path string, line int) string {
+func format_header(out_stream *log.Logger, file_path string, line int) string {
+
+	if out_stream == Info_Stream {
+		return color_stop
+	}
+
 	path_arr := strings.Split(file_path, "/")
 	file := path_arr[len(path_arr)-1]
 
@@ -33,7 +38,7 @@ func Print(out_stream *log.Logger, info string) {
 	_, file, line, ok := runtime.Caller(2)
 
 	if ok {
-		header := format_header(file, line)
+		header := format_header(out_stream, file, line)
 		out_stream.Println(header, info)
 	}
 }
@@ -42,7 +47,7 @@ func Printf(out_stream *log.Logger, format string, args ...interface{}) {
 	_, file, line, ok := runtime.Caller(2)
 
 	if ok {
-		header := format_header(file, line)
+		header := format_header(out_stream, file, line)
 		info := fmt.Sprintf(format, args...)
 
 		out_stream.Println(header, info)

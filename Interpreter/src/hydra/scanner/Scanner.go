@@ -60,7 +60,7 @@ func (this *Scanner) tok(tok_lit string, tok_type token.Token_Type, pos ...int) 
 //==============================================================================
 
 func Unknown_Char_Err(char string) string {
-	return fmt.Sprint("Scanner encounted unknown character '%s'", char)
+	return fmt.Sprintf("Scanner encounted unknown character '%s'", char)
 }
 
 func Rune_Conv_Err(r string) string {
@@ -363,12 +363,12 @@ func (this *Scanner) div_token() *token.Token {
 
 		if char == token.DIV_OP_LIT {
 			//messes up line number and sturf
-			return this.single_line_comment(line, col)
+			return this.single_line_comment(line, col-len(token.SINGLELINE_COMMENT_LIT))
 		}
 
 		if char == token.MULT_OP_LIT {
 			//messes up line number and sturf
-			return this.multi_line_comment(line, col)
+			return this.multi_line_comment(line, col-len(token.MULTILINE_COMMENT_START_LIT))
 		}
 
 		this.rewind()
