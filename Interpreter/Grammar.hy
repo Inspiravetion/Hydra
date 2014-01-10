@@ -2,9 +2,36 @@
 Expr        => '(' Expr ')'
             |  FuncCall
             |  Ident
+            | //literals TODO
+            |  empty
 
-// a = b or funcCallA().field = funcCallb()
-Assmt       => Expr '=' Expr
+// 'a, b, c, this.get("key")'
+ExprList    => Expr ExprList!
+ExprList!   => ',' ExprList
+            |  empty
+// 'return x' , 'a++', 'b--', 'c += 7' etc
+Stmt        => SimpleStmt | ReturnStmt | SpawnStmt //...more to come
+
+// 'a++; b--; c ^= 2'
+Stmts       => Stmt Stmts!
+Stmts!      => (';' | '\n') Stmts
+            |  empty
+
+ReturnStmt  => 'return' Expr
+
+SpawnStmt   => 'spawn' //figure out exact spawnable function syntax TODO
+
+// '++' '--' '+=' '-=' '*=' '/=' '%=' '^=' '|=' '||=' '&=' '<<=' '>>='
+SimpleStmt  => IncDecStmt | AssignStmt
+
+// 'a++'
+IncDecStmt  => Expr ( '++' | '--' )
+
+// 'a, b, c = d, e, funccall()' or funcCallA().field = funcCallb()
+AssignStmt  => ExprList AssignOp ExprList
+
+// '+=' , '<<=', '||='
+AssignOp    => [ AddOp | MulOp | OrOp ] '='
 
 //class myClass extends Array, EventEmitter
 ClassDef    => 'class' Ident ('extends' IdentList)? Stmts 'end'
@@ -51,5 +78,15 @@ HexDigit    => [0-9a-fA-F]
 StringLit   => '"' [^"]* '"' | "'" [^']* "'"  //"' <- for syntax highliting sanity
 
 //Operators
-//'&' '|' '+' '-' '*' '/' '%' '^' '++' '--' '<' '>' '=' '<=' '>=' '==' '+=' '-=' '*=' '/=' '%=' '^=' '|=' '||=' '&=' '||' '&&' '..' '<<' '>>' 
+//'&' '|' '+' '-' '*' '/' '%' '^' '<' '>' '=' '<=' '>=' '==' '||' '&&' '..' '<<' '>>' 
+InfixOps    => MulOp
+            |  AddOp 
+            |  '==' | '!=' | '<' | '<=' | '>' | '>='
+            |  '&&'
+            |  OrOp
+
+MulOp       => '*' | '/' | '^' | '%' | '<<' | '>>' | '&' | '|'
+AddOp       => '+' | '-' 
+OrOp        => '||'
+
 Todo: Stmts, FuncCall
