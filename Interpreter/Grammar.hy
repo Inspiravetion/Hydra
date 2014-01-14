@@ -2,20 +2,51 @@
 Expr        => '(' Expr ')'
             |  FuncCall
             |  Ident
-            | //literals TODO
+            |  HashLit
+            |  ArrayLit
+            |  StringLit
+            |  NumLit
+            |  ChanLit
+            |  ChanRecv
             |  empty
 
-// 'a, b, c, this.get("key")'
-ExprList    => Expr ExprList!
-ExprList!   => ',' ExprList
-            |  empty
 // 'return x' , 'a++', 'b--', 'c += 7' etc
-Stmt        => SimpleStmt | ReturnStmt | SpawnStmt //...more to come
+Stmt        => SimpleStmt 
+            |  ReturnStmt 
+            |  SpawnStmt 
+            |  ChanSndStmt//...more to come
 
-// 'a++; b--; c ^= 2'
-Stmts       => Stmt Stmts!
-Stmts!      => (';' | '\n') Stmts
-            |  empty
+//EXPRESSIONS
+//==============================================================================
+
+// <-myChan <- C
+ChanRecv    => '<-' Ident
+
+//(a, b, c){ return a + b * c }
+AnonFuncDef => '(' OpIdentList ')' '{' Stmts '}'
+
+//afa90_afa
+Ident       => [a-zA-Z]+[a-zA-Z0-9_?!]*
+
+//STATEMENTS
+//==============================================================================
+
+//class myClass extends Array, EventEmitter
+ClassDef    => 'class' Ident ('extends' IdentList)? Stmts 'end'
+
+//private generator function asdaf(a,b,c){ return a + b * c } **** WHERE WILL THIS BE ALOUD?!?!****
+TLFuncDef   => FuncDecor 'function' Ident '(' OpIdentList ')' '{' Stmts '}'
+
+//'private generator', 'private', or 'generator'
+FuncDecor   => PrivFuncDec GenFuncDec
+
+//private or empty
+PrivFuncDec => 'private'
+PrivFuncDec |  empty
+
+//generator or empty
+GenFuncDec  => 'generator'
+GenFuncDec  |  empty
 
 ReturnStmt  => 'return' Expr
 
@@ -33,28 +64,11 @@ AssignStmt  => ExprList AssignOp ExprList
 // '+=' , '<<=', '||='
 AssignOp    => [ AddOp | MulOp | OrOp ] '='
 
-//class myClass extends Array, EventEmitter
-ClassDef    => 'class' Ident ('extends' IdentList)? Stmts 'end'
+// 1 -> myChan
+ChanSndStmt => Expr '->' Ident 
 
-//(a, b, c){ return a + b * c }
-AnonFuncDef => '(' OpIdentList ')' '{' Stmts '}'
-
-//private generator function asdaf(a,b,c){ return a + b * c }
-TLFuncDef   => FuncDecor 'function' Ident '(' OpIdentList ')' '{' Stmts '}'
-
-//'private generator', 'private', or 'generator'
-FuncDecor   => PrivFuncDec GenFuncDec
-
-//private or empty
-PrivFuncDec => 'private'
-PrivFuncDec |  empty
-
-//generator or empty
-GenFuncDec  => 'generator'
-GenFuncDec  |  empty
-
-//afa90_afa
-Ident       => [a-zA-Z]+[a-zA-Z0-9_?!]*
+//LISTS
+//==============================================================================
 
 // empty or ava, sfssf, sgss or afa34
 OpIdentList => IdentList
@@ -64,6 +78,37 @@ OpIdentList |  empty
 IdentList   => Ident IdentList!
 IdentList!  => ',' IdentList
             |  empty
+
+// 'a, b, c, this.get("key")'
+ExprList    => Expr ExprList!
+ExprList!   => ',' ExprList
+            |  empty
+
+// 'a++; b--; c ^= 2'
+Stmts       => Stmt Stmts!
+Stmts!      => (';' | '\n') Stmts
+            |  empty
+
+//LITERALS
+//==============================================================================
+
+//<--> or <-23->
+ChanLit     => '<-' Expr '->'
+
+//{}, { a : 'a', 'b' : 2, 45 : {}}
+HashLit     => '{' KeyValPrs '}'
+KeyValPrs   => KeyValPair KeyValPrs!
+            |  empty
+KeyValPrs!  => ',' KeyValPair KeyValPrs!
+            |  empty
+KeyValPair  => Expr ':' Expr
+            |  empty
+
+//[], [1,2,{}], [1,2,{}, funcCall(), (x){ return x * 2 + 1 }]
+ArrayLit    => '[' ExprList ']'
+
+//123 123.34 0xDeadBe45 
+NumLit      => IntLit | FloatLit | HexLit
 
 //1234 57 9 
 IntLit      => [0-9]+
@@ -75,9 +120,12 @@ FloatLit    => IntLit '.' IntLit
 HexLit      => '0' ('x' | 'X') HexDigit+
 HexDigit    => [0-9a-fA-F]
 
+// 'tdfg' or "redtfygu"
 StringLit   => '"' [^"]* '"' | "'" [^']* "'"  //"' <- for syntax highliting sanity
 
-//Operators
+//OPERATORS
+//==============================================================================
+
 //'&' '|' '+' '-' '*' '/' '%' '^' '<' '>' '=' '<=' '>=' '==' '||' '&&' '..' '<<' '>>' 
 InfixOps    => MulOp
             |  AddOp 
@@ -85,7 +133,9 @@ InfixOps    => MulOp
             |  '&&'
             |  OrOp
 
-MulOp       => '*' | '/' | '^' | '%' | '<<' | '>>' | '&' | '|'
+MulOp       => '*' | '/' | '^' | '%' | '&' | '|'
+            |  ShiftOp
+ShiftOp     => '<<' | '>>'
 AddOp       => '+' | '-' 
 OrOp        => '||'
 
