@@ -1,9 +1,27 @@
-module my_module
+//pkg name based on file name
 
-import abc
-import def
+import std.math //std lib prefixed with 'std'
+import pkg.some_package as sp //installed packages prefixed with 'pkg'
+import ./util/util.hy //relative/absolute paths are also exceptable
 
-export myClass
+//not exported
+priv function square(x){
+    return x * x
+}
+
+//not exported
+priv class MyPrivClass extends myClass
+
+    function new(){
+        super(defaultval1, defaultval2)
+    }
+
+end
+
+//exported
+function magnitude(vec){
+    return math.sqrt(square(vec.x) + square(vec.y))
+}
 
 /**
  * Official Documentation...
@@ -77,7 +95,7 @@ class myClass extends base, myOtherClass and myOtherOtherClass
             while num > 0 do
                 print('From Head: ' + num);
                 num--;
-                c << num; /**this will be synchronized...if it was buffered this wouldnt block until it was full*/
+                c <- num; /**this will be synchronized...if it was buffered this wouldnt block until it was full*/
             end
         }(8); /** the last function return of a group of spawned heads with a channel should close the channel so any recievers
                 * know to terminate their for in loops

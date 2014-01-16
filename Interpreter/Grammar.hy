@@ -1,17 +1,19 @@
 //Pretty much anything that can be evaluated
-Expr        => '(' Expr ')'
-            |  FuncCall
-            |  Ident
-            |  HashLit
-            |  ArrayLit
-            |  StringLit
-            |  NumLit
-            |  ChanLit
-            |  ChanRecv
-            |  empty
+Expr        => '(' Expr ')' TailAriExpr
+            |  FuncCall TailAriExpr
+            |  Ident TailAriExpr
+            |  HashLit 
+            |  ArrayLit 
+            |  StringExpr
+            |  NumLit TailAriExpr
+            |  ChanLit 
+            |  ChanRecv TailAriExpr
+            |  empty 
 
 // 'return x' , 'a++', 'b--', 'c += 7' etc
 Stmt        => SimpleStmt 
+            |  ClassDef
+            |  ImportStmt
             |  ReturnStmt 
             |  SpawnStmt 
             |  ChanSndStmt//...more to come
@@ -28,24 +30,49 @@ AnonFuncDef => '(' OpIdentList ')' '{' Stmts '}'
 //afa90_afa
 Ident       => [a-zA-Z]+[a-zA-Z0-9_?!]*
 
+// 1 + 4 << funCall() - this.field ^ 18
+TailAriExpr => ArithOp Expr
+            |  empty
+
+StringExpr  => StringLit StringTail
+StringTail  => '+' StringLit
+            | empty
+
+***MAKE SURE ALL VERSIONS OF THIS MAKE SENSE***
 //STATEMENTS
 //==============================================================================
 
+//
+ImportStmt  => 'import' ImportArgs AsStmt
+ImportArgs  => PkgPath | FilePath 
+PkgPath     => ('std' | 'pkg') DottedList!
+FilePath    => PathStrt FSlashList HyExt
+PathStrt    => './' | BackPaths | '~/'
+BackPaths   => '../' BackPaths!
+BackPaths!  => '../' BackPaths!
+            |  empty 
+HyExt       => '.hy'
+            |  empty
+AsStmt      => 'as' Ident
+            |  empty
+
 //class myClass extends Array, EventEmitter
-ClassDef    => 'class' Ident ('extends' IdentList)? Stmts 'end'
+ClassDef    => PrivDecor 'class' Ident ExtendStmt Stmts 'end'
+ExtendStmt  => 'extends' IdentList
+            | empty
 
 //private generator function asdaf(a,b,c){ return a + b * c } **** WHERE WILL THIS BE ALOUD?!?!****
 TLFuncDef   => FuncDecor 'function' Ident '(' OpIdentList ')' '{' Stmts '}'
 
 //'private generator', 'private', or 'generator'
-FuncDecor   => PrivFuncDec GenFuncDec
+FuncDecor   => PrivDecor GenFuncDec
 
 //private or empty
-PrivFuncDec => 'private'
-PrivFuncDec |  empty
+PrivDecor   => 'priv'
+            |  empty
 
 //generator or empty
-GenFuncDec  => 'generator'
+GenFuncDec  => 'gen'
 GenFuncDec  |  empty
 
 ReturnStmt  => 'return' Expr
@@ -87,6 +114,13 @@ ExprList!   => ',' ExprList
 // 'a++; b--; c ^= 2'
 Stmts       => Stmt Stmts!
 Stmts!      => (';' | '\n') Stmts
+            |  empty
+
+DottedList! => '.' Ident DottedList!
+            |  empty
+
+FSlashList  => Ident FSlashList!
+FSlashList! => '/' FSlashList
             |  empty
 
 //LITERALS
@@ -133,10 +167,13 @@ InfixOps    => MulOp
             |  '&&'
             |  OrOp
 
+ArithOp     => MulOp | AddOp | ShiftOp
+
 MulOp       => '*' | '/' | '^' | '%' | '&' | '|'
             |  ShiftOp
 ShiftOp     => '<<' | '>>'
 AddOp       => '+' | '-' 
 OrOp        => '||'
 
-Todo: Stmts, FuncCall
+Todo: Stmts, FuncCall, 
+Scanner TODO: ~ <- -> as priv gen

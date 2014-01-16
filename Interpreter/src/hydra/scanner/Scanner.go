@@ -214,19 +214,45 @@ func (this *Scanner) plus_token() *token.Token {
 }
 
 func (this *Scanner) minus_token() *token.Token {
-	return this.three_tier_token(
+	tok := this.three_tier_token(
 		token.MIN_OP_LIT, token.MIN_OP,
 		token.MIN_EQ_LIT, token.MIN_EQ,
 		token.DECREMENT_LIT, token.DECREMENT,
 	)
+
+	if tok.Class == token.MIN_OP {
+		if curr_char, char_err := this.get_next_char(); char_err == nil {
+			if curr_char == token.GREATER_THAN_LIT {
+				tok.Text = token.CHAN_SEND_LIT
+				tok.Class = token.CHAN_SEND
+				return tok
+			}
+		}
+		this.rewind()
+	}
+
+	return tok
 }
 
 func (this *Scanner) less_than_token() *token.Token {
-	return this.three_tier_token(
+	tok := this.three_tier_token(
 		token.LESS_THAN_LIT, token.LESS_THAN,
 		token.LESS_THAN_EQ_LIT, token.LESS_THAN_EQ,
 		token.LSHOVEL_LIT, token.LSHOVEL,
 	)
+
+	if tok.Class == token.LESS_THAN {
+		if curr_char, char_err := this.get_next_char(); char_err == nil {
+			if curr_char == token.MIN_OP_LIT {
+				tok.Text = token.CHAN_RECV_LIT
+				tok.Class = token.CHAN_RECV
+				return tok
+			}
+		}
+		this.rewind()
+	}
+
+	return tok
 }
 
 func (this *Scanner) greater_than_token() *token.Token {
@@ -571,6 +597,10 @@ func (this *Scanner) get_next_token() *token.Token {
 
 		if curr_char == token.RBRACKET_LIT {
 			return this.tok(token.RBRACKET_LIT, token.RBRACKET)
+		}
+
+		if curr_char == token.BIT_NEGATE_LIT {
+			return this.tok(token.BIT_NEGATE_LIT, token.BIT_NEGATE)
 		}
 
 		if curr_char == token.PERIOD_LIT {
