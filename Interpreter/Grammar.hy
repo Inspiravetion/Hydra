@@ -8,6 +8,7 @@ Expr        => '(' Expr ')' TailAriExpr
             |  NumLit TailAriExpr
             |  ChanLit 
             |  ChanRecv TailAriExpr
+            |  BitNotExp
             |  empty 
 
 // 'return x' , 'a++', 'b--', 'c += 7' etc
@@ -20,6 +21,9 @@ Stmt        => SimpleStmt
 
 //EXPRESSIONS
 //==============================================================================
+
+//~0x123fd5 ~(1 | mask)
+BitNotExp   => '~' Expr
 
 // <-myChan <- C
 ChanRecv    => '<-' Ident
@@ -34,15 +38,15 @@ Ident       => [a-zA-Z]+[a-zA-Z0-9_?!]*
 TailAriExpr => ArithOp Expr
             |  empty
 
+//"asdasdf " + '12345' 
 StringExpr  => StringLit StringTail
 StringTail  => '+' StringLit
             | empty
 
-***MAKE SURE ALL VERSIONS OF THIS MAKE SENSE***
 //STATEMENTS
 //==============================================================================
 
-//
+//import ./v1/shared/util.hy as util
 ImportStmt  => 'import' ImportArgs AsStmt
 ImportArgs  => PkgPath | FilePath 
 PkgPath     => ('std' | 'pkg') DottedList!
@@ -80,7 +84,7 @@ ReturnStmt  => 'return' Expr
 SpawnStmt   => 'spawn' //figure out exact spawnable function syntax TODO
 
 // '++' '--' '+=' '-=' '*=' '/=' '%=' '^=' '|=' '||=' '&=' '<<=' '>>='
-SimpleStmt  => IncDecStmt | AssignStmt
+SimpleStmt  => IncDecStmt | AssignStmt //THESE SHOULD ALSO BE EXP!***TODO
 
 // 'a++'
 IncDecStmt  => Expr ( '++' | '--' )
@@ -94,6 +98,10 @@ AssignOp    => [ AddOp | MulOp | OrOp ] '='
 // 1 -> myChan
 ChanSndStmt => Expr '->' Ident 
 
+OpStmt      => 'operator' OpLit 'do' OpStmtOpts 'end'
+OpLit       => (InfixOps | '[]')+
+OpStmtOpts  => Ident ':' Expr OpStmtOpts //prolly wanna make this more strict later
+            |  empty
 //LISTS
 //==============================================================================
 
@@ -169,11 +177,11 @@ InfixOps    => MulOp
 
 ArithOp     => MulOp | AddOp | ShiftOp
 
-MulOp       => '*' | '/' | '^' | '%' | '&' | '|'
+MulOp       => '*' | '/' | '^' | '%' | '&' | '|' 
             |  ShiftOp
 ShiftOp     => '<<' | '>>'
 AddOp       => '+' | '-' 
 OrOp        => '||'
 
 Todo: Stmts, FuncCall, 
-Scanner TODO: ~ <- -> as priv gen
+Scanner TODO: as 

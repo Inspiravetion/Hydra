@@ -1,5 +1,7 @@
 module Custom_BuiltIns
 
+import std.sync.WaitGroup
+
 class CustomArray extends Array
 
   operator [] do //cusArr[0] = 2
@@ -40,20 +42,16 @@ class CustomArray extends Array
   }
  
   function parallel_for_each(callback){
-    var c, done;
-    c = <<>>;
-    done = 0;
+    var wg = new WaitGroup(this.length)
 
     for i, val in this do
       spawn (){
         this[i] = callback(val);
-        c << 1;
+        wg.done();
       }
     end
 
-    while done < this.length do
-      done += << c;
-    end
+    wg.wait()
   }
 
   private function set(i, val){

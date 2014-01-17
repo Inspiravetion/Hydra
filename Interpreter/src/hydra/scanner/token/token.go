@@ -82,6 +82,7 @@ const (
 	MODULE_KEYWORD                       // 'module'
 	CLASS_KEYWORD                        // 'class'
 	IMPORT_KEYWORD                       // 'import'
+	AS_KEYWORD                           // 'as'
 	EXPORT_KEYWORD                       // 'export'
 	SUPER_KEYWORD                        // 'super'
 	THIS_KEYWORD                         // 'this'
@@ -118,6 +119,7 @@ var KeywordMap = map[string]Token_Type{
 	MODULE_KEYWORD_LIT:    MODULE_KEYWORD,
 	CLASS_KEYWORD_LIT:     CLASS_KEYWORD,
 	IMPORT_KEYWORD_LIT:    IMPORT_KEYWORD,
+	AS_KEYWORD_LIT:        AS_KEYWORD,
 	EXPORT_KEYWORD_LIT:    EXPORT_KEYWORD,
 	SUPER_KEYWORD_LIT:     SUPER_KEYWORD,
 	THIS_KEYWORD_LIT:      THIS_KEYWORD,
@@ -280,6 +282,8 @@ func (this Token_Type) String() string {
 		return "CLASS_KEYWORD"
 	case IMPORT_KEYWORD:
 		return "IMPORT_KEYWORD"
+	case AS_KEYWORD:
+		return "AS_KEYWORD"
 	case EXPORT_KEYWORD:
 		return "EXPORT_KEYWORD"
 	case SUPER_KEYWORD:

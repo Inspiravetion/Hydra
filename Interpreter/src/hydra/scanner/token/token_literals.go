@@ -70,6 +70,7 @@ const (
 	MODULE_KEYWORD_LIT          = "module"
 	CLASS_KEYWORD_LIT           = "class"
 	IMPORT_KEYWORD_LIT          = "import"
+	AS_KEYWORD_LIT              = "as"
 	EXPORT_KEYWORD_LIT          = "export"
 	SUPER_KEYWORD_LIT           = "super"
 	THIS_KEYWORD_LIT            = "this"

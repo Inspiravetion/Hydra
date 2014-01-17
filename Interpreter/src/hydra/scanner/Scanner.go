@@ -213,6 +213,22 @@ func (this *Scanner) plus_token() *token.Token {
 	)
 }
 
+func (this *Scanner) greater_than_token() *token.Token {
+	return this.three_tier_token(
+		token.GREATER_THAN_LIT, token.GREATER_THAN,
+		token.GREATER_THAN_EQ_LIT, token.GREATER_THAN_EQ,
+		token.RSHOVEL_LIT, token.RSHOVEL,
+	)
+}
+
+func (this *Scanner) ampersand_token() *token.Token {
+	return this.three_tier_token(
+		token.BIT_AND_LIT, token.BIT_AND,
+		token.BIT_AND_EQ_LIT, token.BIT_AND_EQ,
+		token.AND_LIT, token.AND,
+	)
+}
+
 func (this *Scanner) minus_token() *token.Token {
 	tok := this.three_tier_token(
 		token.MIN_OP_LIT, token.MIN_OP,
@@ -253,22 +269,6 @@ func (this *Scanner) less_than_token() *token.Token {
 	}
 
 	return tok
-}
-
-func (this *Scanner) greater_than_token() *token.Token {
-	return this.three_tier_token(
-		token.GREATER_THAN_LIT, token.GREATER_THAN,
-		token.GREATER_THAN_EQ_LIT, token.GREATER_THAN_EQ,
-		token.RSHOVEL_LIT, token.RSHOVEL,
-	)
-}
-
-func (this *Scanner) ampersand_token() *token.Token {
-	return this.three_tier_token(
-		token.BIT_AND_LIT, token.BIT_AND,
-		token.BIT_AND_EQ_LIT, token.BIT_AND_EQ,
-		token.AND_LIT, token.AND,
-	)
 }
 
 func (this *Scanner) or_token() *token.Token {
