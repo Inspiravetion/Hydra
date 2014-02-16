@@ -32,7 +32,7 @@ ChanRecv    => '<-' Ident
 AnonFuncDef => '(' OpIdentList ')' '{' Stmts '}'
 
 //afa90_afa
-Ident       => [a-zA-Z]+[a-zA-Z0-9_?!]*
+Ident       => [a-zA-Z_][a-zA-Z0-9_?!]*
 
 // 1 + 4 << funCall() - this.field ^ 18
 TailAriExpr => ArithOp Expr

@@ -1,0 +1,1516 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+
+body{
+  color:#444;
+  font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman',
+              "Hiragino Sans GB", "STXihei", "微软雅黑", serif;
+  font-size:12px;
+  line-height:1.5em;
+  background:#fefefe;
+  width: 45em;
+  margin: 10px auto;
+  padding: 1em;
+  outline: 1300px solid #FAFAFA;
+}
+
+a{ color: #0645ad; text-decoration:none;}
+a:visited{ color: #0b0080; }
+a:hover{ color: #06e; }
+a:active{ color:#faa700; }
+a:focus{ outline: thin dotted; }
+a:hover, a:active{ outline: 0; }
+
+span.backtick {
+  border:1px solid #EAEAEA;
+  border-radius:3px;
+  background:#F8F8F8;
+  padding:0 3px 0 3px;
+}
+
+::-moz-selection{background:rgba(255,255,0,0.3);color:#000}
+::selection{background:rgba(255,255,0,0.3);color:#000}
+
+a::-moz-selection{background:rgba(255,255,0,0.3);color:#0645ad}
+a::selection{background:rgba(255,255,0,0.3);color:#0645ad}
+
+p{
+margin:1em 0;
+}
+
+img{
+max-width:100%;
+}
+
+h1,h2,h3,h4,h5,h6{
+font-weight:normal;
+color:#111;
+line-height:1em;
+}
+h4,h5,h6{ font-weight: bold; }
+h1{ font-size:2.5em; }
+h2{ font-size:2em; border-bottom:1px solid silver; padding-bottom: 5px; }
+h3{ font-size:1.5em; }
+h4{ font-size:1.2em; }
+h5{ font-size:1em; }
+h6{ font-size:0.9em; }
+
+blockquote{
+color:#666666;
+margin:0;
+padding-left: 3em;
+border-left: 0.5em #EEE solid;
+}
+hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-bottom: 1px solid #eee; margin: 1em 0; padding: 0; }
+
+
+pre , code, kbd, samp { 
+  color: #000; 
+  font-family: monospace; 
+  font-size: 0.88em; 
+  border-radius:3px;
+  background-color: #F8F8F8;
+  border: 1px solid #CCC; 
+}
+pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; padding: 5px 12px;}
+pre code { border: 0px !important; padding: 0;}
+code { padding: 0 3px 0 3px; }
+
+b, strong { font-weight: bold; }
+
+dfn { font-style: italic; }
+
+ins { background: #ff9; color: #000; text-decoration: none; }
+
+mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
+
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sup { top: -0.5em; }
+sub { bottom: -0.25em; }
+
+ul, ol { margin: 1em 0; padding: 0 0 0 2em; }
+li p:last-child { margin:0 }
+dd { margin: 0 0 0 2em; }
+
+img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+td { vertical-align: top; }
+
+@media only screen and (min-width: 480px) {
+body{font-size:14px;}
+}
+
+@media only screen and (min-width: 768px) {
+body{font-size:16px;}
+}
+
+@media print {
+  * { background: transparent !important; color: black !important; filter:none !important; -ms-filter: none !important; }
+  body{font-size:12pt; max-width:100%; outline:none;}
+  a, a:visited { text-decoration: underline; }
+  hr { height: 1px; border:0; border-bottom:1px solid black; }
+  a[href]:after { content: " (" attr(href) ")"; }
+  abbr[title]:after { content: " (" attr(title) ")"; }
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
+  pre, blockquote { border: 1px solid #999; padding-right: 1em; page-break-inside: avoid; }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page :left { margin: 15mm 20mm 15mm 10mm; }
+  @page :right { margin: 15mm 10mm 15mm 20mm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
+}
+</style><style>/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+pre code {
+  display: block; padding: 0.5em;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+pre .comment,
+pre .template_comment,
+pre .diff .header,
+pre .javadoc {
+  color: #998;
+  font-style: italic
+}
+
+pre .hljs-literal {
+  color: #2AA198;
+  font-weight: bold
+}
+
+pre .hljs-number {
+  color: #2AA198;
+  font-weight: bold
+}
+/*
+  purple : #803C8D;
+  green :#2AA198;
+  blue:#256EB8;
+  red:#C7254E;
+ */
+
+pre .hljs-title {
+  color: #803C8D;
+  font-weight: bold
+}
+
+pre .hljs-params {
+  color: #DD6644;
+}
+
+pre .hljs-built-in {
+  color: #803C8D;
+  font-weight: bold
+}
+
+pre .hljs-string {
+  color: #256EB8;
+}
+
+pre .hljs-comment {
+  color: #777;
+}
+
+pre .hljs-keyword {
+  color: #C7254E;
+  font-weight: normal;
+}
+
+pre .number,
+pre .hexcolor,
+pre .ruby .constant {
+  color: #099;
+}
+
+pre .string,
+pre .tag .value,
+pre .phpdoc,
+pre .tex .formula {
+  color: #d14
+}
+
+pre .title,
+pre .id,
+pre .coffeescript .params,
+pre .scss .preprocessor {
+  color: #900;
+  font-weight: bold
+}
+
+pre .javascript .title,
+pre .lisp .title,
+pre .clojure .title,
+pre .subst {
+  font-weight: normal
+}
+
+pre .class .title,
+pre .haskell .type,
+pre .vhdl .literal,
+pre .tex .command {
+  color: #458;
+  font-weight: bold
+}
+
+pre .tag,
+pre .tag .title,
+pre .rules .property,
+pre .django .tag .keyword {
+  color: #000080;
+  font-weight: normal
+}
+
+pre .attribute,
+pre .variable,
+pre .lisp .body {
+  color: #008080
+}
+
+pre .regexp {
+  color: #009926
+}
+
+pre .class {
+  color: #458;
+  font-weight: bold
+}
+
+pre .symbol,
+pre .ruby .symbol .string,
+pre .lisp .keyword,
+pre .tex .special,
+pre .prompt {
+  color: #990073
+}
+
+pre .built_in,
+pre .lisp .title,
+pre .clojure .built_in {
+  color: #0086b3
+}
+
+pre .preprocessor,
+pre .pi,
+pre .doctype,
+pre .shebang,
+pre .cdata {
+  color: #999;
+  font-weight: bold
+}
+
+pre .deletion {
+  background: #fdd
+}
+
+pre .addition {
+  background: #dfd
+}
+
+pre .diff .change {
+  background: #0086b3
+}
+
+pre .chunk {
+  color: #aaa
+}</style><script>/*
+Syntax highlighting with language autodetection.
+http://highlightjs.org/
+*/
+
+hljs = new (function() {
+
+  /* Utility functions */
+
+  function escape(value) {
+    return value.replace(/&/gm, '&amp;').replace(/</gm, '&lt;').replace(/>/gm, '&gt;');
+  }
+
+  function tag(node) {
+    return node.nodeName.toLowerCase();
+  }
+
+  function testRe(re, lexeme) {
+    var match = re && re.exec(lexeme);
+    return match && match.index == 0;
+  }
+
+  function blockText(block) {
+    return Array.prototype.map.call(block.childNodes, function(node) {
+      if (node.nodeType == 3) {
+        return options.useBR ? node.nodeValue.replace(/\n/g, '') : node.nodeValue;
+      }
+      if (tag(node) == 'br') {
+        return '\n';
+      }
+      return blockText(node);
+    }).join('');
+  }
+
+  function blockLanguage(block) {
+    var classes = (block.className + ' ' + (block.parentNode ? block.parentNode.className : '')).split(/\s+/);
+    classes = classes.map(function(c) {return c.replace(/^language-/, '');});
+    return classes.filter(function(c) {return getLanguage(c) || c == 'no-highlight';})[0];
+  }
+
+  function inherit(parent, obj) {
+    var result = {};
+    for (var key in parent)
+      result[key] = parent[key];
+    if (obj)
+      for (var key in obj)
+        result[key] = obj[key];
+    return result;
+  };
+
+  /* Stream merging */
+
+  function nodeStream(node) {
+    var result = [];
+    (function _nodeStream(node, offset) {
+      for (var child = node.firstChild; child; child = child.nextSibling) {
+        if (child.nodeType == 3)
+          offset += child.nodeValue.length;
+        else if (tag(child) == 'br')
+          offset += 1;
+        else if (child.nodeType == 1) {
+          result.push({
+            event: 'start',
+            offset: offset,
+            node: child
+          });
+          offset = _nodeStream(child, offset);
+          result.push({
+            event: 'stop',
+            offset: offset,
+            node: child
+          });
+        }
+      }
+      return offset;
+    })(node, 0);
+    return result;
+  }
+
+  function mergeStreams(original, highlighted, value) {
+    var processed = 0;
+    var result = '';
+    var nodeStack = [];
+
+    function selectStream() {
+      if (!original.length || !highlighted.length) {
+        return original.length ? original : highlighted;
+      }
+      if (original[0].offset != highlighted[0].offset) {
+        return (original[0].offset < highlighted[0].offset) ? original : highlighted;
+      }
+
+      /*
+      To avoid starting the stream just before it should stop the order is
+      ensured that original always starts first and closes last:
+
+      if (event1 == 'start' && event2 == 'start')
+        return original;
+      if (event1 == 'start' && event2 == 'stop')
+        return highlighted;
+      if (event1 == 'stop' && event2 == 'start')
+        return original;
+      if (event1 == 'stop' && event2 == 'stop')
+        return highlighted;
+
+      ... which is collapsed to:
+      */
+      return highlighted[0].event == 'start' ? original : highlighted;
+    }
+
+    function open(node) {
+      function attr_str(a) {return ' ' + a.nodeName + '="' + escape(a.value) + '"';}
+      result += '<' + tag(node) + Array.prototype.map.call(node.attributes, attr_str).join('') + '>';
+    }
+
+    function close(node) {
+      result += '</' + tag(node) + '>';
+    }
+
+    function render(event) {
+      (event.event == 'start' ? open : close)(event.node);
+    }
+
+    while (original.length || highlighted.length) {
+      var stream = selectStream();
+      result += escape(value.substr(processed, stream[0].offset - processed));
+      processed = stream[0].offset;
+      if (stream == original) {
+        /*
+        On any opening or closing tag of the original markup we first close
+        the entire highlighted node stack, then render the original tag along
+        with all the following original tags at the same offset and then
+        reopen all the tags on the highlighted stack.
+        */
+        nodeStack.reverse().forEach(close);
+        do {
+          render(stream.splice(0, 1)[0]);
+          stream = selectStream();
+        } while (stream == original && stream.length && stream[0].offset == processed);
+        nodeStack.reverse().forEach(open);
+      } else {
+        if (stream[0].event == 'start') {
+          nodeStack.push(stream[0].node);
+        } else {
+          nodeStack.pop();
+        }
+        render(stream.splice(0, 1)[0]);
+      }
+    }
+    return result + escape(value.substr(processed));
+  }
+
+  /* Initialization */
+
+  function compileLanguage(language) {
+
+    function reStr(re) {
+        return (re && re.source) || re;
+    }
+
+    function langRe(value, global) {
+      return RegExp(
+        reStr(value),
+        'm' + (language.case_insensitive ? 'i' : '') + (global ? 'g' : '')
+      );
+    }
+
+    function compileMode(mode, parent) {
+      if (mode.compiled)
+        return;
+      mode.compiled = true;
+
+      mode.keywords = mode.keywords || mode.beginKeywords;
+      if (mode.keywords) {
+        var compiled_keywords = {};
+
+        function flatten(className, str) {
+          if (language.case_insensitive) {
+            str = str.toLowerCase();
+          }
+          str.split(' ').forEach(function(kw) {
+            var pair = kw.split('|');
+            compiled_keywords[pair[0]] = [className, pair[1] ? Number(pair[1]) : 1];
+          });
+        }
+
+        if (typeof mode.keywords == 'string') { // string
+          flatten('keyword', mode.keywords);
+        } else {
+          Object.keys(mode.keywords).forEach(function (className) {
+            flatten(className, mode.keywords[className]);
+          });
+        }
+        mode.keywords = compiled_keywords;
+      }
+      mode.lexemesRe = langRe(mode.lexemes || /\b[A-Za-z0-9_]+\b/, true);
+
+      if (parent) {
+        if (mode.beginKeywords) {
+          mode.begin = '\\b(' + mode.beginKeywords.split(' ').join('|') + ')\\b';
+        }
+        if (!mode.begin)
+          mode.begin = /\B|\b/;
+        mode.beginRe = langRe(mode.begin);
+        if (!mode.end && !mode.endsWithParent)
+          mode.end = /\B|\b/;
+        if (mode.end)
+          mode.endRe = langRe(mode.end);
+        mode.terminator_end = reStr(mode.end) || '';
+        if (mode.endsWithParent && parent.terminator_end)
+          mode.terminator_end += (mode.end ? '|' : '') + parent.terminator_end;
+      }
+      if (mode.illegal)
+        mode.illegalRe = langRe(mode.illegal);
+      if (mode.relevance === undefined)
+        mode.relevance = 1;
+      if (!mode.contains) {
+        mode.contains = [];
+      }
+      var expanded_contains = [];
+      mode.contains.forEach(function(c) {
+        if (c.variants) {
+          c.variants.forEach(function(v) {expanded_contains.push(inherit(c, v));});
+        } else {
+          expanded_contains.push(c == 'self' ? mode : c);
+        }
+      });
+      mode.contains = expanded_contains;
+      mode.contains.forEach(function(c) {compileMode(c, mode);});
+
+      if (mode.starts) {
+        compileMode(mode.starts, parent);
+      }
+
+      var terminators =
+        mode.contains.map(function(c) {
+          return c.beginKeywords ? '\\.?(' + c.begin + ')\\.?' : c.begin;
+        })
+        .concat([mode.terminator_end, mode.illegal])
+        .map(reStr)
+        .filter(Boolean);
+      mode.terminators = terminators.length ? langRe(terminators.join('|'), true) : {exec: function(s) {return null;}};
+
+      mode.continuation = {};
+    }
+
+    compileMode(language);
+  }
+
+  /*
+  Core highlighting function. Accepts a language name, or an alias, and a
+  string with the code to highlight. Returns an object with the following
+  properties:
+
+  - relevance (int)
+  - value (an HTML string with highlighting markup)
+
+  */
+  function highlight(name, value, ignore_illegals, continuation) {
+
+    function subMode(lexeme, mode) {
+      for (var i = 0; i < mode.contains.length; i++) {
+        if (testRe(mode.contains[i].beginRe, lexeme)) {
+          return mode.contains[i];
+        }
+      }
+    }
+
+    function endOfMode(mode, lexeme) {
+      if (testRe(mode.endRe, lexeme)) {
+        return mode;
+      }
+      if (mode.endsWithParent) {
+        return endOfMode(mode.parent, lexeme);
+      }
+    }
+
+    function isIllegal(lexeme, mode) {
+      return !ignore_illegals && testRe(mode.illegalRe, lexeme);
+    }
+
+    function keywordMatch(mode, match) {
+      var match_str = language.case_insensitive ? match[0].toLowerCase() : match[0];
+      return mode.keywords.hasOwnProperty(match_str) && mode.keywords[match_str];
+    }
+
+    function buildSpan(classname, insideSpan, leaveOpen, noPrefix) {
+      var classPrefix = noPrefix ? '' : options.classPrefix,
+          openSpan    = '<span class="' + classPrefix,
+          closeSpan   = leaveOpen ? '' : '</span>';
+
+      openSpan += classname + '">';
+
+      return openSpan + insideSpan + closeSpan;
+    }
+
+    function processKeywords() {
+      var buffer = escape(mode_buffer);
+      if (!top.keywords)
+        return buffer;
+      var result = '';
+      var last_index = 0;
+      top.lexemesRe.lastIndex = 0;
+      var match = top.lexemesRe.exec(buffer);
+      while (match) {
+        result += buffer.substr(last_index, match.index - last_index);
+        var keyword_match = keywordMatch(top, match);
+        if (keyword_match) {
+          relevance += keyword_match[1];
+          result += buildSpan(keyword_match[0], match[0]);
+        } else {
+          result += match[0];
+        }
+        last_index = top.lexemesRe.lastIndex;
+        match = top.lexemesRe.exec(buffer);
+      }
+      return result + buffer.substr(last_index);
+    }
+
+    function processSubLanguage() {
+      if (top.subLanguage && !languages[top.subLanguage]) {
+        return escape(mode_buffer);
+      }
+      var result = top.subLanguage ? highlight(top.subLanguage, mode_buffer, true, top.continuation.top) : highlightAuto(mode_buffer);
+      // Counting embedded language score towards the host language may be disabled
+      // with zeroing the containing mode relevance. Usecase in point is Markdown that
+      // allows XML everywhere and makes every XML snippet to have a much larger Markdown
+      // score.
+      if (top.relevance > 0) {
+        relevance += result.relevance;
+      }
+      if (top.subLanguageMode == 'continuous') {
+        top.continuation.top = result.top;
+      }
+      return buildSpan(result.language, result.value, false, true);
+    }
+
+    function processBuffer() {
+      return top.subLanguage !== undefined ? processSubLanguage() : processKeywords();
+    }
+
+    function startNewMode(mode, lexeme) {
+      var markup = mode.className? buildSpan(mode.className, '', true): '';
+      if (mode.returnBegin) {
+        result += markup;
+        mode_buffer = '';
+      } else if (mode.excludeBegin) {
+        result += escape(lexeme) + markup;
+        mode_buffer = '';
+      } else {
+        result += markup;
+        mode_buffer = lexeme;
+      }
+      top = Object.create(mode, {parent: {value: top}});
+    }
+
+    function processLexeme(buffer, lexeme) {
+
+      mode_buffer += buffer;
+      if (lexeme === undefined) {
+        result += processBuffer();
+        return 0;
+      }
+
+      var new_mode = subMode(lexeme, top);
+      if (new_mode) {
+        result += processBuffer();
+        startNewMode(new_mode, lexeme);
+        return new_mode.returnBegin ? 0 : lexeme.length;
+      }
+
+      var end_mode = endOfMode(top, lexeme);
+      if (end_mode) {
+        var origin = top;
+        if (!(origin.returnEnd || origin.excludeEnd)) {
+          mode_buffer += lexeme;
+        }
+        result += processBuffer();
+        do {
+          if (top.className) {
+            result += '</span>';
+          }
+          relevance += top.relevance;
+          top = top.parent;
+        } while (top != end_mode.parent);
+        if (origin.excludeEnd) {
+          result += escape(lexeme);
+        }
+        mode_buffer = '';
+        if (end_mode.starts) {
+          startNewMode(end_mode.starts, '');
+        }
+        return origin.returnEnd ? 0 : lexeme.length;
+      }
+
+      if (isIllegal(lexeme, top))
+        throw new Error('Illegal lexeme "' + lexeme + '" for mode "' + (top.className || '<unnamed>') + '"');
+
+      /*
+      Parser should not reach this point as all types of lexemes should be caught
+      earlier, but if it does due to some bug make sure it advances at least one
+      character forward to prevent infinite looping.
+      */
+      mode_buffer += lexeme;
+      return lexeme.length || 1;
+    }
+
+    var language = getLanguage(name);
+    if (!language) {
+      throw new Error('Unknown language: "' + name + '"');
+    }
+
+    compileLanguage(language);
+    var top = continuation || language;
+    var result = '';
+    for(var current = top; current != language; current = current.parent) {
+      if (current.className) {
+        result += buildSpan(current.className, result, true);
+      }
+    }
+    var mode_buffer = '';
+    var relevance = 0;
+    try {
+      var match, count, index = 0;
+      while (true) {
+        top.terminators.lastIndex = index;
+        match = top.terminators.exec(value);
+        if (!match)
+          break;
+        count = processLexeme(value.substr(index, match.index - index), match[0]);
+        index = match.index + count;
+      }
+      processLexeme(value.substr(index));
+      for(var current = top; current.parent; current = current.parent) { // close dangling modes
+        if (current.className) {
+          result += '</span>';
+        }
+      };
+      return {
+        relevance: relevance,
+        value: result,
+        language: name,
+        top: top
+      };
+    } catch (e) {
+      if (e.message.indexOf('Illegal') != -1) {
+        return {
+          relevance: 0,
+          value: escape(value)
+        };
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  /*
+  Highlighting with language detection. Accepts a string with the code to
+  highlight. Returns an object with the following properties:
+
+  - language (detected language)
+  - relevance (int)
+  - value (an HTML string with highlighting markup)
+  - second_best (object with the same structure for second-best heuristically
+    detected language, may be absent)
+
+  */
+  function highlightAuto(text, languageSubset) {
+    languageSubset = languageSubset || options.languages || Object.keys(languages);
+    var result = {
+      relevance: 0,
+      value: escape(text)
+    };
+    var second_best = result;
+    languageSubset.forEach(function(name) {
+      if (!getLanguage(name)) {
+        return;
+      }
+      var current = highlight(name, text, false);
+      current.language = name;
+      if (current.relevance > second_best.relevance) {
+        second_best = current;
+      }
+      if (current.relevance > result.relevance) {
+        second_best = result;
+        result = current;
+      }
+    });
+    if (second_best.language) {
+      result.second_best = second_best;
+    }
+    return result;
+  }
+
+  /*
+  Post-processing of the highlighted markup:
+
+  - replace TABs with something more useful
+  - replace real line-breaks with '<br>' for non-pre containers
+
+  */
+  function fixMarkup(value) {
+    if (options.tabReplace) {
+      value = value.replace(/^((<[^>]+>|\t)+)/gm, function(match, p1, offset, s) {
+        return p1.replace(/\t/g, options.tabReplace);
+      });
+    }
+    if (options.useBR) {
+      value = value.replace(/\n/g, '<br>');
+    }
+    return value;
+  }
+
+  /*
+  Applies highlighting to a DOM node containing code. Accepts a DOM node and
+  two optional parameters for fixMarkup.
+  */
+  function highlightBlock(block) {
+    var text = blockText(block);
+    var language = blockLanguage(block);
+    if (language == 'no-highlight')
+        return;
+    var result = language ? highlight(language, text, true) : highlightAuto(text);
+    var original = nodeStream(block);
+    if (original.length) {
+      var pre = document.createElementNS('http://www.w3.org/1999/xhtml', 'pre');
+      pre.innerHTML = result.value;
+      result.value = mergeStreams(original, nodeStream(pre), text);
+    }
+    result.value = fixMarkup(result.value);
+
+    block.innerHTML = result.value;
+    block.className += ' hljs ' + (!language && result.language || '');
+    block.result = {
+      language: result.language,
+      re: result.relevance
+    };
+    if (result.second_best) {
+      block.second_best = {
+        language: result.second_best.language,
+        re: result.second_best.relevance
+      };
+    }
+  }
+
+  var options = {
+    classPrefix: 'hljs-',
+    tabReplace: null,
+    useBR: false,
+    languages: undefined
+  };
+
+  /*
+  Updates highlight.js global options with values passed in the form of an object
+  */
+  function configure(user_options) {
+    options = inherit(options, user_options);
+  }
+
+  /*
+  Applies highlighting to all <pre><code>..</code></pre> blocks on a page.
+  */
+  function initHighlighting() {
+    if (initHighlighting.called)
+      return;
+    initHighlighting.called = true;
+
+    var blocks = document.querySelectorAll('pre code');
+    Array.prototype.forEach.call(blocks, highlightBlock);
+  }
+
+  /*
+  Attaches highlighting to the page load event.
+  */
+  function initHighlightingOnLoad() {
+    addEventListener('DOMContentLoaded', initHighlighting, false);
+    addEventListener('load', initHighlighting, false);
+  }
+
+  var languages = {};
+  var aliases = {};
+
+  function registerLanguage(name, language) {
+    var lang = languages[name] = language(this);
+    if (lang.aliases) {
+      lang.aliases.forEach(function(alias) {aliases[alias] = name;});
+    }
+  }
+
+  function getLanguage(name) {
+    return languages[name] || languages[aliases[name]];
+  }
+
+  /* Interface definition */
+
+  this.highlight = highlight;
+  this.highlightAuto = highlightAuto;
+  this.fixMarkup = fixMarkup;
+  this.highlightBlock = highlightBlock;
+  this.configure = configure;
+  this.initHighlighting = initHighlighting;
+  this.initHighlightingOnLoad = initHighlightingOnLoad;
+  this.registerLanguage = registerLanguage;
+  this.getLanguage = getLanguage;
+  this.inherit = inherit;
+
+  // Common regexps
+  this.IDENT_RE = '[a-zA-Z][a-zA-Z0-9_]*';
+  this.UNDERSCORE_IDENT_RE = '[a-zA-Z_][a-zA-Z0-9_]*';
+  this.NUMBER_RE = '\\b\\d+(\\.\\d+)?';
+  this.C_NUMBER_RE = '(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)'; // 0x..., 0..., decimal, float
+  this.BINARY_NUMBER_RE = '\\b(0b[01]+)'; // 0b...
+  this.RE_STARTERS_RE = '!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~';
+
+  // Common modes
+  this.BACKSLASH_ESCAPE = {
+    begin: '\\\\[\\s\\S]', relevance: 0
+  };
+  this.APOS_STRING_MODE = {
+    className: 'string',
+    begin: '\'', end: '\'',
+    illegal: '\\n',
+    contains: [this.BACKSLASH_ESCAPE]
+  };
+  this.QUOTE_STRING_MODE = {
+    className: 'string',
+    begin: '"', end: '"',
+    illegal: '\\n',
+    contains: [this.BACKSLASH_ESCAPE]
+  };
+  this.C_LINE_COMMENT_MODE = {
+    className: 'comment',
+    begin: '//', end: '$'
+  };
+  this.C_BLOCK_COMMENT_MODE = {
+    className: 'comment',
+    begin: '/\\*', end: '\\*/'
+  };
+  this.HASH_COMMENT_MODE = {
+    className: 'comment',
+    begin: '#', end: '$'
+  };
+  this.NUMBER_MODE = {
+    className: 'number',
+    begin: this.NUMBER_RE,
+    relevance: 0
+  };
+  this.C_NUMBER_MODE = {
+    className: 'number',
+    begin: this.C_NUMBER_RE,
+    relevance: 0
+  };
+  this.BINARY_NUMBER_MODE = {
+    className: 'number',
+    begin: this.BINARY_NUMBER_RE,
+    relevance: 0
+  };
+  this.REGEXP_MODE = {
+    className: 'regexp',
+    begin: /\//, end: /\/[gim]*/,
+    illegal: /\n/,
+    contains: [
+      this.BACKSLASH_ESCAPE,
+      {
+        begin: /\[/, end: /\]/,
+        relevance: 0,
+        contains: [this.BACKSLASH_ESCAPE]
+      }
+    ]
+  };
+  this.TITLE_MODE = {
+    className: 'title',
+    begin: this.IDENT_RE,
+    relevance: 0
+  };
+  this.UNDERSCORE_TITLE_MODE = {
+    className: 'title',
+    begin: this.UNDERSCORE_IDENT_RE,
+    relevance: 0
+  };
+})()</script><script>hljs.registerLanguage('hydra', function(hljs){
+    return {
+      case_insensitive: false, 
+      lexemes: '[a-zA-Z0-9+*/^%&|!$>"\'<.=?_\-]+',
+      keywords: {
+        keyword: 'for if from to else then while var in class private public gen function extends do end',
+        literal: 'false true null',
+        'built-in': 'super throw new yield import export return spawn as <- -> + = - * /'
+      },
+      contains: [
+        {
+          className: 'params',
+          begin: /[=(,]\s*\(/, end: /\)\{/,
+          excludeEnd: true,
+          excludeBegin: true
+        },
+        {
+          className: 'function',
+          beginKeywords: 'function', end: /\{/, excludeEnd: true,
+          contains: [
+            hljs.inherit(hljs.TITLE_MODE, {begin: /[A-Za-z$_][0-9A-Za-z$_]*/}),
+            {
+              className: 'params',
+              begin: /\(/, end: /\)/,
+              contains: [
+                hljs.C_LINE_COMMENT_MODE,
+                hljs.C_BLOCK_COMMENT_MODE
+              ],
+              illegal: /["'\(]/,
+              excludeEnd: true,
+              excludeBegin: true
+            }
+          ],
+          illegal: /\[|%/
+        },
+        hljs.QUOTE_STRING_MODE,
+        hljs.APOS_STRING_MODE,
+        hljs.C_LINE_COMMENT_MODE,
+        hljs.C_NUMBER_MODE
+      ]
+    }
+});</script><script>hljs.initHighlightingOnLoad();</script><title>HydraSpec</title></head><body><h1 id="hydra">Hydra</h1>
+<h2 id="intro">Intro:</h2>
+<pre><code class="hydra">function main() {
+    var nums, noms, odds, greetings
+
+    greetings = &lt;--&gt;
+    nums = [1, 2]
+    noms = [&quot;Tim&quot;, &quot;Eston&quot;, &quot;Aaron&quot;, &quot;Ben&quot;]
+
+    odds = nums.map((x){ x * 2 - 1 })
+
+    for num in odds do
+        spawn (){
+            var msg  = &quot;${noms[num]} says hello from a spawned head!&quot;
+            msg -&gt; greetings
+        }
+    end
+
+    for greeting in greetings do
+        println(greeting)
+    end
+}
+</code></pre>
+
+<h2 id="packages">Packages:</h2>
+<h3 id="importing-from-packages">Importing From Packages:</h3>
+<p>Packages are imported using the <code>import</code> keyword. Each package can be imported seperately or a list of packages can be imported at once</p>
+<p>There are three places a package can be imported from. The first is from the <code>std</code> namespace. This houses all of the packages in the standard library. As such, you don’t need to worry about where those files are on your system. The second is from the <code>pkg</code> namespace. These files must be in a specific configurable folder and directory structure which is setup automatically if the built in package manager is used via <code>$ hydra install &lt;pkg name&gt;</code>. The third option is a full path to a .hy file or a relative path from the current file to the package file being imported.</p>
+<pre><code class="hydra">import std.json, std.http, std.crypto //multiple imports
+</code></pre>
+
+<pre><code class="hydra">import std.math           //math pkg imported from stdlib
+import pkg.socketio       //socketio pkg imported from configured 
+                          //packages folder
+import ./util/utils.hy    //utils pkg imported directly from path
+</code></pre>
+
+<h3 id="using-imports">Using Imports:</h3>
+<p>Packages may be imported in their entirety or their exported classes, functions, and variables may be specifically imported. </p>
+<pre><code class="hydra">import std.json           //json package imported from stdlib
+import std.math.sqrt      //sqrt() function imported from the std.math package
+import std.sync.WaitGroup //WaitGroup class imported from the std.sync package
+import std.os.NUM_CORES   //NUM_CORES variable imported from the std.os package
+</code></pre>
+
+<p>If a whole package is imported, its functions, classes, and variables are accessed through the package name. If the package is imported from a relative or full path, the package will be able to be accessed through the name of the .hy file without the extension </p>
+<pre><code class="hydra">import std.math
+import std.sync
+import ./util/utils.hy
+
+var s = math.sqrt(4)
+var wg = new sync.WaitGroup(3)
+var inf = math.INFINITY
+var stage_name = utils.Generate_Stage_Name()
+</code></pre>
+
+<p>Otherwise they can be used directly.</p>
+<pre><code class="hydra">import std.sync.WaitGroup
+import std.math.sqrt
+import std.math.INFINITY
+
+var wg = new WaitGroup(3)
+var s = sqrt(4)
+var inf = INFINITY
+</code></pre>
+
+<p>Imports may also be renamed with the <code>as</code> keyword.</p>
+<pre><code class="hydra">import std.sync.WaitGroup as WG
+
+var wg = new WG(3)
+</code></pre>
+
+<h3 id="creating-a-package">Creating A Package:</h3>
+<p>To export a top level class, top level function , or top level variable, use the <code>export</code> keyword. There are two syntaxes for this. The first lets you export at the definition of the exported item. For variables, the <code>export</code> keyword implicitely acts as a <code>var</code> keyword as well. The second, and preferred method is explicitely clumping all of your exports together at the end of the file.</p>
+<h5 id="first-way">First Way</h5>
+<pre><code class="hydra">
+var variable = 123.456 //not exported
+
+export VARIABLE = '123.456' //exported
+
+function _Func(a, b){ //not exported
+    return 15 + a + b, b - a - 11
+}
+
+export function Func(a, b){ //exported
+    return _Func(b, a)
+}
+
+class ClassB  //not exported
+    function new(name){
+        this.name = name
+
+        while true do
+            //something...
+        end
+    }
+end
+
+export class ClassA extends ClassB  //exported
+    function new(){
+        super('ClassA')
+    }
+end
+</code></pre>
+
+<h5 id="preferred-way">Preferred Way</h5>
+<pre><code class="hydra">
+var variable = 123.456 //not exported
+
+var VARIABLE = '123.456' //exported
+
+function _Func(a, b){ //not exported
+    return 15 + a + b, b - a - 11
+}
+
+function Func(a, b){ //exported
+    return _Func(b, a)
+}
+
+class ClassB  //not exported
+    function new(name){
+        this.name = name
+
+        while true do
+            //something...
+        end
+    }
+end
+
+class ClassA extends ClassB  //exported
+    function new(){
+        super('ClassA')
+    }
+end
+
+//exports
+export VARIABLE
+export Func
+export ClassA
+</code></pre>
+
+<h2 id="built-in-types">Built In Types:</h2>
+<h3 id="function">Function:</h3>
+<p>There are two types of functions. The first is a named, top level, function and the second is an anonymous closure. Both of these may also have their semantics changed based on whether or not they are generators. A generator function can <code>yield</code> a value which will suspend its execution, giving the value and control back to its caller. The next time it is called it will resume execution from where it is left off. </p>
+<p>Top level functions are functions that are at the top level of their class or package scope. They may be passed around as values via their name.</p>
+<pre><code class="hydra">priv function _foo(){ //non exported package top level function
+    return bar
+}
+
+class Foo
+    function foo(){ //class top level function
+        return _foo //returns another top level function
+    }
+end
+</code></pre>
+
+<p>Closures are anonymous functions that enclose over the values in their current scope. Syntactically, they differ from top level functions in that they do not need the <code>function</code>, <code>priv</code>, or <code>gen</code> keywords. To make a closure into a generator, a <code>*</code> is needed before the first parenthesis. As far as semantics go, enclosed values are implicitely copied to discourage variable inconsistency in concurrent processing. However, values may be passed by reference by passing them in as parameters. This has implications on how to invoke a closure but we will get to that in a second.</p>
+<pre><code class="hydra">var name = 'Charlie'
+var whats_my_name = (){
+    print(name)
+}
+
+whats_my_name() //Charlie
+name = 'Chuckles'
+whats_my_name() //Charlie
+
+var name2 = 'Charlie'
+var whats_my_name2 = (n){
+    print(n)
+}(name2) //n now bound to name...this does NOT invoke the closure
+
+whats_my_name2() //Charlie
+name2 = 'Chuckles'
+whats_my_name2() //Chuckles
+
+function get_big_string(){
+    return &quot;omg it's a generator function!!!&quot;
+}
+
+var word_generator = *(){
+    var words = get_big_string().split()
+    for word in words do
+        yield word
+    end
+}
+
+word_generator() //'omg'
+word_generator() //&quot;it's&quot;
+word_generator() //'a'
+</code></pre>
+
+<p>As you may have noticed, the trailing parenthesis on the closure definition do not invoke it. Instead they serve as a short syntax to bind values to the parameters of a closure. This has two implications. The first, and more prevelant one is that if you have a closure that has bound parameters and takes in new parameters on each call, you will have to place all of the bound parameters at the front of the parameter list. The second, is that if you want to immediately invoke a closure then it will have to be wrapped in parenthesis so that it can be evaluated and then invoked.</p>
+<pre><code class="hydra">var name = 'Charlie'
+var whats_my_name = (n, suffix){
+    print(n + suffix)
+}(name) //n now bound to name, suffix is not bound to anything
+
+whats_my_name(' the king') //Charlie the king
+name = 'Chuckles'
+whats_my_name(' the chump') //Chuckles the chump
+
+var num = ((){
+    return 14
+})() //closure invoked
+</code></pre>
+
+<p>The <code>this</code> keyword lets functions access variables in their calling context. For a top level package function, <code>this</code>, by default, refers to the package context. Note that top level package variables may also be accessed without <code>this</code>.For a class level function, <code>this</code> refers to the instance of the class that invokes it. In a closure, <code>this</code> refers to the context in which the closure was defined.</p>
+<pre><code class="hydra">SIZE = 10 //exported and thus configurable package variable
+
+priv function init(){
+    do_something_with(this.SIZE) //package variable accessed through 'this'
+    do_something_else_with(SIZE) //package variable directly accessed
+}
+
+class Foo 
+
+    function new(b){
+        this.bar = b
+    }
+
+    function baz(){
+        this.bar += 2 //class variable accessed through 'this'
+        return bar //ERROR: 'bar' not in reachable context
+    }
+
+    function inc(amount){
+        return (){
+            return this.bar += amount
+        }
+    }
+
+end
+
+var f = new Foo(1)
+var plus2 = f.inc(2)
+
+plus2() //3
+plus2() //5
+
+f.bar //5
+</code></pre>
+
+<p>...bind, apply, call</p>
+<h3 id="array">Array:</h3>
+<pre><code class="hydra">var arr = []
+arr.push(1) // arr now [1]
+arr.push([]) // arr now [1, []]
+arr.pop() // returns []...arr now [1]
+arr[0] // 1
+
+//array literal with initial values
+arr = [1, [], {'key' : 'val'}, 'string', true, (a, b){ return a * b }] 
+</code></pre>
+
+<h3 id="hash">Hash:</h3>
+<pre><code class="hydra">var hash = {}
+
+hash.a = 'a'
+hash['b'] = 'b'
+
+if hash.has_key('c') then
+    print(hash.c) //not executed
+else
+    print(&quot;hash.c doesn't exist&quot;) //executed
+end 
+
+print(hash) //{ a : 'a', b : 'b'}
+hash.remove('a')
+print(hash) //{ b : 'b'}
+
+hash.mult = (x, y){
+    return x * y
+}
+hash.mult(2, 5) //10
+
+hash.arr = [0, 1, 2, 3, 4, 5]
+hash.arr[3] //3
+</code></pre>
+
+<h3 id="string">String:</h3>
+<pre><code class="hydra">var str1 = 'abc'
+var str2 = &quot;123&quot;
+
+var interpolated = 'str1: ${str1}' //'str1: abc'
+var concatonated = 'str2:' + str2 //'str2: 123'
+</code></pre>
+
+<h3 id="int">Int:</h3>
+<pre><code class="hydra">var i = 123
+</code></pre>
+
+<h3 id="float">Float:</h3>
+<pre><code class="hydra">var f = 123.0
+</code></pre>
+
+<h3 id="channel">Channel:</h3>
+<pre><code class="hydra">var val
+
+var c = &lt;--&gt;
+0 -&gt; c //channel sent 0
+val = &lt;- c //channel received 0
+val //0
+
+c.send(1) //channel sent 1
+val = c.recv() //channel received 1
+val //1
+
+var unbuffered = &lt;--&gt;   //unbuffered channel literal
+
+1 -&gt; unbuffered //head now blocked
+&lt;-unbuffered //head now unblocked
+
+var buffered   = &lt;-10-&gt; //burffered channel literal
+
+from 0 to 8 do 
+    1 -&gt; buffered //non blocking
+end
+
+1 -&gt; buffered //head now blocked
+&lt;-buffered //head now unblocked
+
+</code></pre>
+
+<h3 id="exception">Exception:</h3>
+<pre><code class="hydra">throw 'an exception just cuz'
+
+throw new Exception('the verbose way')
+
+class CustomException extends Exception
+    CustomException(message){
+        this.message = message
+    }
+
+    function toString(){
+        return 'Custom Error: ${this.message}'
+    }
+end
+
+throw new CustomException('My custom message!!!!')
+</code></pre>
+
+<h2 id="classes">Classes</h2>
+<pre><code class="hydra">export DEFAULT_SIZE = 10 //exported package field
+
+class Foo 
+
+    private //private variables
+
+    var class_val = 7
+
+    public //public variables
+
+    var pub_class_val = 10
+
+    private //private methods
+
+    function _bar(){
+        return this.a + this.b + this.DEFAULT_SIZE + class_val
+    }
+
+    public //public methods
+
+    Foo(a, b){
+        priv this.a = a //priv field
+        this.b = b      //public field
+        this.size = DEFAULT_SIZE
+    }
+
+    function bar(chan){
+        spawn (){
+            this._bar() -&gt; chan
+        }  
+    }
+
+    function change_class_val(val){
+        class_val = val //implictely protected by mutex on reads/writes
+    }
+
+end
+
+var foo = new Foo(1,2)
+foo.a    //ERROR: Object, of type Foo, does not have a public field 'a'
+foo.b    //2
+foo.size //10
+
+var c = &lt;--&gt;
+foo.bar(c)
+&lt;-c //20
+
+var foo2 = new Foo(1,2)
+foo2.change_class_val(17)
+foo2.bar(c)
+&lt;-c //30
+
+foo.bar(c)
+&lt;-c //30
+
+foo.pub_class_val //10
+foo.pub_class_val = 25
+foo.pub_class_val //25
+</code></pre>
+
+<h3 id="extends">extends</h3>
+<p>Classes can extend multiple classes. The order in which they extend those classes is important. When a subclass tries to call a superclass's property, Hydra checks the first Class after the <code>extends</code> keyword and then the second and then the third until it either finds the correct property or throws an error.</p>
+<h3 id="supers">super(s)</h3>
+<p>The <code>super</code> keyword can be used to access the methods and variables of a class's superclasses. A superclasses constructor can be called one of three ways. The first is to use <code>super</code> similar to a namespace ie. <code>super.&lt;name of class&gt;(/* params... */)</code>. The second is to use the <code>supers()</code> function. This is for when a class inherits from more than one superclass. It takes a variable number of arrays, each containing the parameters to pass to its respective superclass constructor. Note that when using this method order matters. The last way is a simplified syntax for when you either only extend one superclass or you only want to call the constructor of the first superclass after the <code>extends</code> keyword. In this case the parameters are passed to <code>super</code> as a function call. If a superclass's constructor is not called, all of the variables that the constructor would have initialized are set to <code>null</code>.</p>
+<pre><code class="hydra">
+class A
+
+    A(init_num){
+        this.num = init_num
+    }
+
+end
+
+class B 
+
+    B(init_string){
+        this.string = 'In B ' + init_string
+    }
+
+end
+
+class C extends A
+
+    C(){
+        super(10)
+    }
+
+end
+
+class D extends A, B
+
+    D(){
+        //First way to call the constructor of multiple superclasses
+        super.A(15)
+        super.B('From D')
+    }
+
+end
+
+class E extends A, B
+
+    E(){
+        //Second way...order matters here
+        supers(
+            [20],
+            ['From E']
+        )
+    }
+
+end
+
+class F extends A, B
+
+    F(){
+        super(25)
+    }
+
+end
+
+var c = new C()
+c.num //10
+
+var d = new D()
+d.num //15
+d.string //'In B From D'
+
+var e = new E()
+e.num //20
+e.string //'In B From E'
+
+var f = new F()
+f.num //25
+f.string //null
+</code></pre>
+
+<p>The <code>super</code> keyword can also be used to call a superclass's method directly. Again, <code>super</code> may be used similar to a namespace.</p>
+<pre><code class="hydra">class Dummy
+    Dummy(){}
+
+    function error(msg){
+        print('lols im not what you meant to call')
+    }
+end
+
+class Base
+    Base(){}
+
+    function error(msg){
+        print('Error: ${msg}')
+    }
+end
+
+class Foo extends Dummy, Base
+    Foo(){}
+
+    function bar(zero){
+        if zero &lt; 0 {
+            super.Base.error(&quot;wompppp...too small&quot;)
+        } else if zero == 0 {
+            print('shwweeeeet')
+        } else {
+            this.error('wompppp...too big')
+        }
+    }
+end
+
+var f = new Foo()
+f.bar(-1) // 'Error: wompppp...too small'
+f.bar(0)  // 'shwweeeeet'
+f.bar(1)  // 'lols im not what you meant to call'
+</code></pre></body></html>
