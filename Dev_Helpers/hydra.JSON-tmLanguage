@@ -61,7 +61,7 @@
         },
         {
             "comment": "keywords like 'from' 0 'to' 10 'do'...",
-            "match": "\\b(spawn|if|else|then|for|in|while|do|not|and|or|from|to|by|function|end|module|class|import|export|super|this|return|operator|extends|private|either|wait_for|break|given|is|except)\\b",
+            "match": "\\b(spawn|if|else|then|for|var|in|while|do|not|and|or|from|to|by|function|end|module|class|import|export|super|this|return|operator|extends|private|either|wait_for|break|given|is|except)\\b",
             "name": "keyword.control.source.hydra"
         },
         {

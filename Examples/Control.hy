@@ -6,7 +6,7 @@ class Control
    *  'do' always ends with 'end'
    *  'run' always ends with '(p1, p2, p3){ //some func };'
    */
-    
+
   function new(){
     this.num  = 0;
     this.map  = {};
@@ -17,7 +17,7 @@ class Control
     this.str2 = "str2";
     this.regx = /\w*/;
     this.file = open('myFile.txt');
-    this.func = (param){ 
+    this.func = (param){
       return param < 1;
     };
   }
@@ -51,20 +51,20 @@ class Control
     var total_words_in_file = 0;
 
     //default for in for files splits them as lines
-    for line_num, line in this.file do 
+    for line_num, line in this.file do
       print('line: ' + line_num);
       for word_num, word in line.split(/\s/) do //create an array of strings then loop through it
         print('word: ' + word_num + ' of line ' + line_num + ' => ' + word);
         total_words_in_file++;
       end
     end
-  
+
     print('total word count: ' + total_words_in_file);
   }
 
   generator function for_in(){ //for array
     for i = 0; i < this.arr.length; i++ do
-      yield i , this.arr[i]; 
+      yield i , this.arr[i];
     end
 
     // if you use a for in loop on this class it will act like its local arr
@@ -84,14 +84,14 @@ class Control
 
     //i is i local to for loop
     for var i = 0; i < this.arr.length; i++ do
-      print('i: ' + i); //0 
+      print('i: ' + i); //0
     end
 
     print(i); //'10'
 
     //i is global i
     for i = 0; i < this.arr.length; i++ do
-      print('i: ' + i); //0 
+      print('i: ' + i); //0
     end
 
     print(i); //1
@@ -117,7 +117,7 @@ class Control
     //go from 0 to 14 by steps of 5
     //*** can't violate bounds so 14 isn't given ***
     from 0 to 14 by 5 run (i){
-      print('i: ' + i); //0 5 10 
+      print('i: ' + i); //0 5 10
     }
 
     //dynamic step value
@@ -141,7 +141,7 @@ class Control
     //go from 0 to 14 by steps of 5
     //*** can't violate bounds so 14 isn't given ***
     0..14 by 5 run (i){
-      print('i: ' + i); //0 5 10 
+      print('i: ' + i); //0 5 10
     }
 
     //dynamic step value
@@ -152,6 +152,8 @@ class Control
   }
 
   function range_as_value(){
+    //make this a list comprehension
+    //ie [0..9]
     var range;
 
     range = from 0 to 10;
@@ -211,12 +213,15 @@ class Control
 
   function given_is(){
     given obj
-      is String do 
+      is String do
         string_stuff(obj);
+        break;
       is Array do
         array_stuff(obj);
+        break;
       is 0 or 2 do //allow to check for multiple cases
         number_stuff(obj);
+        break;
       else do
         default();
     end
@@ -227,21 +232,21 @@ class Control
 
     while true do
       wait_for
-        either recvd, clsd << in_chan1 then do 
-          if clsd then 
+        either recvd, clsd << in_chan1 then do
+          if clsd then
             do_something();
-          else 
-            out_chan << do_something(recvd); 
+          else
+            out_chan << do_something(recvd);
           end
-        or recvd, clsd << in_chan2 then do 
-          if clsd then 
+        or recvd, clsd << in_chan2 then do
+          if clsd then
             break;
-          else 
-            out_chan << do_something2(recvd); 
+          else
+            out_chan << do_something2(recvd);
           end
-        or do 
+        or do
           default();
-          break; //break is for while true 
+          break; //break is for while true
         end
       end
     end
@@ -255,11 +260,11 @@ class Control
 
     a , closed << in_chan; //can check for closed
 
-    if !closed do 
+    if !closed do
       print('channel not closed....gave me: ' + a);
     else do
       print('channel closed :(...cant use value');
-    end 
+    end
   }
 
   function closure_semantics(){
@@ -294,7 +299,7 @@ class Control
         unquote_blk(specs)
       end
     end
-  
+
     macro it(name, spec) do
       quote do
         def unquote(binary_to_atom("#{name} spec"))() do // Note: this is generating a function on the module
@@ -302,7 +307,7 @@ class Control
         end
       end
     end
-  
+
     macro should_eq(value1, value2) do
       quote do
         if unquote(value1) != unquote(value2) then raise "some hell" end
@@ -311,11 +316,11 @@ class Control
 
     //lets you right
     describe "some test" do
-      it 'compares two ints' do 
+      it 'compares two ints' do
         should_eq 30, 30
       end
     end
-  
+
     //with closures--------------------
 
     //from to run
@@ -336,7 +341,7 @@ class Control
     }
 
     macro for(item) in(container, blk) do
-      while unquote(item), done = unquote(container).for_in(); !done do 
+      while unquote(item), done = unquote(container).for_in(); !done do
         unquote_blk(blk)();
       do
     end

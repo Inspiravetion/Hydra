@@ -967,7 +967,7 @@ hljs = new (function() {
       keywords: {
         keyword: 'for if from to else then while var in class private public gen function extends do end',
         literal: 'false true null',
-        'built-in': 'super throw new yield import export return spawn as <- -> + = - * /'
+        'built-in': 'super supers throw new yield import export return spawn as <- -> + = - * /'
       },
       contains: [
         {
@@ -1403,9 +1403,9 @@ foo.pub_class_val = 25
 foo.pub_class_val //25
 </code></pre>
 
-<h3 id="extends">extends</h3>
-<p>Classes can extend multiple classes. The order in which they extend those classes is important. When a subclass tries to call a superclass's property, Hydra checks the first Class after the <code>extends</code> keyword and then the second and then the third until it either finds the correct property or throws an error.</p>
-<h3 id="supers">super(s)</h3>
+<h3 id="extends">extends:</h3>
+<p>Classes can extend multiple classes. The order in which they extend those classes is important. When a subclass tries to access a superclass's property via <code>this.&lt;property&gt;</code>, Hydra checks the first Class after the <code>extends</code> keyword and then the second and then the third until it either finds the correct property or throws an error.</p>
+<h3 id="supers">super(s):</h3>
 <p>The <code>super</code> keyword can be used to access the methods and variables of a class's superclasses. A superclasses constructor can be called one of three ways. The first is to use <code>super</code> similar to a namespace ie. <code>super.&lt;name of class&gt;(/* params... */)</code>. The second is to use the <code>supers()</code> function. This is for when a class inherits from more than one superclass. It takes a variable number of arrays, each containing the parameters to pass to its respective superclass constructor. Note that when using this method order matters. The last way is a simplified syntax for when you either only extend one superclass or you only want to call the constructor of the first superclass after the <code>extends</code> keyword. In this case the parameters are passed to <code>super</code> as a function call. If a superclass's constructor is not called, all of the variables that the constructor would have initialized are set to <code>null</code>.</p>
 <pre><code class="hydra">
 class A
@@ -1457,7 +1457,19 @@ end
 class F extends A, B
 
     F(){
-        super(25)
+        //Wrong order
+        supers(
+            ['From F'],
+            [25]
+        )
+    }
+
+end
+
+class G extends A, B
+
+    G(){
+        super(30)
     }
 
 end
@@ -1474,8 +1486,12 @@ e.num //20
 e.string //'In B From E'
 
 var f = new F()
-f.num //25
-f.string //null
+f.num //'From F'
+f.string //'In B 25'
+
+var g = new G()
+g.num //30
+g.string //null
 </code></pre>
 
 <p>The <code>super</code> keyword can also be used to call a superclass's method directly. Again, <code>super</code> may be used similar to a namespace.</p>
@@ -1499,13 +1515,13 @@ class Foo extends Dummy, Base
     Foo(){}
 
     function bar(zero){
-        if zero &lt; 0 {
+        if zero &lt; 0 then do
             super.Base.error(&quot;wompppp...too small&quot;)
-        } else if zero == 0 {
+        else if zero == 0 then do
             print('shwweeeeet')
-        } else {
+        else do
             this.error('wompppp...too big')
-        }
+        end
     }
 end
 
