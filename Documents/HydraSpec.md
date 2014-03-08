@@ -352,7 +352,7 @@ var f = 123.0
 ```
 
 ###Channel:
-Channels act as queues that are shared between different concurrent heads. Channels can be instantiated by their unbuffered literal ```<-->``` or their buffered literal ```<-int_value->```. Unbuffered channels block their current head until another one receives from the channel. Likewise, receives on an unbuffered channel block the current head until there is something in the channel to receive from. While channels have ```send``` and ```recv``` functions, the ```->``` and ```<-``` operator can be used to send to or receive from a channel respectively.
+Channels act as queues that are shared between different concurrent heads. Channels can be instantiated by their unbuffered literal ```<-->``` or their buffered literal ```<-int_value->```. While channels have ```send``` and ```recv``` functions, the ```->``` and ```<-``` operator can be used to send to or receive from a channel respectively.
 
 ```hydra
 var val
@@ -367,7 +367,7 @@ val = c.recv() //channel received 1
 val //1
 ```
 
-Unbuffered channel semantics
+Unbuffered channels block their current head until another one receives from the channel. Likewise, receives on an unbuffered channel block the current head until there is something in the channel to receive from.
 ```hydra
 //HEAD1
 var unbuffered = <-->   //unbuffered channel literal
@@ -381,7 +381,7 @@ spawn(){
 1 -> unbuffered //HEAD1 now blocked
 ```
 
-Buffered channel semantics
+Buffered channels do not block on sends unless they are full. Like unbuffered channels they do block on receive until there is something in the channel to receive.
 ```hydra
 //HEAD1
 var buffered   = <-10-> //burffered channel literal
@@ -621,6 +621,8 @@ f.bar(1)  // 'lols im not what you meant to call'
 ##Control Structures
 
 ###For Loop
+For loops get their own scope so there is no need for the ```var``` keyword. For loops work similary to most other languages except parenthesis are not required around the header.
+
 ```hydra
 function simple_for_loop(arr){
   //control structures get their own scope...no need for var here
@@ -769,6 +771,15 @@ function tricky_for_loop(){
     end
   }
 ```
+###Looping Keywords
+```hydra
+  for i = 0; i < 10; i++ do
+    if i % 2 != 0 then continue
+    if i == 8 then break
+    print(i) //0, 2, 4, 6
+  end
+```
+
 ###Given Is Statement
 ```hydra
   function given_is(obj){
@@ -797,18 +808,18 @@ function tricky_for_loop(){
       wait_for
         either recvd, clsd <- in_chan1 then do
           if clsd then
-            stop();
+            stop()
           else
-            out_chan <- do_something(recvd);
+            do_something(recvd) -> out_chan
           end
         or recvd, clsd <- in_chan2 then do
           if clsd then
-            break;
+            break
           else
-            out_chan <- do_something2(recvd);
+            do_something2(recvd) -> out_chan
           end
         or do
-          default();
+          default()
         end
       end
     end
