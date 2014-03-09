@@ -80,7 +80,7 @@ end
 
 //in class form
 
-class Sequence
+class Sequence //New Builtin Class?!?!
 
   Sequence(start_val, end_val, step_val){
     @_start_val = start_val
@@ -109,6 +109,19 @@ end
 
 var seq, done, i
 seq = new Sequence(start_num, end_num, step)
+done = seq.for_in_to_by(i)
+
+while !done do
+  //your code here...
+
+  done = seq.for_in_to_by()
+end
+
+//'from to by' being syntax sugar for the Sequence type allows for
+//the above to be written like
+
+var seq, done, i
+seq = start_num to end_num by step //or '..' instead of to
 done = seq.for_in_to_by(i)
 
 while !done do
