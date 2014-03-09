@@ -180,6 +180,8 @@ class Stream
   function produce(num_heads, buff_size, producer){
     @_prod_chan = new Producer_Pool(num_heads, buff_size)
       .start(producer)
+
+    return this
   }
 
   function process(num_heads, buff_size, middleware){
@@ -187,16 +189,24 @@ class Stream
 
     @_prod_chan = new Middleware_Pool(num_heads, buff_size)
       .start(@_prod_chan, middleware)
+
+    return this
   }
 
   function consume(num_heads, consumer){
+    @_ensure_producer()
+
+    new Consumer_pool(num_heads).start(@_prod_chan, consumer)
+  }
+
+  function consume_and_wait(num_heads, consumer){
     @_ensure_producer()
 
     var cons_pool = new Consumer_pool(num_heads).start(@_prod_chan, consumer)
     cons_pool.wait()
   }
 
-  function collect(){
+  function collect(num_heads, buff_size, middleware){
     @_ensure_producer()
 
     return new Middleware_Pool(num_heads, buff_size)

@@ -156,6 +156,60 @@ func (this *Middleware_Pool) start(c chan interface{}, middleware Middleware) ch
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
+//                               Stream                                       //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+type Stream struct {
+	prod_chan chan interface{}
+}
+
+func New_Stream() *Stream {
+	return new(Stream)
+}
+
+func (this *Stream) ensure_producer() {
+	if this.prod_chan == nil {
+		fmt.Println("Error: Streams must start with a producer")
+	}
+}
+
+func (this *Stream) produce(num_heads, buff_size int, producer Producer) *Stream {
+	this.prod_chan = New_Producer_Pool(num_heads, buff_size).start(producer)
+
+	return this
+}
+
+func (this *Stream) process(num_heads, buff_size int, middleware Middleware) *Stream {
+	this.ensure_producer()
+
+	this.prod_chan = New_Middleware_Pool(num_heads, buff_size).start(this.prod_chan, middleware)
+
+	return this
+}
+
+func (this *Stream) consume(num_heads int, consumer Consumer) {
+	this.ensure_producer()
+
+	New_Consumer_Pool(num_heads).start(this.prod_chan, consumer)
+}
+
+func (this *Stream) consume_and_wait(num_heads int, consumer Consumer) {
+	this.ensure_producer()
+
+	cons_pool := New_Consumer_Pool(num_heads)
+	cons_pool.start(this.prod_chan, consumer)
+	cons_pool.wait()
+}
+
+func (this *Stream) collect(num_heads, buff_size int, middleware Middleware) chan interface{} {
+	this.ensure_producer()
+
+	return New_Middleware_Pool(num_heads, buff_size).start(this.prod_chan, middleware)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
 //                               MAIN                                         //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,6 +217,7 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
+	//Hard Ways
 	var my_arr = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	prod_pool := New_Producer_Pool(10, 5)
@@ -203,4 +258,28 @@ func main() {
 	cons_pool.wait()
 
 	fmt.Println("All producers done, all messages printed, all channels closed")
+
+	fmt.Println("\n\n")
+
+	//Easy ways
+	New_Stream().produce(10, 5, func(i int, c chan interface{}) {
+		head_index := my_arr[i]
+
+		for j := 0; j < 10000; j++ {
+			c <- head_index
+		}
+	}).process(10, 5, func(data interface{}) interface{} {
+		return fmt.Sprintf("Changed values: %d", data)
+	}).consume(10, func(data interface{}) {
+		fmt.Println(data)
+	})
+
+	New_Stream().produce(10, 5, func(i int, c chan interface{}) {
+		my_vulgar_word := vulgar_arr[i%len(vulgar_arr)]
+		c <- my_vulgar_word
+	}).process(10, 5, func(data interface{}) interface{} {
+		return fmt.Sprintf("Changed FUCKING values: %s", data)
+	}).consume_and_wait(10, func(msg interface{}) {
+		fmt.Println(msg)
+	})
 }
