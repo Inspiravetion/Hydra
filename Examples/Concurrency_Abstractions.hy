@@ -149,72 +149,145 @@ end
 
 
 //Possible High Level Composition
-new Stream()
-.produce(10, 5, (chan){
+new Multi_Stream(10, 10, 10)
+.produce(5, (chan){
     something() -> chan
 })
-.process(10, 5, (data){
+.process(5, (data){
     return do_something_to_the(data)
 })
-.consume(10, (finished_data){ //dont need to collect data
+.consume((finished_data){ //dont need to collect data
     log(finished_data)
 })
 
-var results = new Stream()
-.produce(10, 5, (chan){
+var results = new Multi_Stream(10,10,10)
+.produce(5, (chan){
     something() -> chan
 })
-.process(10, 5, (data){
+.process(5, (data){
     return do_something_to_the(data)
 })
-.collect(10, 5, (finished_data){ //need to collect data
+.collect(5, (finished_data){ //need to collect data
     return prettify(finished_data)
 })
 
-class Stream
+for data in results do
+  print(data)
+end
 
-  Stream(){
+class Multi_Stream
+
+  Multi_Stream(num_prod, num_midd, num_cons){
     @_prod_chan = null
+    @_num_prod  = num_prod
+    @_num_midd  = num_midd
+    @_num_cons  = num_cons
   }
 
-  function produce(num_heads, buff_size, producer){
-    @_prod_chan = new Producer_Pool(num_heads, buff_size)
+  function produce(buff_size, producer){
+    @_prod_chan = new Producer_Pool(@_num_prod, buff_size)
       .start(producer)
 
     return this
   }
 
-  function process(num_heads, buff_size, middleware){
+  function process(buff_size, middleware){
     @_ensure_producer()
 
-    @_prod_chan = new Middleware_Pool(num_heads, buff_size)
+    @_prod_chan = new Middleware_Pool(@_num_midd, buff_size)
       .start(@_prod_chan, middleware)
 
     return this
   }
 
-  function consume(num_heads, consumer){
+  function consume(consumer){
     @_ensure_producer()
 
-    new Consumer_pool(num_heads).start(@_prod_chan, consumer)
+    new Consumer_pool(@_num_cons).start(@_prod_chan, consumer)
   }
 
-  function consume_and_wait(num_heads, consumer){
+  function consume_and_wait(consumer){
     @_ensure_producer()
 
-    var cons_pool = new Consumer_pool(num_heads).start(@_prod_chan, consumer)
+    var cons_pool = new Consumer_pool(@_num_cons).start(@_prod_chan, consumer)
     cons_pool.wait()
   }
 
-  function collect(num_heads, buff_size, middleware){
+  function collect(buff_size, middleware){
     @_ensure_producer()
 
-    return new Middleware_Pool(num_heads, buff_size)
+    return new Middleware_Pool(@_num_cons, buff_size)
       .start(@_prod_chan, middleware)
   }
 
   function _ensure_producer(){
     if !@_prod_chan then throw 'Streams must start with a producer' end
+  }
+
+end
+
+//Let you select from an array of channels, sending and recieving, and expose a for_in interface
+import select, Select_Case, SEND, RECV from std::runtime
+import Mutex from std::sync
+
+class Recv_Set
+
+  Recv_Set(recv_chans){
+
+    recv_chans.map((chan){
+        return new Select_Case(chan, RECV)
+    })
+
+    @_cases = recv_chans
+  }
+
+  gen function for_in(){ //for_in methods are going to have to be head safe so that
+    var chosen_index, value, still_open //multiple heads can run them
+
+    while @_cases.length > 0 do
+
+      chosen_index, value, still_open = select(@_cases)
+
+      if !still_open then
+        @_cases.remove(chosen_index)
+        continue
+      end
+
+      yield value
+
+    end
+  }
+
+end
+
+class Send_Set
+
+  Send_Set(send_chans){
+
+    send_chans.map((chan){
+        return new Select_Case(chan, SEND)
+    })
+
+    @_cases = send_chans
+    @_send_lock = new Mutex()
+  }
+
+  function send(val){
+    @_send_lock.lock()
+
+    for case in @_cases do
+        case.value = val
+    end
+
+    select(@_cases)
+
+    @_send_lock.unlock()
+  }
+
+  function close_all(){
+    for case in @_cases do
+      close(case.chan)
+    end
   }
 
 end
