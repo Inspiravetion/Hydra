@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"runtime"
 	"sync"
 )
@@ -12,33 +13,40 @@ import (
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-type Producer func(int, chan interface{})
+type Producer func(int, *Send_Set)
 
 type Producer_Pool struct {
 	wg        sync.WaitGroup
+	chans     []chan interface{}
+	send_set  *Send_Set
 	num_prods int
+	num_chans int
 	buff_size int
 }
 
-func New_Producer_Pool(num_prods int, buff_size int) *Producer_Pool {
-	return new(Producer_Pool).init(num_prods, buff_size)
+func New_Producer_Pool(num_prods, num_chans, buff_size int) *Producer_Pool {
+	return new(Producer_Pool).init(num_prods, num_chans, buff_size)
 }
 
-func (this *Producer_Pool) init(num_prods int, buff_size int) *Producer_Pool {
+func (this *Producer_Pool) init(num_prods, num_chans, buff_size int) *Producer_Pool {
 
 	this.buff_size = buff_size
 	this.num_prods = num_prods
+	this.num_chans = num_chans
+
+	this.send_set = New_Send_Set(make([]chan interface{}, 0))
 
 	return this
 }
 
-func (this *Producer_Pool) start(producer Producer) chan interface{} {
-	var channel chan interface{}
+func (this *Producer_Pool) start(producer Producer) []chan interface{} {
 
-	if this.buff_size > 1 {
-		channel = make(chan interface{}, this.buff_size)
-	} else {
-		channel = make(chan interface{})
+	for i := 0; i < this.num_chans; i++ {
+		if this.buff_size > 1 {
+			this.send_set.Add(make(chan interface{}, this.buff_size))
+		} else {
+			this.send_set.Add(make(chan interface{}))
+		}
 	}
 
 	this.wg.Add(this.num_prods)
@@ -46,16 +54,16 @@ func (this *Producer_Pool) start(producer Producer) chan interface{} {
 	for i := 0; i < this.num_prods; i++ {
 		go func(i int) {
 			defer this.wg.Done()
-			producer(i, channel)
+			producer(i, this.send_set)
 		}(i)
 	}
 
 	go func() {
 		this.wg.Wait()
-		close(channel)
+		this.send_set.Close_All()
 	}()
 
-	return channel
+	return this.send_set.Channels()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,28 +75,29 @@ func (this *Producer_Pool) start(producer Producer) chan interface{} {
 type Consumer func(interface{})
 
 type Consumer_Pool struct {
-	num_prods int
-	wg        sync.WaitGroup
+	num_cons int
+	wg       sync.WaitGroup
 }
 
-func New_Consumer_Pool(num_prods int) *Consumer_Pool {
-	return new(Consumer_Pool).init(num_prods)
+func New_Consumer_Pool(num_cons int) *Consumer_Pool {
+	return new(Consumer_Pool).init(num_cons)
 }
 
-func (this *Consumer_Pool) init(num_prods int) *Consumer_Pool {
-	this.num_prods = num_prods
+func (this *Consumer_Pool) init(num_cons int) *Consumer_Pool {
+	this.num_cons = num_cons
 
 	return this
 }
 
-func (this *Consumer_Pool) start(c chan interface{}, consumer Consumer) {
+func (this *Consumer_Pool) start(chans []chan interface{}, consumer Consumer) {
+	recv_set := New_Recv_Set(chans)
 
-	this.wg.Add(this.num_prods)
+	this.wg.Add(this.num_cons)
 
-	for i := 0; i < this.num_prods; i++ {
+	for i := 0; i < this.num_cons; i++ {
 		go func() {
 			defer this.wg.Done()
-			for data := range c {
+			for data, done := recv_set.Next(); !done; data, done = recv_set.Next() {
 				consumer(data)
 			}
 		}()
@@ -106,106 +115,286 @@ func (this *Consumer_Pool) wait() {
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-type Middleware func(interface{}) interface{}
+type Middleware func(interface{}, *Send_Set)
 
 type Middleware_Pool struct {
-	num_heads int
-	buf_size  int
 	wg        sync.WaitGroup
+	send_set  *Send_Set
+	num_chans int
+	num_heads int
+	buff_size int
 }
 
-func New_Middleware_Pool(num_heads int, buf_size int) *Middleware_Pool {
-	return new(Middleware_Pool).init(num_heads, buf_size)
+func New_Middleware_Pool(num_heads, num_chans, buf_size int) *Middleware_Pool {
+	return new(Middleware_Pool).init(num_heads, num_chans, buf_size)
 }
 
-func (this *Middleware_Pool) init(num_heads int, buf_size int) *Middleware_Pool {
+func (this *Middleware_Pool) init(num_heads, num_chans, buf_size int) *Middleware_Pool {
+	this.num_chans = num_chans
 	this.num_heads = num_heads
-	this.buf_size = buf_size
+	this.buff_size = buf_size
+
+	this.send_set = New_Send_Set(make([]chan interface{}, 0))
 
 	return this
 }
 
-func (this *Middleware_Pool) start(c chan interface{}, middleware Middleware) chan interface{} {
-	var out_chan chan interface{}
+func (this *Middleware_Pool) start(in_chans []chan interface{}, middleware Middleware) []chan interface{} {
 
-	if this.buf_size > 1 {
-		out_chan = make(chan interface{}, this.buf_size)
-	} else {
-		out_chan = make(chan interface{})
+	for i := 0; i < this.num_chans; i++ {
+		if this.buff_size > 1 {
+			this.send_set.Add(make(chan interface{}, this.buff_size))
+		} else {
+			this.send_set.Add(make(chan interface{}))
+		}
 	}
 
 	this.wg.Add(this.num_heads)
 
+	recv_set := New_Recv_Set(in_chans)
+
 	for i := 0; i < this.num_heads; i++ {
 		go func() {
 			defer this.wg.Done()
-			for data := range c {
-				out_chan <- middleware(data)
+			for data, done := recv_set.Next(); !done; data, done = recv_set.Next() {
+				middleware(data, this.send_set)
 			}
 		}()
 	}
 
 	go func() {
 		this.wg.Wait()
-		close(out_chan)
+		this.send_set.Close_All()
 	}()
 
-	return out_chan
+	return this.send_set.Channels()
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
-//                               Stream                                       //
+//                               Send_Set                                     //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-type Stream struct {
-	prod_chan chan interface{}
+type Send_Set struct {
+	loop_lock sync.Mutex
+	send_lock sync.Mutex
+	cases     []reflect.SelectCase
 }
 
-func New_Stream() *Stream {
-	return new(Stream)
+func New_Send_Set(chans []chan interface{}) *Send_Set {
+	return new(Send_Set).init(chans)
 }
 
-func (this *Stream) ensure_producer() {
-	if this.prod_chan == nil {
+func (this *Send_Set) init(chans []chan interface{}) *Send_Set {
+	this.cases = make([]reflect.SelectCase, len(chans))
+
+	for i := 0; i < len(chans); i++ {
+		this.cases[i] = reflect.SelectCase{
+			Dir:  reflect.SelectSend,
+			Chan: reflect.ValueOf(chans[i]),
+		}
+	}
+
+	return this
+}
+
+func (this *Send_Set) Send(val interface{}) {
+	this.send_lock.Lock()
+	defer this.send_lock.Unlock()
+
+	for i := 0; i < len(this.cases); i++ {
+		this.cases[i].Send = reflect.ValueOf(val)
+	}
+
+	reflect.Select(this.cases)
+}
+
+func (this *Send_Set) Close_All() {
+	for i := 0; i < len(this.cases); i++ {
+		c, _ := this.cases[i].Chan.Interface().(chan interface{})
+		close(c)
+	}
+}
+
+func (this *Send_Set) Add(c chan interface{}) {
+	this.send_lock.Lock()
+	defer this.send_lock.Unlock()
+
+	this.cases = append(this.cases, reflect.SelectCase{
+		Dir:  reflect.SelectSend,
+		Chan: reflect.ValueOf(c),
+	})
+}
+
+func (this *Send_Set) Channels() []chan interface{} {
+	chans := make([]chan interface{}, len(this.cases))
+
+	for i := 0; i < len(this.cases); i++ {
+		c, _ := this.cases[i].Chan.Interface().(chan interface{})
+		chans[i] = c
+	}
+
+	return chans
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//                               Recv_Set                                     //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+type Recv_Set struct {
+	loop_lock sync.Mutex
+	case_lock sync.Mutex
+	cases     []reflect.SelectCase
+}
+
+func New_Recv_Set(chans []chan interface{}) *Recv_Set {
+	return new(Recv_Set).init(chans)
+}
+
+func (this *Recv_Set) init(chans []chan interface{}) *Recv_Set {
+	this.cases = make([]reflect.SelectCase, len(chans))
+
+	for i := 0; i < len(chans); i++ {
+		this.cases[i] = reflect.SelectCase{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(chans[i]),
+		}
+	}
+
+	return this
+}
+
+func (this *Recv_Set) is_empty() bool {
+	this.case_lock.Lock()
+	defer this.case_lock.Unlock()
+
+	empty := len(this.cases) <= 0
+	return empty
+}
+
+func (this *Recv_Set) Add(c chan interface{}) {
+	this.case_lock.Lock()
+	defer this.case_lock.Unlock()
+
+	this.cases = append(this.cases, reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(c),
+	})
+}
+
+func (this *Recv_Set) Next() (interface{}, bool) {
+	this.loop_lock.Lock()
+
+	if !this.is_empty() {
+
+		chosen_index, value, still_open := reflect.Select(this.cases)
+
+		if !still_open {
+			this.case_lock.Lock()
+			this.cases[chosen_index] = this.cases[len(this.cases)-1]
+			this.cases = this.cases[0 : len(this.cases)-1]
+			this.case_lock.Unlock()
+			this.loop_lock.Unlock()
+			return this.Next()
+		}
+
+		this.loop_lock.Unlock()
+		return value.Interface(), false
+
+	} else {
+		this.loop_lock.Unlock()
+		return nil, true
+	}
+
+}
+
+func (this *Recv_Set) Channels() []chan interface{} {
+	this.case_lock.Lock()
+	defer this.case_lock.Unlock()
+
+	chans := make([]chan interface{}, len(this.cases))
+
+	for i := 0; i < len(this.cases); i++ {
+		c, _ := this.cases[i].Chan.Interface().(chan interface{})
+		chans[i] = c
+	}
+
+	return chans
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//                               Multi_Stream                                 //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+type Multi_Stream struct {
+	prod_chans *Recv_Set
+	num_prod   int
+	num_midd   int
+	num_cons   int
+}
+
+func New_Multi_Stream(prods, midds, cons int) *Multi_Stream {
+	return new(Multi_Stream).init(prods, midds, cons)
+}
+
+func (this *Multi_Stream) init(prods, midds, cons int) *Multi_Stream {
+	this.num_prod = prods
+	this.num_midd = midds
+	this.num_cons = cons
+
+	return this
+}
+
+func (this *Multi_Stream) ensure_producer() {
+	if this.prod_chans == nil {
 		fmt.Println("Error: Streams must start with a producer")
 	}
 }
 
-func (this *Stream) produce(num_heads, buff_size int, producer Producer) *Stream {
-	this.prod_chan = New_Producer_Pool(num_heads, buff_size).start(producer)
+func (this *Multi_Stream) Produce(num_out_chans, buff_size int, producer Producer) *Multi_Stream {
+
+	chans := New_Producer_Pool(this.num_prod, num_out_chans, buff_size).start(producer)
+
+	this.prod_chans = New_Recv_Set(chans)
 
 	return this
 }
 
-func (this *Stream) process(num_heads, buff_size int, middleware Middleware) *Stream {
+func (this *Multi_Stream) Process(num_out_chans, buff_size int, middleware Middleware) *Multi_Stream {
 	this.ensure_producer()
 
-	this.prod_chan = New_Middleware_Pool(num_heads, buff_size).start(this.prod_chan, middleware)
+	chans := New_Middleware_Pool(this.num_midd, num_out_chans, buff_size).start(this.prod_chans.Channels(), middleware)
+
+	this.prod_chans = New_Recv_Set(chans)
 
 	return this
 }
 
-func (this *Stream) consume(num_heads int, consumer Consumer) {
+func (this *Multi_Stream) Consume(consumer Consumer) {
 	this.ensure_producer()
 
-	New_Consumer_Pool(num_heads).start(this.prod_chan, consumer)
+	New_Consumer_Pool(this.num_cons).start(this.prod_chans.Channels(), consumer)
 }
 
-func (this *Stream) consume_and_wait(num_heads int, consumer Consumer) {
+func (this *Multi_Stream) Consume_And_Wait(consumer Consumer) {
 	this.ensure_producer()
 
-	cons_pool := New_Consumer_Pool(num_heads)
-	cons_pool.start(this.prod_chan, consumer)
+	cons_pool := New_Consumer_Pool(this.num_cons)
+	cons_pool.start(this.prod_chans.Channels(), consumer)
 	cons_pool.wait()
 }
 
-func (this *Stream) collect(num_heads, buff_size int, middleware Middleware) chan interface{} {
+func (this *Multi_Stream) Collect(num_out_chans, buff_size int, middleware Middleware) []chan interface{} {
 	this.ensure_producer()
 
-	return New_Middleware_Pool(num_heads, buff_size).start(this.prod_chan, middleware)
+	return New_Middleware_Pool(this.num_midd, num_out_chans, buff_size).start(this.prod_chans.Channels(), middleware)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,66 +409,27 @@ func main() {
 	//Hard Ways
 	var my_arr = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
-	prod_pool := New_Producer_Pool(10, 5)
-	midd_pool := New_Middleware_Pool(10, 5)
-	cons_pool := New_Consumer_Pool(10)
-
-	messages := prod_pool.start(func(i int, c chan interface{}) {
-		head_index := my_arr[i]
-
-		for j := 0; j < 10000; j++ {
-			c <- head_index
-		}
-	})
-
-	mutated_messages := midd_pool.start(messages, func(data interface{}) interface{} {
-		return fmt.Sprintf("Changed values: %d", data)
-	})
-
-	cons_pool.start(mutated_messages, func(msg interface{}) {
-		fmt.Println(msg)
-	})
-
 	var vulgar_arr = []string{"fuck", "damn", "shit"}
 
-	vulgar_messages := prod_pool.start(func(i int, c chan interface{}) {
-		my_vulgar_word := vulgar_arr[i%len(vulgar_arr)]
-		c <- my_vulgar_word
-	})
-
-	mutated_vulgar_messages := midd_pool.start(vulgar_messages, func(data interface{}) interface{} {
-		return fmt.Sprintf("Changed FUCKING values: %s", data)
-	})
-
-	cons_pool.start(mutated_vulgar_messages, func(msg interface{}) {
-		fmt.Println(msg)
-	})
-
-	cons_pool.wait()
-
-	fmt.Println("All producers done, all messages printed, all channels closed")
-
-	fmt.Println("\n\n")
-
 	//Easy ways
-	New_Stream().produce(10, 5, func(i int, c chan interface{}) {
+	New_Multi_Stream(10, 10, 10).Produce(5, 2, func(i int, chans *Send_Set) {
 		head_index := my_arr[i]
 
 		for j := 0; j < 10000; j++ {
-			c <- head_index
+			chans.Send(head_index)
 		}
-	}).process(10, 5, func(data interface{}) interface{} {
-		return fmt.Sprintf("Changed values: %d", data)
-	}).consume(10, func(data interface{}) {
+	}).Process(5, 2, func(data interface{}, chans *Send_Set) {
+		chans.Send(fmt.Sprintf("Changed values: %d", data))
+	}).Consume_And_Wait(func(data interface{}) {
 		fmt.Println(data)
 	})
 
-	New_Stream().produce(10, 5, func(i int, c chan interface{}) {
+	New_Multi_Stream(10, 10, 10).Produce(5, 2, func(i int, chans *Send_Set) {
 		my_vulgar_word := vulgar_arr[i%len(vulgar_arr)]
-		c <- my_vulgar_word
-	}).process(10, 5, func(data interface{}) interface{} {
-		return fmt.Sprintf("Changed FUCKING values: %s", data)
-	}).consume_and_wait(10, func(msg interface{}) {
+		chans.Send(my_vulgar_word)
+	}).Process(5, 2, func(data interface{}, chans *Send_Set) {
+		chans.Send(fmt.Sprintf("Changed FUCKING values: %s", data))
+	}).Consume_And_Wait(func(msg interface{}) {
 		fmt.Println(msg)
 	})
 }

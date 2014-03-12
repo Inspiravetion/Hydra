@@ -46,38 +46,46 @@ import WaitGroup from std::sync
 
 class Producer_Pool
 
-  Producer_Pool(num_prods, buf_size){
+  Producer_Pool(num_prods, num_chans, buf_size){
     @_num_prods = num_prods
+    @_num_chans = num_chans
     @_buf_size  = buf_size
     @_wg        = new WaitGroup()
+    @_chans     = []
+    @_send_set  = new SendSet()
   }
 
   //This assumes that BOTH and ONLY functions and Channels get passed by reference
   //into closures...super intuitive but don't forget
   function start(producer){
-    var chan
 
-    if @_buf_size and @_buf_size.is_a? Int then
-      chan = <-@_buf_size->
-    else
-      chan = <-->
+    for i in 0 to @_num_chans do
+
+      if @_buf_size and @_buf_size.is_a? Int then
+        @_send_set.add(<-@_buf_size->)
+      else
+        @_send_set.add(<-->)
+      end
+
     end
 
     @_wg.add(@_num_prods)
 
     for i in 0 to @num_prods do
-      spawn (wg){
-        producer(i, chan) //WHAT IF ERROR HERE?!?!
+      spawn (wg, send_set){
+        for val in producer do //WHAT IF ERROR HERE?!?!...also for_in should be able to take a class with a for_in generator or a straight generator function
+          send_set.send(val)
+        end
         wg.done() //WILL THIS STILL GET CALLED??!?!...how does rust/go do it?
-      }(@_wg)              //DO WE NEED DEFER?!?!
+      }(@_wg, @_send_set)              //DO WE NEED DEFER?!?!
     end
 
-    spawn (wg){
+    spawn (wg, send_set){
       wg.wait()
-      close(chan)
-    }(@_wg)
+      send_set.close_all()
+    }(@_wg, @_send_set)
 
-    return chan
+    return @_send_set.channels()
   }
 
 end
@@ -89,16 +97,18 @@ class Consumer_Pool //Scaling this to multiple channels is going to
     @_wg       = new WaitGroup()
   }
 
-  function start(chan, consumer){ //get this to scale to an arbitrary number of chanels
+  function start(chans, consumer){ //get this to scale to an arbitrary number of chanels
+    var recv_set = new Recv_Set(chans)
+
     @_wg.add(@_num_cons)
 
     for _ in 0 to @_num_cons do
-      spawn (wg){
-        for data in chan do
+      spawn (wg, recv_set){
+        for data in recv_set do
           consumer(data)
         end
         wg.done()
-      }(@_wg)
+      }(@_wg, recv_set)
     end
   }
 
@@ -110,38 +120,44 @@ end
 
 class Middleware_Pool //take in data from one channel...yield a value to be sent to an out channel
 
-  Middleware_Pool(num_heads, buf_size){
+  Middleware_Pool(num_heads, num_chans, buf_size){
     @_num_heads = num_heads
     @_buf_size  = buf_size
     @_wg        = new WaitGroup()
+    @_num_chans = num_chans
+    @_send_set  = new Send_Set()
   }
 
-  function start(in_chan, middleware){
-    var out_chan
+  function start(in_chans, middleware){
+    for i in 0 to @_num_chans do
 
-    if @_buf_size and @_buf_size.is_a? Int then
-      out_chan = <-@_buf_size->
-    else
-      out_chan = <-->
+      if @_buf_size and @_buf_size.is_a? Int then
+        @_send_set.add(<-@_buf_size->)
+      else
+        @_send_set.add(<-->)
+      end
+
     end
 
     @_wg.add(@_num_heads)
 
+    var recv_set = new Recv_Set(in_chans)
+
     for _ in 0 to @_num_heads do
-      spawn(wg){
-        for data in in_chan do
-          middleware(data) -> out_chan
+      spawn(wg, send_set, recv_set){
+        for data in recv_set do
+          send_set.send(middleware(data))
         end
         wg.done()
-      }(@_wg)
+      }(@_wg, @_send_set, recv_set)
     end
 
-    spawn (wg){
+    spawn (wg, send_set){
       wg.wait()
-      close(out_chan)
-    }(@_wg)
+      send_set.close_all()
+    }(@_wg, @_send_set)
 
-    return out_chan
+    return @_send_set.channels()
 
   }
 
@@ -175,27 +191,42 @@ for data in results do
   print(data)
 end
 
+//WHAT THE NEW ONE WILL BE LIKE
+//------------------------------------------------------------------------------
+
+new Multi_Stream(10, 10, 10)
+.produce(5, 2, *(chan){
+    for i in 0 to 10 do
+      yield something()
+    end
+})
+.consume((finished_data){ //dont need to collect data
+    log(finished_data)
+})
+//------------------------------------------------------------------------------
+
+
 class Multi_Stream
 
   Multi_Stream(num_prod, num_midd, num_cons){
-    @_prod_chan = null
-    @_num_prod  = num_prod
-    @_num_midd  = num_midd
-    @_num_cons  = num_cons
+    @_prod_chans = null
+    @_num_prod   = num_prod
+    @_num_midd   = num_midd
+    @_num_cons   = num_cons
   }
 
-  function produce(buff_size, producer){
-    @_prod_chan = new Producer_Pool(@_num_prod, buff_size)
+  function produce(num_out_chans, buff_size, producer){
+    @_prod_chans = new Producer_Pool(@_num_prod, num_out_chans, buff_size)
       .start(producer)
 
     return this
   }
 
-  function process(buff_size, middleware){
+  function process(num_out_chans, buff_size, middleware){
     @_ensure_producer()
 
-    @_prod_chan = new Middleware_Pool(@_num_midd, buff_size)
-      .start(@_prod_chan, middleware)
+    @_prod_chans = new Middleware_Pool(@_num_midd, num_out_chans, buff_size)
+      .start(@_prod_chans, middleware)
 
     return this
   }
@@ -203,21 +234,21 @@ class Multi_Stream
   function consume(consumer){
     @_ensure_producer()
 
-    new Consumer_pool(@_num_cons).start(@_prod_chan, consumer)
+    new Consumer_pool(@_num_cons).start(@_prod_chans, consumer)
   }
 
   function consume_and_wait(consumer){
     @_ensure_producer()
 
-    var cons_pool = new Consumer_pool(@_num_cons).start(@_prod_chan, consumer)
+    var cons_pool = new Consumer_pool(@_num_cons).start(@_prod_chans, consumer)
     cons_pool.wait()
   }
 
-  function collect(buff_size, middleware){
+  function collect(num_out_chans, buff_size, middleware){
     @_ensure_producer()
 
-    return new Middleware_Pool(@_num_cons, buff_size)
-      .start(@_prod_chan, middleware)
+    return new Middleware_Pool(@_num_cons, num_out_chans, buff_size)
+      .start(@_prod_chans, middleware)
   }
 
   function _ensure_producer(){
@@ -232,24 +263,27 @@ import Mutex from std::sync
 
 class Recv_Set
 
-  Recv_Set(recv_chans){
+  Recv_Set(recv_chans=[]){
 
     recv_chans.map((chan){
         return new Select_Case(chan, RECV)
     })
 
     @_cases = recv_chans
+    @_cases_lock = new Mutex()
   }
 
   gen function for_in(){ //for_in methods are going to have to be head safe so that
     var chosen_index, value, still_open //multiple heads can run them
 
-    while @_cases.length > 0 do
+    while !@empty?() do
 
       chosen_index, value, still_open = select(@_cases)
 
       if !still_open then
+        @_cases_lock.lock()
         @_cases.remove(chosen_index)
+        @_cases_lock.unlock()
         continue
       end
 
@@ -258,11 +292,29 @@ class Recv_Set
     end
   }
 
+  function add(chan){
+    @_cases_lock.lock()
+    @_cases.push(new Select_Case(chan, RECV))
+    @_cases_lock.unlock()
+  }
+
+  function empty?(){
+    var empty
+
+    @cases_lock.lock()
+
+    empty = @_cases.length <= 0
+
+    @cases_lock.unlock()
+
+    return empty
+  }
+
 end
 
 class Send_Set
 
-  Send_Set(send_chans){
+  Send_Set(send_chans=[]){
 
     send_chans.map((chan){
         return new Select_Case(chan, SEND)
@@ -288,6 +340,22 @@ class Send_Set
     for case in @_cases do
       close(case.chan)
     end
+  }
+
+  function add(chan){
+    @_send_lock.lock()
+    @_cases.push(new Select_Case(chan, SEND))
+    @_send_lock.unlock()
+  }
+
+  function channels(){
+    var chans = []
+
+    for case in @_cases do
+      chans.push(case.chan)
+    end
+
+    return chans
   }
 
 end
