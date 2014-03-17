@@ -7,6 +7,43 @@
 //after 'in' in the loop will only change the loop if that objects for_in generator
 //function takes it into account
 
+//To allow a class to be able to be used in a for in loop, it get opt in in one of
+//two ways. By default, for in will look for a public generator function on the object
+//with the name 'for_in'. Alternatively, for in can be given a generator that it will
+//call directly. ie.
+
+class Binary_Tree
+
+  Binary_Tree(){
+    //initialization...
+  }
+
+  gen function preorder(){
+    //yield values in preorder...
+  }
+
+  function inorder(){
+    return *(){
+      //yield values in inorder...
+    }
+  }
+
+  gen function postorder(){
+    //yield values in postorder...
+  }
+
+end
+
+btree = new Binary_Tree()
+//add a bunch of stuff...
+for val in btree.preorder do //giving function not invoking it
+  //print out a preorder representation
+end
+
+for val in btree.inorder() do //invoking function to get generator
+  //print out a inorder representation
+end
+
 //For in syntax
 //-------------------------------------
 
@@ -122,10 +159,10 @@ for_in_by(0, 6, 2)
 
 //exclusive Range
 0..6 by 2 //0,2,4
-0 upto 6 //0,2,4
+0 upto 6 by 2//0,2,4
 new Range(0, 6, 2, false) //0,2,4
 
 //Inclusive Range
 0...6 by 2 //0,2,4,6
-0 through 6 //0,2,4,6
+0 through 6 by 2 //0,2,4,6
 new Ranger(0, 6, 2, true)
