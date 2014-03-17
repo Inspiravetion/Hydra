@@ -229,6 +229,7 @@ func (this *Send_Set) Add(c chan interface{}) {
 }
 
 func (this *Send_Set) Channels() []chan interface{} {
+
 	chans := make([]chan interface{}, len(this.cases))
 
 	for i := 0; i < len(this.cases); i++ {
@@ -402,11 +403,11 @@ func (this *Multi_Stream) Collect(num_out_chans, buff_size int, middleware Middl
 //                               MAIN                                         //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
+
 func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	//Hard Ways
 	var my_arr = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	var vulgar_arr = []string{"fuck", "damn", "shit"}

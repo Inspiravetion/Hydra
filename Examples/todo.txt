@@ -1,0 +1,73 @@
+//todo:
+//  1. work out @<property> copying or giving direct acces to <property> in a closure
+//      ->leaning towards treating @ as a pointer to the intance that it comes from so
+//      that copying semantics are technically kept but you still get real references to
+//      <property>
+class Incrementer
+
+  Incrementer(step){
+    @step = step
+  }
+
+  gen function genner(){
+    return (){
+      var count = 0
+      yield count
+      while true do
+        yield count += @step
+      end
+    }
+  }
+
+end
+
+var inc = new Incrementer(3)
+var gnrtr = inc.genner()
+
+gnrtr() //0
+gnrtr() //3
+inc.step = 5
+gnrtr() //8
+//concurrently this pattern would allow for each head to have their own unique generator BUT
+//if any of them changed the step value of the @step it would affect all of them...so
+//properties of classes that can run in concurrent functions should get RWmutexes...accept when do u decide
+//to make that implicit vs putting it on the user?
+
+class Safer_Incrementer
+
+  Safer_Incrementer(step){
+    @step = step
+  }
+
+  gen function genner(){
+    var step = @step
+    return (){
+      var count = 0
+      yield count
+      while true do
+        yield count += step
+      end
+    }
+  }
+
+end
+
+var inc = new Safer_Incrementer(3)
+var gnrtr = inc.genner()
+
+gnrtr() //0
+gnrtr() //3
+inc.step = 5
+gnrtr() //6
+
+//  2.concurrent calls to generators
+//      ->for generators attached to classes it makes sense to let concurrent calls get the
+//      next object in the generators sequence until it is done...how do u make sure all of them
+//      know when it is done though?!?!...maybe have the generator always return that it is done
+//      until it is explicitly is restarted and introduce a new key word?
+//      ->what do we do for top level closures?
+// 4.If you pass a number or string into a function, as a variable or literal, can that function change
+// the value of the variable in the callers scope?...you cant in ruby and js
+
+
+//***CONCURRENT*** CLOSURES/GENERATORS/CLASSES/ITERATION WILL BE THE CORNER STONES OF HYDRA...GOTTA FIGURE THESE OUT
