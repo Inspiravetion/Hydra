@@ -10,7 +10,7 @@ class Incrementer
   }
 
   gen function genner(){
-    return (){
+    return *(){
       var count = 0
       yield count
       while true do

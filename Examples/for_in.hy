@@ -18,17 +18,17 @@ class Binary_Tree
     //initialization...
   }
 
-  gen function preorder(){
+  gen function preorder(maxdepth=-1){
     //yield values in preorder...
   }
 
-  function inorder(){
+  function inorder(maxdepth=-1){
     return *(){
       //yield values in inorder...
     }
   }
 
-  gen function postorder(){
+  gen function postorder(maxdepth=-1){
     //yield values in postorder...
   }
 
