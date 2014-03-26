@@ -162,10 +162,10 @@ marr = new My_Array(1, 2, 3, 4, 5, 6)
 rev1 = marr.rev()
 rev2 = marr.rev()
 
-rev1() //6
-rev1() //5
+rev1() //6, false
+rev1() //5, false
 
-rev2() //6
+rev2() //6, false
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                Concurrent Use                              //
@@ -192,6 +192,9 @@ end
 
 var marr = new My_Array(1, 2, 3, 4, 5, 6)
 
+//Multiple Generator Instances
+//-------------------------------------
+
 //Both get their own generator instance when they call rev() BUT both could be messed up
 //as length isnt protected
 spawn (ma){
@@ -208,3 +211,20 @@ spawn (ma){
 
 marr.pop() //this could cause a data race as the generators get the real reference to
 //the marr.length property
+
+//Single Generator Instances
+//-------------------------------------
+
+var rev_elems = marr.rev() //generators should get captured by reference in closures
+
+spawn (){
+  for i in rev_elems do
+    print(i) //6,5,2 ***actual order depends on scheduling***
+  end
+}
+
+spawn (){
+  for i in rev_elems do
+    print(i) //4,3,1 ***actual order depends on scheduling***
+  end
+}

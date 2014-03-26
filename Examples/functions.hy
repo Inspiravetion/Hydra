@@ -1,5 +1,5 @@
 //Numbers, Bools, Strings => passed by value
-//Hashes, Arrays, Chans, Objects => passed by reference
+//Hashes, Arrays, Chans, Generators, Objects => passed by reference
 //-------------------------------------
 
 function negate(b){
@@ -42,6 +42,22 @@ function sender(c){
 var chan = <-->
 spawn sender(chan)
 print(<-chan) //1
+
+function caller(genrtr){
+  print(genrtr())
+}
+
+var g = *(){
+  for i in 0 upto 3 do
+    yield i
+  end
+}
+
+var genrtr = g()
+
+print(genrtr()) //0
+caller(genrtr)  //1
+print(genrtr()) //2
 
 //Same semantics for assignment
 //-------------------------------------
