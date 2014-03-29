@@ -3,14 +3,14 @@
 //The variables between the 'for' and 'in' are restricted to the loop scope and
 //after every iteration they are passed back into the generator so that it can
 //take into account their change if need be. Otherwise the generator can ignore
-//the change and make the loop un-alterable once it starts. changing the object
-//after 'in' in the loop will only change the loop if that objects for_in generator
-//function takes it into account
+//the change and make the loop un-alterable once it starts. If the object after 'in' is not a generator, changing it
+//in the loop will only change the loop if that objects 'for_in' generator
+//function takes it into account.
 
-//To allow a class to be able to be used in a for in loop, it can opt in in one of
-//two ways. By default, for in will look for a public generator function on the object
+//A for in loop takes a generator or class instance and loops through its values.
+//If a class is given, for in will look for a public generator function on the object
 //with the name 'for_in'. Alternatively, for in can be given a generator instance that it will
-//call directly. ie.
+//call directly.
 
 class Binary_Tree
 

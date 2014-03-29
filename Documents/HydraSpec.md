@@ -225,9 +225,9 @@ var word_generator = *(){
 }
 
 var words = word_generator()
-words() //'omg'
-words() //"it's"
-words() //'a'
+words() //false, 'omg'
+words() //false, "it's"
+words() //false, 'a'
 ```
 
 As you may have noticed, the trailing parenthesis on the closure definition do not invoke it. Instead they serve as a short syntax to bind values to the parameters of a closure. This has two implications. The first, and more prevalent, one is that if you have a closure that has bound parameters and takes in new parameters on each call, you will have to place all of the bound parameters at the front of the parameter list. The second, is that if you want to immediately invoke a closure then it will have to be wrapped in parenthesis so that it can be evaluated and then invoked.
@@ -303,18 +303,34 @@ end
 ```
 More often than not, generators yield values without needing any feedback. However, values can be passed back to a yielding generator by passing them as function parameters to the instance. The generator will get the values the next time it is called after it yields and it will resume execution from there.
 ```hydra
-gen function echoer(start){
-  var msg = start
+gen function echoer(start1, start2){
+  var msg1, msg2 = start1, start2
   while true do
-    msg = yield msg
+    msg1, msg2 = yield msg1 + ' ' +  msg2
   end
 }
 
-var echo = echoer('hey')
-echo() //'hey'
-echo('there') //'there'
-echo('good') //'good'
-echo('lookin') //'lookin'
+var echo = echoer('hey', 'there')
+echo() //'hey there'
+echo('good', 'lookin') //false, 'good lookin'
+echo('how', 'YOU')  //false, 'how YOU'
+echo('doin', '?') //false, 'doin ?'
+```
+Because generators need to be consistent even when being used concurrently, they are protected by a mutex so that only one head can run any generator instance at a time.
+```hydra
+var nums = 0 upto 10
+
+spawn (){
+  for i in nums do
+    print(i) //0,1,3,6,7,8 ***actual order depends on scheduling***
+  end
+}
+
+spawn (){
+  for i in nums do
+    print(i) //2,4,5,9 ***actual order depends on scheduling***
+  end
+}
 ```
 
 ###Array:
@@ -669,7 +685,8 @@ f.bar(1)  // 'lols im not what you meant to call'
 
 ##Control Structures
 
-###For In Loop(mention for_in generator function api)
+###For In Loop:
+A for in loop takes a generator or class instance and loops through its values. If a class is given, for in will look for a public generator function on the object with the name 'for_in'. Alternatively, for in can be given a generator instance that it will call directly. The variables between the 'for' and 'in' are restricted to the loop scope and after every iteration they are passed back into the generator so that it can take into account their change if need be. Otherwise the generator can ignore the change and make the loop un-alterable once it starts. If the object after 'in' is not a generator, changing it in the loop will only change the loop if that objects 'for_in' generator function takes it into account.
 ```hydra
   function map_for_in(){
     var map = { one: 1, two: 2 };
@@ -703,8 +720,55 @@ f.bar(1)  // 'lols im not what you meant to call'
     print('channel closed');
   }
 ```
+As long as the for in loop gets a generator instance, it doesn't matter if it came from a closure or is returned from a function call.
+```hydra
+class Binary_Tree
+
+  Binary_Tree(){
+    //initialization...
+  }
+
+  gen function preorder(maxdepth=-1){
+    //yield values in preorder...
+  }
+
+  function inorder(maxdepth=-1){
+    return *(){
+      //yield values in inorder...
+    }
+  }
+
+  function postorder(maxdepth=-1){
+    var copy_me = @property
+    var genner = *(){
+      //yield values in postorder...
+      //copy property instead of giving direct access to it
+    }
+    return genner()
+  }
+
+end
+
+btree = new Binary_Tree()
+
+//add a bunch of stuff...
+
+for val in btree.preorder() do //invoking generator function to get generator instance
+  //print out a preorder representation
+end
+
+for val in btree.postorder() do //invoking function to get generator instance
+  //print out a postorder representation
+end
+
+for val in (btree.inorder())() do //invoking function to get generator closure then invoking
+                                  //generator closure to get generator instance
+  //print out a inorder representation
+end
+```
 
 ###While Loop
+A while loop takes an expression, which may contain multiple statements, and runs a block of code while the given expression evaluates to a truthy value. Variables in a while loop can come from its outter scope. However, if a new variable is created in the while loop it is only reachable in the scope of the while loop.
 ```hydra
   function while_loop(){
     var bool = true
@@ -713,18 +777,30 @@ f.bar(1)  // 'lols im not what you meant to call'
       bool = some_func_call();
     end
   }
+
+  function multi_stmt_while_loop(){
+    while char = get_next_char(); char != EOF do
+      print(char)
+    end
+
+    print(char) //Error: no char variable in current scope
+  }
 ```
 
 ###Looping Keywords
+In both for in and while loops, the ```continue``` and ```break``` key words can be used to alter the control flow. The ```continue``` keyword makes the loop skip executing the rest of the code in that iteration and starts the next iteration immediately. The ```break``` keyword stops the loop all together and passes control to the next statement outside of the loop.
 ```hydra
-  for i = 0; i < 10; i++ do
-    if i % 2 != 0 then continue
-    if i == 8 then break
+  for i in 0 upto 10 do
+    if i % 2 != 0 then continue end
+    if i == 8 then break end
     print(i) //0, 2, 4, 6
   end
+
+  print('break just popped out of the loop')
 ```
 
 ###Given Is Statement
+The ```given is``` statement goes through each one of its arms comparing the object after ```given``` to the expected object(s) of the arm. If the expected object(s) is a class, the arm is executed if the given object is an instance of the class. If the expected object(s) is a string or number the arm will execute if the given object has the same value. If the expected object(s) is a function the arm will execute if the given object is the same function. For class methods this is only the case when both objects are methods on the same instance. For closures, generator instances, and any other object they must be the same instance. If the comparison in the arm evaluates to true, the code in that arm is run and the next arm is evaluated. That is to say that all of the arms could be executed unless the ```break``` keyword is used to pop out of the ```given is``` statement. If none of the arm conditions are true, the statement will effectively do nothing unless a default block of code, which is always run if the ```given is``` statement gets to it, is given. A default block of code is similar to a regular arm except it comes at the end of the statement and starts with ```else do``` instead of ```is <expected object(s)> do```.
 ```hydra
   function given_is(obj){
     given obj
@@ -743,7 +819,8 @@ f.bar(1)  // 'lols im not what you meant to call'
   }
 ```
 
-###Wait For Either Or Statement
+###Wait_For Statement
+The ```wait_for``` statement lets you sudo-randomly choose and communicate over an arbitrary number of sending/receiving channels. It takes channel send/receive cases and checks to see which ones would not block if executed. From the pool of executable cases, it chooses one and executes it. If none of the cases are executable it blocks until one is ready and then executes it. A default case can be added to the end which will run if no other case is executable.
 ```hydra
   function wait_for_either_or(in_chan1, in_chan2, out_chan){
     var recvd, clsd;

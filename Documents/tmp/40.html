@@ -1,10 +1,12 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><style>html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 
 body{
   color:#444;
   font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman',
               "Hiragino Sans GB", "STXihei", "微软雅黑", serif;
-  font-size:12px;
+  font-size:14px;
   line-height:1.5em;
   background:#fefefe;
   width: 45em;
@@ -63,13 +65,13 @@ border-left: 0.5em #EEE solid;
 hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-bottom: 1px solid #eee; margin: 1em 0; padding: 0; }
 
 
-pre , code, kbd, samp { 
-  color: #000; 
-  font-family: monospace; 
-  font-size: 0.88em; 
+pre , code, kbd, samp {
+  color: #000;
+  font-family: monospace;
+  font-size: 0.88em;
   border-radius:3px;
   background-color: #F8F8F8;
-  border: 1px solid #CCC; 
+  border: 1px solid #CCC;
 }
 pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; padding: 5px 12px;}
 pre code { border: 0px !important; padding: 0;}
@@ -95,31 +97,6 @@ img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
 
 table { border-collapse: collapse; border-spacing: 0; }
 td { vertical-align: top; }
-
-@media only screen and (min-width: 480px) {
-body{font-size:14px;}
-}
-
-@media only screen and (min-width: 768px) {
-body{font-size:16px;}
-}
-
-@media print {
-  * { background: transparent !important; color: black !important; filter:none !important; -ms-filter: none !important; }
-  body{font-size:12pt; max-width:100%; outline:none;}
-  a, a:visited { text-decoration: underline; }
-  hr { height: 1px; border:0; border-bottom:1px solid black; }
-  a[href]:after { content: " (" attr(href) ")"; }
-  abbr[title]:after { content: " (" attr(title) ")"; }
-  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
-  pre, blockquote { border: 1px solid #999; padding-right: 1em; page-break-inside: avoid; }
-  tr, img { page-break-inside: avoid; }
-  img { max-width: 100% !important; }
-  @page :left { margin: 15mm 20mm 15mm 10mm; }
-  @page :right { margin: 15mm 10mm 15mm 20mm; }
-  p, h2, h3 { orphans: 3; widows: 3; }
-  h2, h3 { page-break-after: avoid; }
-}
 </style><style>/*
 
 github.com style (c) Vasily Polovnyov <vast@whiteants.net>
@@ -962,7 +939,7 @@ hljs = new (function() {
   };
 })()</script><script>hljs.registerLanguage('hydra', function(hljs){
     return {
-      case_insensitive: false, 
+      case_insensitive: false,
       lexemes: '[a-zA-Z0-9+*/^%&|!$>"\'<.=?_\-]+',
       keywords: {
         keyword: 'for if from to else then while var in class private public gen function extends do end',
@@ -1033,7 +1010,7 @@ hljs = new (function() {
 </code></pre>
 
 <pre><code class="hydra">import std.math           //math pkg imported from stdlib
-import pkg.socketio       //socketio pkg imported from configured 
+import pkg.socketio       //socketio pkg imported from configured
                           //packages folder
 import ./util/utils.hy    //utils pkg imported directly from path
 </code></pre>
@@ -1215,7 +1192,7 @@ priv function init(){
     do_something_else_with(SIZE) //package variable directly accessed
 }
 
-class Foo 
+class Foo
 
     function new(b){
         this.bar = b
@@ -1252,7 +1229,7 @@ arr.pop() // returns []...arr now [1]
 arr[0] // 1
 
 //array literal with initial values
-arr = [1, [], {'key' : 'val'}, 'string', true, (a, b){ return a * b }] 
+arr = [1, [], {'key' : 'val'}, 'string', true, (a, b){ return a * b }]
 </code></pre>
 
 <h3 id="hash">Hash:</h3>
@@ -1265,7 +1242,7 @@ if hash.has_key('c') then
     print(hash.c) //not executed
 else
     print(&quot;hash.c doesn't exist&quot;) //executed
-end 
+end
 
 print(hash) //{ a : 'a', b : 'b'}
 hash.remove('a')
@@ -1315,7 +1292,7 @@ var unbuffered = &lt;--&gt;   //unbuffered channel literal
 
 var buffered   = &lt;-10-&gt; //burffered channel literal
 
-from 0 to 8 do 
+from 0 to 8 do
     1 -&gt; buffered //non blocking
 end
 
@@ -1345,7 +1322,7 @@ throw new CustomException('My custom message!!!!')
 <h2 id="classes">Classes</h2>
 <pre><code class="hydra">export DEFAULT_SIZE = 10 //exported package field
 
-class Foo 
+class Foo
 
     private //private variables
 
@@ -1372,7 +1349,7 @@ class Foo
     function bar(chan){
         spawn (){
             this._bar() -&gt; chan
-        }  
+        }
     }
 
     function change_class_val(val){
@@ -1416,7 +1393,7 @@ class A
 
 end
 
-class B 
+class B
 
     B(init_string){
         this.string = 'In B ' + init_string
