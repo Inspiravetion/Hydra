@@ -484,7 +484,7 @@ end
 throw new CustomException('My custom message!!!!') //'Custom Error: My custom message!!!!'
 ```
 
-##Classes
+##Classes:
 Classes have both public and private class wide and instance specific variables. Functions on the other hand are just for an instance. Instance variables and functions are referenced with the ```@``` operator while class variables are referenced with the ```#``` operator. Private variables and functions have names that start with ```_```. As class variables can be accessed from any instance of the class, they are implicitly protected on reads/writes by a mutex so that they are head-safe.
 
 ```hydra
@@ -667,11 +667,11 @@ class Foo extends Dummy, Base
     Foo(){}
 
     function bar(zero){
-        if zero < 0 then do
+        if zero < 0 then
             super.Base.error("wompppp...too small")
-        else if zero == 0 then do
+        else if zero == 0 then
             print('shwweeeeet')
-        else do
+        else
             @error('wompppp...too big')
         end
     }
@@ -683,10 +683,10 @@ f.bar(0)  // 'shwweeeeet'
 f.bar(1)  // 'lols im not what you meant to call'
 ```
 
-##Control Structures
+##Control Structures:
 
 ###For In Loop:
-A for in loop takes a generator or class instance and loops through its values. If a class is given, for in will look for a public generator function on the object with the name 'for_in'. Alternatively, for in can be given a generator instance that it will call directly. The variables between the 'for' and 'in' are restricted to the loop scope and after every iteration they are passed back into the generator so that it can take into account their change if need be. Otherwise the generator can ignore the change and make the loop un-alterable once it starts. If the object after 'in' is not a generator, changing it in the loop will only change the loop if that objects 'for_in' generator function takes it into account.
+A for in loop takes a generator or class instance and loops through its values. If a class instance is given, for in will look for a public generator function on the object with the name 'for_in' to get its generator from. Alternatively, for in can be given a generator instance that it will call directly. The variables between the 'for' and 'in' are restricted to the loop scope and after every iteration they are passed back into the generator so that it can take into account their change if need be. Otherwise the generator can ignore the change and make the loop un-alterable once it starts. If the object after 'in' is not a generator, changing it in the loop will only change the loop if that objects 'for_in' generator function takes it into account.
 ```hydra
   function map_for_in(){
     var map = { one: 1, two: 2 };
@@ -767,7 +767,7 @@ for val in (btree.inorder())() do //invoking function to get generator closure t
 end
 ```
 
-###While Loop
+###While Loop:
 A while loop takes an expression, which may contain multiple statements, and runs a block of code while the given expression evaluates to a truthy value. Variables in a while loop can come from its outter scope. However, if a new variable is created in the while loop it is only reachable in the scope of the while loop.
 ```hydra
   function while_loop(){
@@ -787,7 +787,7 @@ A while loop takes an expression, which may contain multiple statements, and run
   }
 ```
 
-###Looping Keywords
+###Looping Keywords:
 In both for in and while loops, the ```continue``` and ```break``` key words can be used to alter the control flow. The ```continue``` keyword makes the loop skip executing the rest of the code in that iteration and starts the next iteration immediately. The ```break``` keyword stops the loop all together and passes control to the next statement outside of the loop.
 ```hydra
   for i in 0 upto 10 do
@@ -799,7 +799,7 @@ In both for in and while loops, the ```continue``` and ```break``` key words can
   print('break just popped out of the loop')
 ```
 
-###Given Is Statement
+###Given Is Statement:
 The ```given is``` statement goes through each one of its arms comparing the object after ```given``` to the expected object(s) of the arm. If the expected object(s) is a class, the arm is executed if the given object is an instance of the class. If the expected object(s) is a string or number the arm will execute if the given object has the same value. If the expected object(s) is a function the arm will execute if the given object is the same function. For class methods this is only the case when both objects are methods on the same instance. For closures, generator instances, and any other object they must be the same instance. If the comparison in the arm evaluates to true, the code in that arm is run and the next arm is evaluated. That is to say that all of the arms could be executed unless the ```break``` keyword is used to pop out of the ```given is``` statement. If none of the arm conditions are true, the statement will effectively do nothing unless a default block of code, which is always run if the ```given is``` statement gets to it, is given. A default block of code is similar to a regular arm except it comes at the end of the statement and starts with ```else do``` instead of ```is <expected object(s)> do```.
 ```hydra
   function given_is(obj){
@@ -819,7 +819,7 @@ The ```given is``` statement goes through each one of its arms comparing the obj
   }
 ```
 
-###Wait_For Statement
+###Wait_For Statement:
 The ```wait_for``` statement lets you sudo-randomly choose and communicate over an arbitrary number of sending/receiving channels. It takes channel send/receive cases and checks to see which ones would not block if executed. From the pool of executable cases, it chooses one and executes it. If none of the cases are executable it blocks until one is ready and then executes it. A default case can be added to the end which will run if no other case is executable.
 ```hydra
   function wait_for_either_or(in_chan1, in_chan2, out_chan){
@@ -827,13 +827,13 @@ The ```wait_for``` statement lets you sudo-randomly choose and communicate over 
 
     while true do
       wait_for
-        either recvd, clsd <- in_chan1 then do
+        either recvd, clsd <- in_chan1 then
           if clsd then
             stop()
           else
             do_something(recvd) -> out_chan
           end
-        or recvd, clsd <- in_chan2 then do
+        or recvd, clsd <- in_chan2 then
           if clsd then
             break
           else
@@ -845,4 +845,245 @@ The ```wait_for``` statement lets you sudo-randomly choose and communicate over 
       end
     end
   }
+```
+##Value/Reference Semantics:
+
+###Function Parameters:
+String, Int, Float, and Boolean parameters get passed by value. Parameters that are a Hash, Array, Channel, Generator instance, or any other Object get passed by reference.
+```hydra
+function negate(b){
+  b = !b
+}
+
+var bool = true
+negate(bool)
+print(bool) //true
+
+
+function inc(a){
+  a += a
+}
+
+var num = 1;
+inc(num)
+print(num) //1
+
+var string = "a"
+inc(string)
+print(string) //"a"
+
+var arr = [1]
+inc(arr)
+print(arr) //[1, 1]
+
+function change(h){
+  h.1 = 2
+}
+
+var hash = {'1': 1}
+change(hash)
+print(hash) //{ '1' : 2 }
+
+function sender(c){
+  1 -> c
+}
+
+var chan = <-->
+spawn sender(chan)
+print(<-chan) //1
+
+function caller(genrtr){
+  print(genrtr())
+}
+
+var g = *(){
+  for i in 0 upto 3 do
+    yield i
+  end
+}
+
+var genrtr = g()
+
+print(genrtr()) //0
+caller(genrtr)  //1
+print(genrtr()) //2
+```
+###Assignment:
+Assignments have the same semantics as function parameters. When you assign an object to a variable, the variable takes the value of the object if it is a String, Int, Float, or Boolean. Otherwise, the variable references the actual object and any changes to the variable will be reflected in all other references to the object. Reassigning the variable simply makes it reference a new object or take on a new value. It does not effect the previous object it referenced.
+
+```hydra
+class Builtins
+  Builtins(){
+    @str  = "a"
+    @num  = 1
+    @bool = true
+
+    @hash = { '1' : 1 }
+    @arr  = [1]
+    @chan = <-2->
+  }
+
+  function changer(){
+    return (){
+      @str  = "b"
+      @num  = 2
+      @bool = false
+      @hash = { '2' : 2 }
+      @arr  = [2]
+      1 -> @chan
+    }
+  }
+
+end
+
+var builtin = new Builtins()
+
+var s, n, b, h, a, c
+
+s = builtin.str
+print(s) // "a"
+s.upcase() // "A"
+print(builtin.str) //"a"
+
+b = builtin.bool
+print(b) // true
+b.negate() // false
+print(builtin.bool) //true
+
+h = builtin.hash
+print(h) // { '1' : 1 }
+h.2 = 2
+print(builtin.hash) //{ '1' : 1, '2' : 2 }
+
+a = builtin.arr
+print(a) // [1]
+a.push(2)
+print(builtin.arr) // [1, 2]
+
+c = builtin.chan
+1 -> c
+print(<-builtin.chan) //1
+```
+###Binding Closure Parameters:
+
+```hydra
+//-------------------------------------
+//Closure closing over values, copying some and taking references of others
+
+var num, str, bool, hash, arr, chan
+
+num = 1
+bool = true
+str  = 'a'
+hash = { '1' : 1 }
+arr  = [1]
+chan = <-2->
+
+var clos = (){
+  num  = 2
+  bool = false
+  str  = 'b'
+  hash = { '2' : 2 }
+  arr  = [2]
+  1 -> chan
+}
+
+clos()
+
+print(num) // 1
+print(bool)// true
+print(str) // 'a'
+print(hash)// { '1' : 1 }
+print(arr) // [1]
+print(<-chan)// 1
+
+//-------------------------------------
+//Closure closing around, and thus copying implicitly an object
+
+var builtins = new Builtins()
+
+var clos2 = (){
+  builtins.num  = 2
+  builtins.bool = false
+  builtins.str  = 'b'
+  builtins.hash = { '2' : 2 }
+  builtins.arr  = [2]
+  1 -> builtins.chan
+}
+
+clos2()
+
+print(builtins.num) // 1
+print(builtins.bool)// true
+print(builtins.str) // 'a'
+print(builtins.hash)// { '1' : 1 }
+print(builtins.arr) // [1]
+print(<-builtins.chan)// 1
+
+//-------------------------------------
+//Closure being passed a reference
+
+var clos3 = (b){
+  b.num  = 2
+  b.bool = false
+  b.str  = 'b'
+  b.hash = { '2' : 2 }
+  b.arr  = [2]
+  1 -> b.chan
+}
+
+builtins = new Builtins()
+
+clos3(builtins)
+
+print(builtins.num) // 2
+print(builtins.bool)// false
+print(builtins.str) // 'b'
+print(builtins.hash)// { '2' : 2 }
+print(builtins.arr) // [2]
+print(<-builtins.chan)// 1
+
+//-------------------------------------
+//Closure with bound parameter
+
+builtins = new Builtins()
+
+var clos4 = (b){
+  b.num  = 3
+  b.bool = true
+  b.str  = 'c'
+  b.hash = { '3' : 3 }
+  b.arr  = [3]
+  2 -> b.chan
+}(builtins)
+
+clos4()
+
+print(builtins.num) // 3
+print(builtins.bool)// true
+print(builtins.str) // 'c'
+print(builtins.hash)// { '3' : 3 }
+print(builtins.arr) // [3]
+print(<-builtins.chan)// 2
+
+//-------------------------------------
+//Closure capturing @<property>
+
+builtins = new Builtins()
+var change = builtins.changer()
+
+print(builtins.num) // 1
+print(builtins.bool)// true
+print(builtins.str) // 'a'
+print(builtins.hash)// { '1' : 1 }
+print(builtins.arr) // [1]
+
+change()
+
+print(builtins.num) // 2
+print(builtins.bool)// false
+print(builtins.str) // 'b'
+print(builtins.hash)// { '2' : 2 }
+print(builtins.arr) // [2]
+print(<-builtins.chan)// 1
 ```

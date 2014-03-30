@@ -92,35 +92,31 @@ var s, n, b, h, a, c
 
 s = builtin.str
 print(s) // "a"
-s = "b"
+s.upcase() // "A"
 print(builtin.str) //"a"
-
-n = builtin.num
-print(n) // 1
-n = 2
-print(builtin.num) //1
 
 b = builtin.bool
 print(b) // true
-b = false
+b.negate() // false
 print(builtin.bool) //true
 
 h = builtin.hash
 print(h) // { '1' : 1 }
-h = { '2' : 2 }
-print(builtin.hash) //{ '2' : 2 }
+h.2 = 2
+print(builtin.hash) //{ '1' : 1, '2' : 2 }
 
 a = builtin.arr
 print(a) // [1]
-a = [2]
-print(builtin.arr) // [2]
+a.push(2)
+print(builtin.arr) // [1, 2]
 
 c = builtin.chan
 1 -> c
 print(<-builtin.chan) //1
 
-//closure semantics
+
 //-------------------------------------
+//Closure closing over values, copying some and taking references of others
 
 var num, str, bool, hash, arr, chan
 
@@ -149,6 +145,9 @@ print(hash)// { '1' : 1 }
 print(arr) // [1]
 print(<-chan)// 1
 
+//-------------------------------------
+//Closure closing around, and thus copying implicitly an object
+
 var builtins = new Builtins()
 
 var clos2 = (){
@@ -169,6 +168,9 @@ print(builtins.hash)// { '1' : 1 }
 print(builtins.arr) // [1]
 print(<-builtins.chan)// 1
 
+//-------------------------------------
+//Closure being passed a reference
+
 var clos3 = (b){
   b.num  = 2
   b.bool = false
@@ -177,6 +179,8 @@ var clos3 = (b){
   b.arr  = [2]
   1 -> b.chan
 }
+
+builtins = new Builtins()
 
 clos3(builtins)
 
@@ -187,6 +191,10 @@ print(builtins.hash)// { '2' : 2 }
 print(builtins.arr) // [2]
 print(<-builtins.chan)// 1
 
+//-------------------------------------
+//Closure with bound parameter
+
+builtins = new Builtins()
 
 var clos4 = (b){
   b.num  = 3
@@ -206,8 +214,11 @@ print(builtins.hash)// { '3' : 3 }
 print(builtins.arr) // [3]
 print(<-builtins.chan)// 2
 
-var builtins = new Builtins()
-var change   = builtins.changer()
+//-------------------------------------
+//Closure capturing @<property>
+
+builtins = new Builtins()
+var change = builtins.changer()
 
 print(builtins.num) // 1
 print(builtins.bool)// true
