@@ -2,7 +2,7 @@
 
 ##Intro:
 
-```hydra
+```hy
 function main() {
     var nums, noms, odds, greetings, wg
 
