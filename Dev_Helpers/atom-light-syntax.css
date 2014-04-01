@@ -1,0 +1,185 @@
+.editor-colors,
+.editor-colors .gutter {
+  background-color: #fbfbfd;
+  color: #555;
+}
+.editor-colors .invisible-character {
+  color: rgba(85, 85, 85, 0.2);
+}
+.editor-colors .indent-guide {
+  color: rgba(85, 85, 85, 0.2);
+}
+.editor-colors .wrap-guide {
+  background-color: rgba(85, 85, 85, 0.2);
+}
+.editor-colors .gutter {
+  color: #555555;
+  background: #ffffff;
+}
+.editor-colors .gutter .line-number.folded,
+.editor-colors .gutter .line-number:after,
+.editor-colors .fold-marker:after {
+  color: #e87b00;
+}
+.editor-colors .invisible {
+  color: #555;
+}
+.editor-colors .selection .region {
+  background-color: #e1e1e1;
+}
+.editor-colors.is-focused .cursor {
+  border-color: #000000;
+}
+.editor-colors.is-focused .selection .region {
+  background-color: #afc4da;
+}
+.editor-colors.is-focused .line-number.cursor-line-no-selection,
+.editor-colors.is-focused .line.cursor-line {
+  background-color: rgba(255, 255, 134, 0.34);
+}
+.editor-colors .comment {
+  color: #999988;
+  font-style: italic;
+}
+.editor-colors .string {
+  color: #D14;
+}
+.editor-colors .source .string .source,
+.editor-colors .source .string .meta.embedded.line {
+  color: #5A5A5A;
+}
+.editor-colors .source .string .punctuation.section.embedded {
+  color: #920B2D;
+}
+.editor-colors .source .string .punctuation.section.embedded .source {
+  color: #920B2D;
+}
+.editor-colors .constant.numeric {
+  color: #D14;
+}
+.editor-colors .constant.language {
+  color: #606aa1;
+}
+.editor-colors .constant.character,
+.editor-colors .constant.other {
+  color: #606aa1;
+}
+.editor-colors .constant.symbol {
+  color: #990073;
+}
+.editor-colors .constant.numeric.line-number.find-in-files .match {
+  color: rgba(143, 190, 0, 0.63);
+}
+.editor-colors .variable {
+  color: #008080;
+}
+.editor-colors .variable.parameter {
+  color: #606aa1;
+}
+.editor-colors .keyword {
+  color: #222;
+  font-weight: bold;
+}
+.editor-colors .keyword.unit {
+  color: #445588;
+}
+.editor-colors .keyword.special-method {
+  color: #0086B3;
+}
+.editor-colors .storage {
+  color: #222;
+}
+.editor-colors .storage.type {
+  color: #222;
+}
+.editor-colors .entity.name.class {
+  text-decoration: underline;
+  color: #606aa1;
+}
+.editor-colors .entity.other.inherited-class {
+  text-decoration: underline;
+  color: #606aa1;
+}
+.editor-colors .entity.name.function {
+  color: #900;
+}
+.editor-colors .entity.name.tag {
+  color: #008080;
+}
+.editor-colors .entity.other.attribute-name {
+  color: #458;
+  font-weight: bold;
+}
+.editor-colors .entity.name.filename.find-in-files {
+  color: #E6DB74;
+}
+.editor-colors .support.constant,
+.editor-colors .support.function,
+.editor-colors .support.type {
+  color: #458;
+}
+.editor-colors .support.class {
+  color: #008080;
+}
+.editor-colors .invalid {
+  color: #F8F8F0;
+  background-color: #00A8C6;
+}
+.editor-colors .invalid.deprecated {
+  color: #F8F8F0;
+  background-color: #8FBE00;
+}
+.editor-colors .meta.structure.dictionary.json > .string.quoted.double.json,
+.editor-colors .meta.structure.dictionary.json > .string.quoted.double.json .punctuation.string {
+  color: #000080;
+}
+.editor-colors .meta.structure.dictionary.value.json > .string.quoted.double.json {
+  color: #d14;
+}
+.editor-colors .meta.diff,
+.editor-colors .meta.diff.header {
+  color: #75715E;
+}
+.editor-colors .css.support.property-name {
+  font-weight: bold;
+  color: #333;
+}
+.editor-colors .css.constant {
+  color: #099;
+}
+.editor-colors .source.gfm {
+  color: #444;
+}
+.editor-colors .gfm .markup.heading {
+  color: #111;
+}
+.editor-colors .gfm .link {
+  color: #888;
+}
+.editor-colors .gfm .variable.list {
+  color: #888;
+}
+.editor-colors .markdown .paragraph {
+  color: #444;
+}
+.editor-colors .markdown .heading {
+  color: #111;
+}
+.editor-colors .markdown .link {
+  color: #888;
+}
+.editor-colors .markdown .link .string {
+  color: #888;
+}
+.editor-colors .search-results .marker .region {
+  background-color: transparent;
+  border: 1px solid #999999;
+}
+.editor-colors .search-results .marker.current-result .region {
+  border: 1px solid #000000;
+}
+.bracket-matcher {
+  background-color: #C9C9C9;
+  opacity: .7;
+  border-bottom: 0 none;
+}

@@ -377,7 +377,7 @@ body{
   word-wrap: normal;
 }
 .markdown-preview pre {
-  background: #282828;
+/*  background: #282828;*/
   border: 1px solid #ccc;
   font-size: 13px;
   line-height: 19px;
@@ -386,7 +386,7 @@ body{
   border-radius: 3px;
 }
 .markdown-preview pre.editor-colors {
-  background: #282828;
+/*  background: #282828;*/
   border: 1px solid #e6e6e6;
 }
 .markdown-preview pre code,

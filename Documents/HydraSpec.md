@@ -768,7 +768,7 @@ end
 ```
 
 ###While Loop:
-A while loop takes an expression, which may contain multiple statements, and runs a block of code while the given expression evaluates to a truthy value. Variables in a while loop can come from its outter scope. However, if a new variable is created in the while loop it is only reachable in the scope of the while loop.
+A while loop takes one or more expressions, and runs a block of code while the last given expression evaluates to a truthy value. The last, expression will be run in each iteration of the loop. Variables in a while loop can come from its outter scope. However, if a new variable is created in the while loop it must be preceded with the ```var``` keyword and is only reachable in the scope of the while loop.
 ```hydra
   function while_loop(){
     var bool = true
@@ -779,8 +779,9 @@ A while loop takes an expression, which may contain multiple statements, and run
   }
 
   function multi_stmt_while_loop(){
-    while char = get_next_char(); char != EOF do
-      print(char)
+    while var char = get_next_char(); char != EOF do
+      print(char);
+      char = get_next_char();
     end
 
     print(char) //Error: no char variable in current scope
