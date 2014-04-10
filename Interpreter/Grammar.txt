@@ -1,0 +1,95 @@
+BASICS BUILDING BLOCKS
+--------------------------------------------------------------------------------
+
+IntDigit   => [0-9]
+IntDigits  => IntDigit IntDigits
+           |  empty
+
+HexDigit   => [0-9a-fA-F]
+HexDigits  => HexDigit HexDigits
+           |  empty
+
+Ident       => [a-zA-Z_$][a-zA-Z0-9_?!$]*
+
+KeyVal      => (Ident | StringLit) ':' Expr
+
+Expr        => Ident |
+
+OptExpr     => Expr | empty
+
+Stmt        =>
+
+ChanSendRcv =>
+ChanSend    =>
+ChanRcv     =>
+
+LISTS
+--------------------------------------------------------------------------------
+
+IdentList   => Ident IdentList!
+IdentList!  => ',' IdentList
+            |  empty
+
+Stmts       => Stmt Stmts!
+Stmts!      => ';' Stmts
+            |  empty
+
+Exprs       => Expr Exprs!
+Exprs!      => ',' Exprs
+            |  empty
+
+OptExprs    => Exprs | empty
+
+KeyValList  => KeyVal KeyValList!
+KeyValList! => ',' KeyValList
+            |  empty
+
+CONTROL STRUCTURES
+--------------------------------------------------------------------------------
+
+ForInLoop   => 'for' IdentList 'in' Expr 'do' Stmts 'end'
+
+WhileLoop   => 'while' Stmts 'do' Stmts 'end'
+
+IfElse       => IfBranch ElseIfBranch
+IfBranch     => 'if' Stmts 'do' Stmts
+ElseIfBranch => 'else if' Stmts ElseIfBranch
+             |  ElseBranch
+             |  'end'
+ElseBranch   => 'else' Stmts 'end'
+
+GivenIs     => 'given' Expr IsBranch
+IsBranch    => 'is' Expr 'do' Stmts IsBranch
+            |  ElseBranch
+ElseBranch  => 'else do' Stmts 'end'
+            |  'end'
+
+WaitFor     => 'wait_for' 'either' ChanSendRcv 'then' Stmts OrBranch 'end'
+OrBranch    => 'or' ChanSendRcv 'then' Stmts OrBranch
+            |  OrDefault
+OrDefault   => 'or do' Stmts 'end'
+            |  empty
+
+BUILT IN LITERALS
+--------------------------------------------------------------------------------
+
+IntLit     => IntDigits | HexLit
+HexLit     => '0' ('x' | 'X') HexDigits
+
+FloatLit   => IntDigits '.' IntDigits
+
+StringLit  => SingleStr | DoubleStr
+SingleStr  => "'" [^']* "'"
+DoubleStr  => '"' [^"]* '"'
+
+ArrayLit   => '[' Exprs ']'
+
+HashLit    => '{' KeyValList '}'
+
+ChanLit    => '<-' OptExpr '->'
+
+FuncLit    => 'gen' 'function' Ident '(' OpOptExprs ')' '{' Stmts '}'
+           |  'function' Ident '(' OptExprs ')' '{' Stmts '}'
+
+ClosureLit  => ClosureLead '(' OptExprs ')' '{' Stmts '}'
+ClosureLead => '=' | ',' | '(' | '*' | ':' | '['

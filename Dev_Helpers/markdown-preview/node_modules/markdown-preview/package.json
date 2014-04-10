@@ -1,0 +1,33 @@
+{
+  "name": "markdown-preview",
+  "version": "0.59.0",
+  "main": "./lib/markdown-preview",
+  "description": "Open a rendered version of the Markdown in the current editor with `ctrl-shift-m`.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/markdown-preview"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "fs-plus": "2.x",
+    "pathwatcher": "^1.0",
+    "roaster": ">=1.0.3 <2.0",
+    "temp": "0.6.x",
+    "underscore-plus": "1.x",
+    "wrench": "1.5.x"
+  },
+  "readme": "# Markdown Preview package\n\nShow the rendered HTML markdown to the right of the current editor using\n`ctrl-shift-m`\n\nIt can be activated from the editor using the `ctrl-shift-m` key-binding and is\ncurrently enabled for `.markdown`, `.md`, `.mkd`, `.mkdown`, and `.ron` files.\n\n![](https://f.cloud.github.com/assets/671378/2265253/5b1c2ae8-9e7e-11e3-9d93-3fa7caae4710.png)\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/atom/markdown-preview/issues"
+  },
+  "homepage": "https://github.com/atom/markdown-preview",
+  "_id": "markdown-preview@0.59.0",
+  "dist": {
+    "shasum": "fc220dca1331cc3eb0cd61752f96165c02efaac0"
+  },
+  "_from": "/var/lib/jenkins/.atom/.node-gyp/.atom/.apm/markdown-preview/0.59.0/package.tgz"
+}

@@ -943,12 +943,12 @@ var s, n, b, h, a, c
 
 s = builtin.str
 print(s) // "a"
-s.upcase() // "A"
+print(s.upcase()) // "A"
 print(builtin.str) //"a"
 
 b = builtin.bool
 print(b) // true
-b.negate() // false
+print(b.negate()) // false
 print(builtin.bool) //true
 
 h = builtin.hash
@@ -968,7 +968,6 @@ print(<-builtin.chan) //1
 ###Binding Closure Parameters:
 
 ```hydra
-//-------------------------------------
 //Closure closing over values, copying some and taking references of others
 
 var num, str, bool, hash, arr, chan
