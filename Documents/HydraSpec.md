@@ -177,6 +177,52 @@ export ClassA
 
 ##Built In Types:
 
+###Int:
+Integers can be in base 10, hex, or binary form.
+
+```hydra
+var i = 123
+var h = 0xBEEF1234
+var b = 0b11010110
+```
+###Float:
+Floats can only be expressed in base 10 and must have at least one number after the decimal place. Otherwise they will be treated as an Int.
+
+```hydra
+var f = 123.0
+```
+
+###String:
+Strings can use single or double quotes and can be formatted via interpolation or concatenation. Literal strings can also be created delimited by three single quotes on either side. Literal strings require no escaping.
+
+```hydra
+var str1 = 'abc'
+var str2 = "123"
+
+var interpolated = 'str1: ${str1}' //'str1: abc'
+var concatenated = 'str2: ' + str2 //'str2: 123'
+
+var literal = '''<div>What you see is what you get</div>'''
+```
+
+###Regex:
+Regular Expressions can be instantiated in two ways. As a literal delimited by ```/``` or by passing a pattern string to the Regex constructor. String interpolation can be used with either form of instantiation.
+
+```hydra
+var reg1 = /(abc)(123)!*/
+var reg2 = new Regex('(abc)(123)!*')
+
+reg1.exec('abc123!!!') //['abc123!!!', 'abc', '123']
+reg2.exec('abc123!!!') //['abc123!!!', 'abc', '123']
+
+var name = 'hydra'
+var reg3 = /${name} is\sawesome!*/
+var reg4 = new Regex('${name} is\sawesome!*')
+
+reg3.exec('hydra is awesome!!!!') //['hydra is awesome!!!!']
+reg4.exec('hydra is awesome!!!!') //['hydra is awesome!!!!']
+```
+
 ###Function:
 There are two types of functions. The first is a named, top level, function and the second is an anonymous closure. Both of these may also have their semantics changed based on whether or not they are generators. A generator function returns an instance of a generator which acts like a function with the exception that it can ```yield``` a value which will suspend its execution, giving the value and control back to its caller. The next time it is called it will resume execution from where it is left off.
 
@@ -294,12 +340,14 @@ var double = *(generator){
 }
 
 var list, doubles
-list = nums(10)
+list = nums(3)
 doubles = double(list)
 
-while done, val = doubles(); !done do
-  print(i) //0,2,4,6,8,10,12,14,16,18
-end
+doubles() //false, 0
+doubles() //false, 1
+doubles() //false, 2
+
+doubles() //true, undefined
 ```
 More often than not, generators yield values without needing any feedback. However, values can be passed back to a yielding generator by passing them as function parameters to the instance. The generator will get the values the next time it is called after it yields and it will resume execution from there.
 ```hydra
@@ -344,7 +392,7 @@ arr.pop() // returns []...arr now [1]
 arr[0] // 1
 
 //array literal with initial values
-arr = [1, [], {'key' : 'val'}, 'string', true, (a, b){ return a * b }]
+arr = [1, [], {'key' : 'val'}, 'string', /\"(hi*)\"/, true, (a, b){ return a * b }]
 ```
 
 ###Hash:
@@ -386,34 +434,6 @@ hash[arr2] = 2
 hash[arr1] //1
 hash[arr2] //2
 hash[arr3] //1
-```
-
-###String:
-Strings can use single or double quotes and can be formatted via interpolation or concatenation. Literal strings can also be created delimited by three single quotes on either side. Literal strings require no escaping.
-
-```hydra
-var str1 = 'abc'
-var str2 = "123"
-
-var interpolated = 'str1: ${str1}' //'str1: abc'
-var concatenated = 'str2: ' + str2 //'str2: 123'
-
-var literal = '''<div>What you see is what you get</div>'''
-```
-
-###Int:
-Integers can be in base 10, hex, or binary form.
-
-```hydra
-var i = 123
-var h = 0xBEEF1234
-var b = 0b11010110
-```
-###Float:
-Floats can only be expressed in base 10 and must have at least one number after the decimal place. Otherwise they will be treated as an Int.
-
-```hydra
-var f = 123.0
 ```
 
 ###Channel:
@@ -768,7 +788,7 @@ end
 ```
 
 ###While Loop:
-A while loop takes one or more expressions, and runs a block of code while the last given expression evaluates to a truthy value. The last, expression will be run in each iteration of the loop. Variables in a while loop can come from its outter scope. However, if a new variable is created in the while loop it must be preceded with the ```var``` keyword and is only reachable in the scope of the while loop.
+A while loop takes a boolean literal, a comparison, a variable, or a function call as its condition and runs a block of code while the condition evaluates to a truthy value. The condition will be run before each iteration of the loop including the first one. New variables may not be created in the condition portion of the while loop.
 ```hydra
   function while_loop(){
     var bool = true
@@ -778,13 +798,19 @@ A while loop takes one or more expressions, and runs a block of code while the l
     end
   }
 
-  function multi_stmt_while_loop(){
-    while var char = get_next_char(); char != EOF do
+  function comparison_while_loop(){
+    var char = get_next_char();
+
+    while char != EOF do
       print(char);
       char = get_next_char();
     end
+  }
 
-    print(char) //Error: no char variable in current scope
+  function func_call_while_loop(){
+    while still_running() do
+      print('still going!');
+    end
   }
 ```
 
@@ -801,7 +827,7 @@ In both for in and while loops, the ```continue``` and ```break``` key words can
 ```
 
 ###Given Is Statement:
-The ```given is``` statement goes through each one of its arms comparing the object after ```given``` to the expected object(s) of the arm. If the expected object(s) is a class, the arm is executed if the given object is an instance of the class. If the expected object(s) is a string or number the arm will execute if the given object has the same value. If the expected object(s) is a function the arm will execute if the given object is the same function. For class methods this is only the case when both objects are methods on the same instance. For closures, generator instances, and any other object they must be the same instance. If the comparison in the arm evaluates to true, the code in that arm is run and the next arm is evaluated. That is to say that all of the arms could be executed unless the ```break``` keyword is used to pop out of the ```given is``` statement. If none of the arm conditions are true, the statement will effectively do nothing unless a default block of code, which is always run if the ```given is``` statement gets to it, is given. A default block of code is similar to a regular arm except it comes at the end of the statement and starts with ```else do``` instead of ```is <expected object(s)> do```.
+The ```given is``` statement goes through each one of its arms comparing the object after ```given``` to the expected object(s) of the arm. If the expected object(s) is a class, the arm is executed if the given object is an instance of the class. If the expected object(s) is a string or number the arm will execute if the given object has the same value. If the expected object(s) is a function the arm will execute if the given object is the same function. For class methods this is only the case when both objects are methods on the same instance. For closures, generator instances, regular expressions, and any other object they must be the same instance. If the comparison in the arm evaluates to true, the code in that arm is run and the next arm is evaluated. That is to say that all of the arms could be executed unless the ```break``` keyword is used to pop out of the ```given is``` statement. If none of the arm conditions are true, the statement will effectively do nothing unless a default block of code, which is always run if the ```given is``` statement gets to it, is given. A default block of code is similar to a regular arm except it comes at the end of the statement and starts with ```else do``` instead of ```is <expected object(s)> do```.
 ```hydra
   function given_is(obj){
     given obj

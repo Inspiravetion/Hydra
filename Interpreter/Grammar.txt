@@ -19,9 +19,15 @@ OptExpr     => Expr | empty
 
 Stmt        =>
 
-ChanSendRcv =>
-ChanSend    =>
-ChanRcv     =>
+ChanSendRcv => ChanSend | ChanRcv
+ChanSend    => Expr '->' Expr
+ChanRcv     => OptIdentList '<-' Expr
+
+Constructor => Ident '(' Exprs ')' '{' Stmts '}'
+
+ClassVarDecl => '#_' | '#' Ident '=' Expr
+
+Comment     =>
 
 LISTS
 --------------------------------------------------------------------------------
@@ -29,6 +35,8 @@ LISTS
 IdentList   => Ident IdentList!
 IdentList!  => ',' IdentList
             |  empty
+
+OptIdentList => IdentList | empty
 
 Stmts       => Stmt Stmts!
 Stmts!      => ';' Stmts
@@ -93,3 +101,12 @@ FuncLit    => 'gen' 'function' Ident '(' OpOptExprs ')' '{' Stmts '}'
 
 ClosureLit  => ClosureLead '(' OptExprs ')' '{' Stmts '}'
 ClosureLead => '=' | ',' | '(' | '*' | ':' | '['
+
+
+LANGUAGE CONSTRUCTS
+--------------------------------------------------------------------------------
+
+Class          => 'class' Ident ExtendInfo ClassInternals 'end'
+ExtendInfo     => 'extends' IdentList
+ClassInternals => (Constructor | ClassVarDecl | FuncLit | Comment) ClassInternals
+               |  empty

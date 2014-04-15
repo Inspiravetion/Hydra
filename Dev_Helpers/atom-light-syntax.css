@@ -46,7 +46,7 @@
 }
 .editor-colors .source .string .source,
 .editor-colors .source .string .meta.embedded.line {
-  color: #5A5A5A;
+  /* color: #5A5A5A; */
 }
 .editor-colors .source .string .punctuation.section.embedded {
   color: #920B2D;
@@ -62,7 +62,7 @@
 }
 .editor-colors .constant.character,
 .editor-colors .constant.other {
-  color: #606aa1;
+  color: #9728D5;
 }
 .editor-colors .constant.symbol {
   color: #990073;
