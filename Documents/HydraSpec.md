@@ -10,7 +10,7 @@ function main() {
     nums = [1, 2]
     noms = ["Tim", "Eston", "Aaron", "Ben"]
 
-    odds = nums.map((x){ x * 2 - 1 })
+    odds = nums.map((x){ return x * 2 - 1 })
     wg   = new WaitGroup(odds.length)
 
     for num in odds do
@@ -50,19 +50,10 @@ import ./util/utils.hy //utils package imported directly from path
 ```
 
 ###Using Imports:
-Packages may be imported in their entirety or their exported classes, functions, and variables may be specifically imported.
-```hydra
-import std::json               //json package imported from stdlib
-import std::math.sqrt          //sqrt() function imported from the math package
-import std::sync.WaitGroup     //WaitGroup class imported from the sync package
-import std::os.NUM_CORES       //NUM_CORES variable imported from the os package
-import pkg::socketio.Socket    //Socket class imported from socketio package
-import ./util/utils.hy::Logger //Logger class imported from utils package
-```
+Packages may be imported in their entirety or their exported classes, functions, and variables may be specifically imported with the ```from``` keyword.
 
-Multiple classes, functions, and variables may be imported from a package with the ```from``` keyword.
 ```hydra
-import json, os, sync from std           //multiple imports from stdlib
+import json, os, sync from std           //multiple package imports from stdlib
 import sqrt, ceil from std::math         //multiple function imports from std::math
 import Socket, Client from pkg::socketio //multiple class imports from std::socketio
 import Logger from ./util/utils.hy       //Logger class imported from utils package
@@ -82,10 +73,9 @@ var stage_name = utils.generate_stage_name()
 
 Otherwise they can be used directly.
 ```hydra
-import std::sync.WaitGroup
-import std::math.sqrt
-import std::math.INFINITY
-import ./util/utils.hy::Logger
+import WaitGroup from std::sync
+import sqrt, INFINITY from std::math
+import Logger from ./util/utils.hy
 
 var wg = new WaitGroup(3)
 var s = sqrt(4)
@@ -95,7 +85,7 @@ var logger = new Logger()
 
 Imports may also be renamed with the ```as``` keyword.
 ```hydra
-import std::sync.WaitGroup as WG
+import WaitGroup from std::sync as WG
 import Logger from ./util/utils.hy as L
 
 var wg = new WG(3)

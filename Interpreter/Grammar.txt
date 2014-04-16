@@ -11,13 +11,25 @@ HexDigits  => HexDigit HexDigits
 
 Ident       => [a-zA-Z_$][a-zA-Z0-9_?!$]*
 
+OptIdent    => Ident | empty
+
 KeyVal      => (Ident | StringLit) ':' Expr
 
-Expr        => Ident |
+Expr        => NewStmt
+            |  InstanceVar
+            |  ClassVar
+            |  BuiltinLit
+            |  SquareBracInd
+            |  FuncCall
+            |  Ident
 
 OptExpr     => Expr | empty
 
-Stmt        =>
+Stmt        => VarDecl
+            |  ReturnStmt
+            |  AssignStmt
+            |  ControlStructure
+            |  Exprs
 
 ChanSendRcv => ChanSend | ChanRcv
 ChanSend    => Expr '->' Expr
@@ -25,9 +37,32 @@ ChanRcv     => OptIdentList '<-' Expr
 
 Constructor => Ident '(' Exprs ')' '{' Stmts '}'
 
-ClassVarDecl => '#_' | '#' Ident '=' Expr
+ClassVarDecl => ClassVar '=' Expr
 
-Comment     =>
+Comment         => SingleLnComment | MultiLnComment
+SingleLnComment => '//' [^\n]*
+MultiLnComment  => '/*' [^(*/)]* '*/'
+
+Params      => '(' OptExprs ')'
+OptParams   => Params | empty
+
+FuncCall    => DottedExprs Params
+
+SquareBracInd => Ident '[' Expr ']'
+
+VarDecl     => 'var' Exprs optRSAssign
+
+RSAssign    => '=' Exprs
+
+OptRSAssign => RSAssign | empty
+
+AssignStmt  => IdentList RSAssign
+
+ReturnStmt  => 'return' OptExprs
+
+InstanceVar => ('@_' | '@') Ident
+
+ClassVar    => ('#_' | '#') Ident
 
 LISTS
 --------------------------------------------------------------------------------
@@ -48,12 +83,18 @@ Exprs!      => ',' Exprs
 
 OptExprs    => Exprs | empty
 
+DottedExprs  => Expr DottedExprs!
+DottedExprs! => '.' DottedExprs
+             |  empty
+
 KeyValList  => KeyVal KeyValList!
 KeyValList! => ',' KeyValList
             |  empty
 
 CONTROL STRUCTURES
 --------------------------------------------------------------------------------
+
+ControlStructure => ForInLoop | WhileLoop | IfElse | GivenIs | WaitFor
 
 ForInLoop   => 'for' IdentList 'in' Expr 'do' Stmts 'end'
 
@@ -81,6 +122,8 @@ OrDefault   => 'or do' Stmts 'end'
 BUILT IN LITERALS
 --------------------------------------------------------------------------------
 
+BuiltinLit => IntLit | FloatLit | StringLit | RegexLit | ArrayLit | HashLit | ChanLit | FuncLit
+
 IntLit     => IntDigits | HexLit
 HexLit     => '0' ('x' | 'X') HexDigits
 
@@ -90,23 +133,41 @@ StringLit  => SingleStr | DoubleStr
 SingleStr  => "'" [^']* "'"
 DoubleStr  => '"' [^"]* '"'
 
+RegexLit   => '/' ([^/]|\.)+ '/'
+
 ArrayLit   => '[' Exprs ']'
 
 HashLit    => '{' KeyValList '}'
 
 ChanLit    => '<-' OptExpr '->'
 
-FuncLit    => 'gen' 'function' Ident '(' OpOptExprs ')' '{' Stmts '}'
-           |  'function' Ident '(' OptExprs ')' '{' Stmts '}'
+FuncLit    => 'gen' 'function' Ident '(' OptIdentList ')' '{' Stmts '}'
+           |  'function' Ident '(' OptIdentList ')' '{' Stmts '}'
 
-ClosureLit  => ClosureLead '(' OptExprs ')' '{' Stmts '}'
-ClosureLead => '=' | ',' | '(' | '*' | ':' | '['
-
+ClosureLit  => OptAsterick ClosureDef
+OptAsterick => '*'
+            |  empty
+ClosureDef  => '(' OptIdentList ')' '{' Stmts '}' OptParams
 
 LANGUAGE CONSTRUCTS
 --------------------------------------------------------------------------------
 
-Class          => 'class' Ident ExtendInfo ClassInternals 'end'
+ClassDef       => 'class' Ident ExtendInfo ClassInternals 'end'
 ExtendInfo     => 'extends' IdentList
 ClassInternals => (Constructor | ClassVarDecl | FuncLit | Comment) ClassInternals
                |  empty
+
+SpawnStmt      => 'spawn' (ClosureDef | FuncCall)
+
+NewStmt        => 'new' FuncCall
+
+ImportStmt     => 'import' (FullImport | PartialImport)
+FullImport     => PkgLocation
+PartialImport  => IdentList 'from' PkgLocation
+PkgLocation    => ('std' | 'pkg') '::' Ident
+               |  ImportPath
+ImportPath     => ('~' | '.') '/' Path
+Path           => Ident '/' Path
+               |  Ident '.hy'
+
+ExportStmt     =>
