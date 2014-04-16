@@ -93,42 +93,8 @@ var logger = new L()
 ```
 
 ###Creating A Package:
-To export a top level class, top level function , or top level variable, use the ```export``` keyword. There are two syntaxes for this. The first lets you export at the definition of the exported item. For variables, the ```export``` keyword implicitly acts as a ```var``` keyword as well. The second, and preferred method is explicitly clumping all of your exports together at the beginning/end of the file.
+To export a top level class, top level function , or top level variable, use the ```export``` keyword. By default, exported items are reachable by the variable name they are exported with. Like ```import <part> from <package> as <newname>```, export items can also be exported with specific names using the ```as``` keyword.
 
-#####First Way
-
-```hydra
-
-var variable = 123.456 //not exported
-
-export VARIABLE = '123.456' //exported
-
-function _Func(a, b){ //not exported
-    return 15 + a + b, b - a - 11
-}
-
-export function Func(a, b){ //exported
-    return _Func(b, a)
-}
-
-class ClassB  //not exported
-    ClassB(name){
-        @name = name
-
-        while true do
-            //something...
-        end
-    }
-end
-
-export class ClassA extends ClassB  //exported
-    ClassA(){
-        super('ClassA')
-    }
-end
-```
-
-#####Preferred Way
 ```hydra
 
 var variable = 123.456 //not exported
@@ -160,9 +126,14 @@ class ClassA extends ClassB  //exported
 end
 
 //exports
-export VARIABLE
-export Func
+export VARIABLE //when this package is imported, VARIABLE can be reached by <mypkg>.VARIABLE
+export Func as funcy //when this package is imported, Func can be reached by <mypkg>.funcy
 export ClassA
+```
+
+Multiple items may also be exported at once
+```hydra
+export RWFile, RFile, WFile, W_ONLY //multiple exports
 ```
 
 ##Built In Types:

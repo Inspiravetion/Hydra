@@ -1,3 +1,5 @@
+Program => PrgrmStmts
+
 BASICS BUILDING BLOCKS
 --------------------------------------------------------------------------------
 
@@ -15,13 +17,18 @@ OptIdent    => Ident | empty
 
 KeyVal      => (Ident | StringLit) ':' Expr
 
-Expr        => NewStmt
+Expr        => HeadExpr TailExpr
+HeadExpr    => NewStmt
             |  InstanceVar
             |  ClassVar
             |  BuiltinLit
             |  SquareBracInd
             |  FuncCall
+            |  IncDecStmt
             |  Ident
+            |  '(' Expr ')'
+TailExpr    => InfixOp Expr
+            |  empty
 
 OptExpr     => Expr | empty
 
@@ -29,6 +36,12 @@ Stmt        => VarDecl
             |  ReturnStmt
             |  AssignStmt
             |  ControlStructure
+            |  Exprs
+
+PrgrmStmt   => VarDecl
+            |  AssignStmt
+            |  ControlStructure
+            |  LanguageConstruct
             |  Exprs
 
 ChanSendRcv => ChanSend | ChanRcv
@@ -66,6 +79,10 @@ ClassVar    => ('#_' | '#') Ident
 
 LISTS
 --------------------------------------------------------------------------------
+
+PrgrmStmts  => PrgrmStmt PrgrmStmts!
+PrgrmStmts! => PrgrmStmt
+            |  empty
 
 IdentList   => Ident IdentList!
 IdentList!  => ',' IdentList
@@ -122,7 +139,14 @@ OrDefault   => 'or do' Stmts 'end'
 BUILT IN LITERALS
 --------------------------------------------------------------------------------
 
-BuiltinLit => IntLit | FloatLit | StringLit | RegexLit | ArrayLit | HashLit | ChanLit | FuncLit
+BuiltinLit => IntLit
+           |  FloatLit
+           |  StringLit
+           |  RegexLit
+           |  ArrayLit
+           |  HashLit
+           |  ChanLit
+           |  ClosureLit
 
 IntLit     => IntDigits | HexLit
 HexLit     => '0' ('x' | 'X') HexDigits
@@ -141,9 +165,6 @@ HashLit    => '{' KeyValList '}'
 
 ChanLit    => '<-' OptExpr '->'
 
-FuncLit    => 'gen' 'function' Ident '(' OptIdentList ')' '{' Stmts '}'
-           |  'function' Ident '(' OptIdentList ')' '{' Stmts '}'
-
 ClosureLit  => OptAsterick ClosureDef
 OptAsterick => '*'
             |  empty
@@ -152,22 +173,59 @@ ClosureDef  => '(' OptIdentList ')' '{' Stmts '}' OptParams
 LANGUAGE CONSTRUCTS
 --------------------------------------------------------------------------------
 
+LanguageConstruct => ClassDef | SpawnStmt | NewStmt | ImportStmt | ExportStmt
+
 ClassDef       => 'class' Ident ExtendInfo ClassInternals 'end'
 ExtendInfo     => 'extends' IdentList
-ClassInternals => (Constructor | ClassVarDecl | FuncLit | Comment) ClassInternals
+ClassInternals => (Constructor | ClassVarDecl | FuncDef | Comment) ClassInternals
                |  empty
+
+FuncDef        => 'gen' 'function' Ident '(' OptIdentList ')' '{' Stmts '}'
+               |  'function' Ident '(' OptIdentList ')' '{' Stmts '}'
 
 SpawnStmt      => 'spawn' (ClosureDef | FuncCall)
 
 NewStmt        => 'new' FuncCall
 
-ImportStmt     => 'import' (FullImport | PartialImport)
-FullImport     => PkgLocation
-PartialImport  => IdentList 'from' PkgLocation
+ImportStmt     => 'import' (FullImport | RenameImport | MultiImport)
+FullImport     => PkgLocation AsRename
+RenameImport   => Ident 'from' PkgLocation AsRename
+MultiImport    => IdentList 'from' PkgLocation
 PkgLocation    => ('std' | 'pkg') '::' Ident
                |  ImportPath
 ImportPath     => ('~' | '.') '/' Path
 Path           => Ident '/' Path
                |  Ident '.hy'
+AsRename       => 'as' Identifier
+               |  empty
 
-ExportStmt     =>
+ExportStmt     => 'export' (SingleExport | MultiExport)
+MultiExport    => IdentList
+SingleExport   => Ident AsRename
+
+
+OPPERATOR EXPRESSIONS
+--------------------------------------------------------------------------------
+
+IncDecStmt     => Ident ( '++' | '--' )
+
+TailAriExpr    => ArithOp Expr
+               |  empty
+
+StringExpr     => StringLit StringTail
+StringTail     => '+' StringLit
+               | empty
+
+InfixOp        => MulOp
+               |  AddOp
+               |  '==' | '!=' | '<' | '<=' | '>' | '>='
+               |  '&&'
+               |  OrOp
+
+ArithOp        => MulOp | AddOp
+
+MulOp          => '*' | '/' | '^' | '%' | '&' | '|'
+               |  ShiftOp
+ShiftOp        => '<<' | '>>'
+AddOp          => '+' | '-'
+OrOp           => '||'
