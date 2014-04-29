@@ -21,6 +21,7 @@ Expr        => HeadExpr TailExpr
 HeadExpr    => NewStmt
             |  InstanceVar
             |  ClassVar
+            |  YieldExpr
             |  BuiltinLit
             |  SquareBracInd
             |  FuncCall
@@ -48,7 +49,7 @@ ChanSendRcv => ChanSend | ChanRcv
 ChanSend    => Expr '->' Expr
 ChanRcv     => OptIdentList '<-' Expr
 
-Constructor => Ident '(' Exprs ')' '{' Stmts '}'
+Constructor => Ident '(' OptIdentList ')' '{' Stmts '}'
 
 ClassVarDecl => ClassVar '=' Expr
 
@@ -63,7 +64,7 @@ FuncCall    => DottedExprs Params
 
 SquareBracInd => Ident '[' Expr ']'
 
-VarDecl     => 'var' Exprs optRSAssign
+VarDecl     => 'var' Ident optRSAssign
 
 RSAssign    => '=' Exprs
 
@@ -76,6 +77,8 @@ ReturnStmt  => 'return' OptExprs
 InstanceVar => ('@_' | '@') Ident
 
 ClassVar    => ('#_' | '#') Ident
+
+YieldExpr   => 'yield' OptExprs
 
 LISTS
 --------------------------------------------------------------------------------
@@ -115,7 +118,7 @@ ControlStructure => ForInLoop | WhileLoop | IfElse | GivenIs | WaitFor
 
 ForInLoop   => 'for' IdentList 'in' Expr 'do' Stmts 'end'
 
-WhileLoop   => 'while' Stmts 'do' Stmts 'end'
+WhileLoop   => 'while' Expr 'do' Stmts 'end'
 
 IfElse       => IfBranch ElseIfBranch
 IfBranch     => 'if' Stmts 'do' Stmts
@@ -187,16 +190,16 @@ SpawnStmt      => 'spawn' (ClosureDef | FuncCall)
 
 NewStmt        => 'new' FuncCall
 
-ImportStmt     => 'import' (FullImport | RenameImport | MultiImport)
+ImportStmt     => 'import' (FullImport | PartialImport | MultiImport)
 FullImport     => PkgLocation AsRename
-RenameImport   => Ident 'from' PkgLocation AsRename
+PartialImport  => Ident 'from' PkgLocation AsRename
 MultiImport    => IdentList 'from' PkgLocation
 PkgLocation    => ('std' | 'pkg') '::' Ident
                |  ImportPath
 ImportPath     => ('~' | '.') '/' Path
 Path           => Ident '/' Path
                |  Ident '.hy'
-AsRename       => 'as' Identifier
+AsRename       => 'as' Ident
                |  empty
 
 ExportStmt     => 'export' (SingleExport | MultiExport)
@@ -216,10 +219,15 @@ StringExpr     => StringLit StringTail
 StringTail     => '+' StringLit
                | empty
 
-InfixOp        => MulOp
-               |  AddOp
+InfixOp        => InfixEq
+               |  ArithOp
                |  '==' | '!=' | '<' | '<=' | '>' | '>='
                |  '&&'
+               |  OrOp
+               |  RangeOps
+
+InfixEq        => InfixEq! '='
+InfixEq!       => ArithOp
                |  OrOp
 
 ArithOp        => MulOp | AddOp
@@ -229,3 +237,5 @@ MulOp          => '*' | '/' | '^' | '%' | '&' | '|'
 ShiftOp        => '<<' | '>>'
 AddOp          => '+' | '-'
 OrOp           => '||'
+
+RangeOps       => '...' | '..'

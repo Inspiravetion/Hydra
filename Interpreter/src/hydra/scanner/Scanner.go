@@ -514,7 +514,7 @@ func (this *Scanner) period_token() *token.Token {
 
 	if char, err := this.get_next_char(); err == nil {
 		if char == token.PERIOD_LIT {
-			return this.tok(token.RANGE_LIT, token.RANGE)
+			return this.tok(token.EXCL_RANGE_LIT, token.EXCL_RANGE)
 		}
 
 		this.rewind()

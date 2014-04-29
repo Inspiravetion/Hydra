@@ -48,7 +48,8 @@ const (
 	BIT_AND_EQ                           // '&='
 	OR                                   // '||'
 	AND                                  // '&&'
-	RANGE                                // '..'
+	EXCL_RANGE                           // '..'
+	INCL_RANGE                           // '...'
 	LSHOVEL                              // '<<'
 	RSHOVEL                              // '>>'
 	LCURLY                               // '{'
@@ -79,61 +80,55 @@ const (
 	TO_KEYWORD                           // 'to'
 	BY_KEYWORD                           // 'by'
 	END_KEYWORD                          // 'end'
-	MODULE_KEYWORD                       // 'module'
 	CLASS_KEYWORD                        // 'class'
 	IMPORT_KEYWORD                       // 'import'
 	AS_KEYWORD                           // 'as'
 	EXPORT_KEYWORD                       // 'export'
-	SUPER_KEYWORD                        // 'super'
-	THIS_KEYWORD                         // 'this'
-	RETURN_KEYWORD                       // 'return'
-	OPERATOR_KEYWORD                     // 'operator'
-	EXTENDS_KEYWORD                      // 'extends'
-	PRIVATE_KEYWORD                      // 'priv'
-	GENERATOR_KEYWORD                    // 'gen'
-	EITHER_KEYWORD                       // 'either'
-	WAIT_FOR_KEYWORD                     // 'wait_for'
-	BREAK_KEYWORD                        // 'break'
-	GIVEN_KEYWORD                        // 'given'
-	IS_KEYWORD                           // 'is'
-	EXCEPT_KEYWORD                       // 'except'
+	// SUPER_KEYWORD                        // 'super'
+	THIS_KEYWORD      // 'this'
+	RETURN_KEYWORD    // 'return'
+	OPERATOR_KEYWORD  // 'operator'
+	EXTENDS_KEYWORD   // 'extends'
+	GENERATOR_KEYWORD // 'gen'
+	EITHER_KEYWORD    // 'either'
+	WAIT_FOR_KEYWORD  // 'wait_for'
+	BREAK_KEYWORD     // 'break'
+	GIVEN_KEYWORD     // 'given'
+	IS_KEYWORD        // 'is'
 )
 
 var KeywordMap = map[string]Token_Type{
-	FUNC_KEYWORD_LIT:      FUNC_KEYWORD,
-	SPAWN_KEYWORD_LIT:     SPAWN_KEYWORD,
-	IF_KEYWORD_LIT:        IF_KEYWORD,
-	ELSE_KEYWORD_LIT:      ELSE_KEYWORD,
-	THEN_KEYWORD_LIT:      THEN_KEYWORD,
-	FOR_KEYWORD_LIT:       FOR_KEYWORD,
-	IN_KEYWORD_LIT:        IN_KEYWORD,
-	WHILE_KEYWORD_LIT:     WHILE_KEYWORD,
-	DO_KEYWORD_LIT:        DO_KEYWORD,
-	NOT_KEYWORD_LIT:       NOT_KEYWORD,
-	AND_KEYWORD_LIT:       AND_KEYWORD,
-	OR_KEYWORD_LIT:        OR_KEYWORD,
-	FROM_KEYWORD_LIT:      FROM_KEYWORD,
-	TO_KEYWORD_LIT:        TO_KEYWORD,
-	BY_KEYWORD_LIT:        BY_KEYWORD,
-	END_KEYWORD_LIT:       END_KEYWORD,
-	MODULE_KEYWORD_LIT:    MODULE_KEYWORD,
-	CLASS_KEYWORD_LIT:     CLASS_KEYWORD,
-	IMPORT_KEYWORD_LIT:    IMPORT_KEYWORD,
-	AS_KEYWORD_LIT:        AS_KEYWORD,
-	EXPORT_KEYWORD_LIT:    EXPORT_KEYWORD,
-	SUPER_KEYWORD_LIT:     SUPER_KEYWORD,
+	FUNC_KEYWORD_LIT:   FUNC_KEYWORD,
+	SPAWN_KEYWORD_LIT:  SPAWN_KEYWORD,
+	IF_KEYWORD_LIT:     IF_KEYWORD,
+	ELSE_KEYWORD_LIT:   ELSE_KEYWORD,
+	THEN_KEYWORD_LIT:   THEN_KEYWORD,
+	FOR_KEYWORD_LIT:    FOR_KEYWORD,
+	IN_KEYWORD_LIT:     IN_KEYWORD,
+	WHILE_KEYWORD_LIT:  WHILE_KEYWORD,
+	DO_KEYWORD_LIT:     DO_KEYWORD,
+	NOT_KEYWORD_LIT:    NOT_KEYWORD,
+	AND_KEYWORD_LIT:    AND_KEYWORD,
+	OR_KEYWORD_LIT:     OR_KEYWORD,
+	FROM_KEYWORD_LIT:   FROM_KEYWORD,
+	TO_KEYWORD_LIT:     TO_KEYWORD,
+	BY_KEYWORD_LIT:     BY_KEYWORD,
+	END_KEYWORD_LIT:    END_KEYWORD,
+	CLASS_KEYWORD_LIT:  CLASS_KEYWORD,
+	IMPORT_KEYWORD_LIT: IMPORT_KEYWORD,
+	AS_KEYWORD_LIT:     AS_KEYWORD,
+	EXPORT_KEYWORD_LIT: EXPORT_KEYWORD,
+	// SUPER_KEYWORD_LIT:     SUPER_KEYWORD,
 	THIS_KEYWORD_LIT:      THIS_KEYWORD,
 	RETURN_KEYWORD_LIT:    RETURN_KEYWORD,
 	OPERATOR_KEYWORD_LIT:  OPERATOR_KEYWORD,
 	EXTENDS_KEYWORD_LIT:   EXTENDS_KEYWORD,
-	PRIVATE_KEYWORD_LIT:   PRIVATE_KEYWORD,
 	GENERATOR_KEYWORD_LIT: GENERATOR_KEYWORD,
 	EITHER_KEYWORD_LIT:    EITHER_KEYWORD,
 	WAIT_FOR_KEYWORD_LIT:  WAIT_FOR_KEYWORD,
 	BREAK_KEYWORD_LIT:     BREAK_KEYWORD,
 	GIVEN_KEYWORD_LIT:     GIVEN_KEYWORD,
 	IS_KEYWORD_LIT:        IS_KEYWORD,
-	EXCEPT_KEYWORD_LIT:    EXCEPT_KEYWORD,
 }
 
 func New(val string, class Token_Type, line int, col int) *Token {
@@ -242,8 +237,10 @@ func (this Token_Type) String() string {
 		return "MULTILINE_COMMENT"
 	case SINGLELINE_COMMENT:
 		return "SINGLELINE_COMMENT"
-	case RANGE:
-		return "RANGE"
+	case EXCL_RANGE:
+		return "EXCL_RANGE"
+	case INCL_RANGE:
+		return "INCL_RANGE"
 	case FUNC_KEYWORD:
 		return "FUNC_KEYWORD"
 	case SPAWN_KEYWORD:
@@ -276,8 +273,6 @@ func (this Token_Type) String() string {
 		return "BY_KEYWORD"
 	case END_KEYWORD:
 		return "END_KEYWORD"
-	case MODULE_KEYWORD:
-		return "MODULE_KEYWORD"
 	case CLASS_KEYWORD:
 		return "CLASS_KEYWORD"
 	case IMPORT_KEYWORD:
@@ -286,8 +281,8 @@ func (this Token_Type) String() string {
 		return "AS_KEYWORD"
 	case EXPORT_KEYWORD:
 		return "EXPORT_KEYWORD"
-	case SUPER_KEYWORD:
-		return "SUPER_KEYWORD"
+	// case SUPER_KEYWORD:
+	// 	return "SUPER_KEYWORD"
 	case THIS_KEYWORD:
 		return "THIS_KEYWORD"
 	case RETURN_KEYWORD:
@@ -296,8 +291,6 @@ func (this Token_Type) String() string {
 		return "OPERATOR_KEYWORD"
 	case EXTENDS_KEYWORD:
 		return "EXTENDS_KEYWORD"
-	case PRIVATE_KEYWORD:
-		return "PRIVATE_KEYWORD"
 	case GENERATOR_KEYWORD:
 		return "GENERATOR_KEYWORD"
 	case EITHER_KEYWORD:
@@ -310,8 +303,6 @@ func (this Token_Type) String() string {
 		return "GIVEN_KEYWORD"
 	case IS_KEYWORD:
 		return "IS_KEYWORD"
-	case EXCEPT_KEYWORD:
-		return "EXCEPT_KEYWORD"
 	}
 	return ""
 }
