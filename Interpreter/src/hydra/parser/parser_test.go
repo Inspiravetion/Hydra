@@ -10,16 +10,45 @@ import (
 
 var _ = Describe("Parser", func() {
 
-	program := "for val in obj do\n\tprint(val)\nend"
-	toks := scanner.New(scanner.STRING, program).Run()
+	It("Should be able to parse a super basic for in loop", func() {
 
-	p := parser.New(toks)
-	p.Parse()
+		toks := scanner.New(
+			scanner.STRING,
+			`for val in obj do
+                print(val)
+            end`,
+		).Run()
 
-	program2 := "for val1, val2, val3 in obj do\n\tfmt.print(val)\nend"
-	toks2 := scanner.New(scanner.STRING, program2).Run()
+		p := parser.New(toks)
+		p.Parse()
+	})
 
-	p2 := parser.New(toks2)
-	p2.Parse()
+	It("Should be able to parse a for in loop with multiple vals", func() {
+
+		toks := scanner.New(
+			scanner.STRING,
+			`for val1, val2, val3 in obj do
+                fmt.print(val)
+            end`,
+		).Run()
+
+		p := parser.New(toks)
+		p.Parse()
+	})
+
+	It("Should be able to parse multiple top level program statements", func() {
+
+		toks := scanner.New(
+			scanner.STRING,
+			`import std.sync
+            
+            for val1, val2, val3 in obj do
+                fmt.print(val)
+            end`,
+		).Run()
+
+		p := parser.New(toks)
+		p.Parse()
+	})
 
 })

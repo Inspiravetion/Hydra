@@ -14,8 +14,24 @@ func main() {
 
 	// file_tokens := scanner.New(scanner.FILE, os.Args[1]).Run()
 
-	string_tokens := scanner.New(scanner.STRING,
-		"for val in obj do\n\tprint(val)\nend").Run()
+	string_tokens := scanner.New(
+		scanner.STRING,
+		`
+		import std::sync
+		import ~/root/dir/test.hy
+		import TestClass from ~/root/dir/test.hy
+		import TestClass from ~/root/dir/test.hy as T
+		import Mutex from std::sync 
+		import Mutex from std::sync as M
+		import sqrt, ceil from std::math
+		import func1, func2 from ~/root/dir/test.hy
+		
+
+
+		for val in obj do
+			print(val)
+		end`,
+	).Run()
 
 	parser := parser.New(string_tokens)
 	parser.Parse()

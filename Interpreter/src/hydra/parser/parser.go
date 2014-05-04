@@ -5,7 +5,7 @@ import (
 	// "hydra/ast"
 	"fmt"
 	"hydra/scanner/token"
-	// "hydra/util"
+	"hydra/util"
 )
 
 var no_err string = ""
@@ -59,6 +59,14 @@ func (this *Parser) program() string {
 			continue
 		}
 
+		if this.tok.Class == token.IMPORT_KEYWORD {
+			if err = this.import_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
 		return "Expression starting at" + this.tokPos() + "not allowed at top level"
 	}
 
@@ -103,6 +111,161 @@ func (this *Parser) for_in_loop() string {
 	}
 
 	this.next()
+
+	return no_err
+}
+
+func (this *Parser) import_stmt() string {
+
+	if this.tok.Class != token.IMPORT_KEYWORD {
+		return "import_stmt() called when the current token is not 'import'"
+	}
+
+	this.next()
+
+	if this.tok.Class == token.IDENTIFIER {
+		if this.tok.Text != "std" && this.tok.Text != "pkg" {
+			return this.partial_import()
+		}
+	}
+
+	return this.package_location(false)
+}
+
+func (this *Parser) package_location(renameable bool) string {
+	var err string
+
+	if this.tok.Class == token.IDENTIFIER &&
+		(this.tok.Text == "std" || this.tok.Text == "pkg") {
+
+		if err = this.builtin_pkg_location(); err != no_err {
+			return err
+		}
+
+		if renameable {
+			return this.as_rename()
+		}
+
+		return no_err
+	}
+
+	if this.tok.Class == token.BIT_NEGATE || this.tok.Class == token.PERIOD {
+		if err = this.path_pkg_location(); err != no_err {
+			return err
+		}
+
+		if renameable {
+			return this.as_rename()
+		}
+
+		return no_err
+	}
+
+	util.Throw("Unrecognized import location")
+	return "Unrecognized import location"
+}
+
+func (this *Parser) builtin_pkg_location() string {
+	this.next()
+
+	for i := 0; i < 2; i++ {
+		if this.tok.Class != token.COLON {
+			return "Expected import deliminator at" + this.tokPos()
+		}
+
+		this.next()
+	}
+
+	return this.ident()
+}
+
+func (this *Parser) path_pkg_location() string {
+	var err string
+	first := true
+
+	this.next()
+
+	for {
+		if this.tok.Class != token.DIV_OP {
+			if first {
+				return "Expected a '/' in the import stmt at" + this.tokPos()
+			}
+
+			break
+		}
+
+		this.next()
+
+		if err = this.ident(); err != no_err {
+			return err
+		}
+
+		first = false
+	}
+
+	if this.tok.Class != token.PERIOD {
+		return "import paths must end in '.hy'"
+	}
+
+	this.next()
+
+	if this.tok.Class != token.IDENTIFIER || this.tok.Text != "hy" {
+		return "import paths must end in '.hy'"
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) partial_import() string {
+
+	if this.tok.Class != token.IDENTIFIER {
+		return "import statement missing identifier at" + this.tokPos()
+	}
+
+	this.next()
+
+	if this.tok.Class == token.COMMA {
+		this.next()
+
+		return this.multi_import()
+	}
+
+	if this.tok.Class != token.FROM_KEYWORD {
+		return "Expected 'from' at" + this.tokPos()
+	}
+
+	this.next()
+
+	return this.package_location(true)
+}
+
+func (this *Parser) multi_import() string {
+	var err string
+
+	if err = this.ident_list(); err != no_err {
+		return err
+	}
+
+	if this.tok.Class != token.FROM_KEYWORD {
+		return "Expected 'from' at" + this.tokPos()
+	}
+
+	this.next()
+
+	return this.package_location(false)
+}
+
+func (this *Parser) as_rename() string {
+	if this.tok.Class == token.AS_KEYWORD {
+
+		this.next()
+
+		if err := this.ident(); err != no_err {
+			return err
+		}
+	}
 
 	return no_err
 }
