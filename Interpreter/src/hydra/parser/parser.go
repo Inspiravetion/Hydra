@@ -34,7 +34,6 @@ func (this *Parser) Parse() {
 }
 
 func (this *Parser) next() {
-	//does scanner send EOF?
 	this.tok = <-this.tokens
 }
 
@@ -67,11 +66,23 @@ func (this *Parser) program() string {
 			continue
 		}
 
+		if this.tok.Class == token.EXPORT_KEYWORD {
+			if err = this.export_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
 		return "Expression starting at" + this.tokPos() + "not allowed at top level"
 	}
 
 	return no_err
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                                For In Loop                                 //
+////////////////////////////////////////////////////////////////////////////////
 
 func (this *Parser) for_in_loop() string {
 	var err string
@@ -114,6 +125,10 @@ func (this *Parser) for_in_loop() string {
 
 	return no_err
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Import Statement                            //
+////////////////////////////////////////////////////////////////////////////////
 
 func (this *Parser) import_stmt() string {
 
@@ -262,12 +277,36 @@ func (this *Parser) as_rename() string {
 
 		this.next()
 
-		if err := this.ident(); err != no_err {
-			return err
-		}
+		return this.ident()
 	}
 
 	return no_err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Export Statement                            //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) export_stmt() string {
+	var err string
+
+	if this.tok.Class != token.EXPORT_KEYWORD {
+		return "export_stmt() called withou the current token being 'export'"
+	}
+
+	this.next()
+
+	if err = this.ident(); err != no_err {
+		return err
+	}
+
+	if this.tok.Class == token.COMMA {
+		this.next()
+
+		return this.ident_list()
+	}
+
+	return this.as_rename()
 }
 
 func (this *Parser) ident_list() string {

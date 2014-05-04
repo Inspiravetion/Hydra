@@ -26,11 +26,14 @@ func main() {
 		import sqrt, ceil from std::math
 		import func1, func2 from ~/root/dir/test.hy
 		
-
-
 		for val in obj do
 			print(val)
-		end`,
+		end
+
+		export MutexEmitter 
+		export MutexEmitter as Memitter
+		export a, b, a
+		`,
 	).Run()
 
 	parser := parser.New(string_tokens)
