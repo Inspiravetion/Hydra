@@ -49,14 +49,15 @@ Stmt        => VarDecl
             |  Comment
 
 PrgrmStmt   => VarDecl
-            |  AssignStmt
             |  SpawnStmt
             |  ControlStructure
             |  LanguageConstruct
-            |  FuncCall
             |  NewStmt
-            |  IncDecStmt
             |  Comment
+            |  AssignStmt
+            |  FuncCall
+            |  IncDecStmt
+
 
 ChanSendRcv => ChanSend | ChanRcv
 ChanSend    => Expr '->' Expr

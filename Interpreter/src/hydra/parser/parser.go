@@ -5,13 +5,14 @@ import (
 	// "hydra/ast"
 	"fmt"
 	"hydra/scanner/token"
-	"hydra/util"
+	// "hydra/util"
 )
+
+var no_err string = ""
 
 type Parser struct {
 	tok    *token.Token
 	tokens <-chan *token.Token
-	// program *ast.Program
 }
 
 func New(tokens <-chan *token.Token) *Parser {
@@ -20,135 +21,206 @@ func New(tokens <-chan *token.Token) *Parser {
 
 func (this *Parser) init(tokens <-chan *token.Token) *Parser {
 	this.tokens = tokens
+	this.next()
 	return this
 }
 
-func (this *Parser) Parse() /**ast.Program*/ {
-	/*return*/ this.program()
-	fmt.Println("Parsed correctly!")
+func (this *Parser) Parse() {
+	if err := this.program(); err != no_err {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Parsed correctly!")
+	}
 }
 
 func (this *Parser) next() {
+	//does scanner send EOF?
 	this.tok = <-this.tokens
 }
 
-func (this *Parser) program() /**ast.Program*/ {
-	// prgrm := ast.New_Program()
-	this.next()
-
-	if this.tok.Class == token.FOR_KEYWORD {
-		/*prgrm.Add(*/ this.for_in_loop() /*)*/
-	}
-
-	// return prgrm
+func (this *Parser) tokPos() string {
+	return fmt.Sprintf(" %d:%d ", this.tok.Line, this.tok.Column)
 }
 
-func (this *Parser) for_in_loop() {
-	//loop := ast.New_For_In_Loop(this.tok)
+func (this *Parser) program() string {
+
+	for {
+		if this.tok == token.EOF {
+			break
+		}
+
+		var err string
+
+		if this.tok.Class == token.FOR_KEYWORD {
+			if err = this.for_in_loop(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		return "Expression starting at" + this.tokPos() + "not allowed at top level"
+	}
+
+	return no_err
+}
+
+func (this *Parser) for_in_loop() string {
+	var err string
 
 	if this.tok.Class != token.FOR_KEYWORD {
-		util.Throw("Parsing Error")
+		return "for_in_loop() called when the current token is not 'for'"
 	}
 
 	this.next()
-	this.ident_list()
+
+	if err = this.ident_list(); err != no_err {
+		return err
+	}
 
 	if this.tok.Class != token.IN_KEYWORD {
-		util.Throw("Parsing Error")
+		return "Expected 'in' in for_in loop at" + this.tokPos()
 	}
 
 	this.next()
-	this.expr()
+
+	if err = this.expr(); err != no_err {
+		return err
+	}
 
 	if this.tok.Class != token.DO_KEYWORD {
-		util.Throw("Parsing Error")
+		return "Expected 'in' in for_in loop at" + this.tokPos()
 	}
 
 	this.next()
-	this.stmts()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
 
 	if this.tok.Class != token.END_KEYWORD {
-		util.Throw("Parsing Error")
+		return "Expected 'end' at" + this.tokPos()
 	}
 
 	this.next()
+
+	return no_err
 }
 
-func (this *Parser) ident_list() {
+func (this *Parser) ident_list() string {
+	var err string
+
 	//guarantee one identifier
-	this.ident()
+	if err = this.ident(); err != no_err {
+		return err
+	}
 
 	//consume comma delimited identifiers and then return
 	for {
 		if this.tok.Class != token.COMMA {
-			return
+			break
 		}
 
 		this.next()
-		this.ident()
+
+		if err = this.ident(); err != no_err {
+			return err
+		}
 	}
 
+	return no_err
 }
 
-func (this *Parser) expr() {
+func (this *Parser) expr() string {
 
 	if this.tok.Class != token.IDENTIFIER {
-		util.Throw("Parsing Error")
+		return "Expected Identifier at" + this.tokPos()
 	}
 
 	this.next()
+
+	return no_err
 }
 
-func (this *Parser) stmts() {
-	this.func_call()
+func (this *Parser) stmts() string {
+	if err := this.func_call(); err != no_err {
+		return err
+	}
+
+	return no_err
 }
 
-func (this *Parser) ident() {
+func (this *Parser) ident() string {
 	if this.tok.Class != token.IDENTIFIER {
-		util.Throw("Parsing Error")
+		return "Expected identifier at" + this.tokPos()
 	}
 
 	this.next()
+
+	return no_err
 }
 
-func (this *Parser) func_call() {
-	this.dotted_expression()
+func (this *Parser) func_call() string {
+	var err string
 
-	this.params()
+	if err = this.dotted_expression(); err != no_err {
+		return err
+	}
+
+	if err = this.params(); err != no_err {
+		return err
+	}
+
+	return no_err
 }
 
-func (this *Parser) dotted_expression() {
-	this.expr()
+func (this *Parser) dotted_expression() string {
+	var err string
+
+	if err = this.expr(); err != no_err {
+		return err
+	}
 
 	for {
 		if this.tok.Class != token.PERIOD {
-			return
+			return no_err
 		}
 
 		this.next()
-		this.expr()
+
+		/*TODO this chould cause infinite loop if dotted_expression is called
+		  anywhere indirectly by expr()
+		*/
+		if err = this.expr(); err != no_err {
+			return "Expecting expression after comma at" + this.tokPos()
+		}
 	}
 }
 
-func (this *Parser) params() {
+func (this *Parser) params() string {
 
 	if this.tok.Class != token.LPAREN {
-		util.Throw("Parsing Error")
+		return "Expected '(' at" + this.tokPos()
 	}
 
 	this.next()
-	this.opt_exprs()
+
+	if err := this.opt_exprs(); err != no_err {
+		return err
+	}
 
 	if this.tok.Class != token.RPAREN {
-		util.Throw("Parsing Error")
+		return "Expected ')' at" + this.tokPos()
 	}
 
 	this.next()
+
+	return no_err
 }
 
-func (this *Parser) opt_exprs() {
+func (this *Parser) opt_exprs() string {
 	if this.tok.Class != token.IDENTIFIER {
-		return
+		return no_err
 	}
 
 	this.next()
@@ -156,10 +228,13 @@ func (this *Parser) opt_exprs() {
 	for {
 
 		if this.tok.Class != token.COMMA {
-			return
+			return no_err
 		}
 
 		this.next()
-		this.ident()
+
+		if err := this.ident(); err != no_err {
+			return err
+		}
 	}
 }

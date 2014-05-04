@@ -4,9 +4,6 @@ TEST_DIRS = $(wildcard ./src/hydra/sc*)
 TEST_FILES = scanner ast parser
 
 all:
-	go build ./hydra.go
-
-everything:
 	go build -a ./hydra.go
 
 linux: 

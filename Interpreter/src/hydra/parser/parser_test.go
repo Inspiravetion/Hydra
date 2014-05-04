@@ -16,4 +16,10 @@ var _ = Describe("Parser", func() {
 	p := parser.New(toks)
 	p.Parse()
 
+	program2 := "for val1, val2, val3 in obj do\n\tfmt.print(val)\nend"
+	toks2 := scanner.New(scanner.STRING, program2).Run()
+
+	p2 := parser.New(toks2)
+	p2.Parse()
+
 })

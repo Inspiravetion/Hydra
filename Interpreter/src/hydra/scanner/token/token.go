@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var EOF *Token = &Token{Class: EOF_TYPE}
+
 type Token struct {
 	Line   int
 	Column int
@@ -95,6 +97,7 @@ const (
 	BREAK_KEYWORD     // 'break'
 	GIVEN_KEYWORD     // 'given'
 	IS_KEYWORD        // 'is'
+	EOF_TYPE          // EOF
 )
 
 var KeywordMap = map[string]Token_Type{

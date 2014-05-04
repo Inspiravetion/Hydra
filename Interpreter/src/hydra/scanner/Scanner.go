@@ -546,6 +546,9 @@ func (this *Scanner) stream_tokens(out_chan chan *token.Token) {
 	for tok := this.get_next_token(); tok != nil; tok = this.get_next_token() {
 		out_chan <- tok
 	}
+
+	out_chan <- token.EOF
+
 	close(out_chan)
 
 	if this.input != nil {

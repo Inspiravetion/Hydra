@@ -129,14 +129,14 @@ var mocks = []mock_input{
 			token.BY_KEYWORD, token.NUM_LITERAL, token.DO_KEYWORD,
 			token.LPAREN, token.IDENTIFIER, token.RPAREN,
 			token.LCURLY, token.IDENTIFIER, token.LPAREN,
-			token.IDENTIFIER, token.RPAREN, token.RCURLY,
+			token.IDENTIFIER, token.RPAREN, token.RCURLY, token.EOF_TYPE,
 		},
 	},
 	{
 		`this.func_call() /* comment /*****/`,
 		[]token.Token_Type{
 			token.THIS_KEYWORD, token.PERIOD, token.IDENTIFIER,
-			token.LPAREN, token.RPAREN, token.MULTILINE_COMMENT,
+			token.LPAREN, token.RPAREN, token.MULTILINE_COMMENT, token.EOF_TYPE,
 		},
 	},
 	{
@@ -155,7 +155,7 @@ var mocks = []mock_input{
 			token.IDENTIFIER, token.BIT_OR, token.IDENTIFIER,
 			token.RPAREN, token.COLON, token.LPAREN,
 			token.IDENTIFIER, token.BIT_AND, token.IDENTIFIER,
-			token.RPAREN, token.SEMICOLON, token.RCURLY,
+			token.RPAREN, token.SEMICOLON, token.RCURLY, token.EOF_TYPE,
 		},
 	},
 	{
@@ -168,7 +168,7 @@ var mocks = []mock_input{
 			token.MULT_OP, token.IDENTIFIER, token.ADD_OP,
 			token.IDENTIFIER, token.DIV_OP, token.IDENTIFIER,
 			token.MIN_OP, token.IDENTIFIER, token.MOD_OP,
-			token.IDENTIFIER, token.RCURLY,
+			token.IDENTIFIER, token.RCURLY, token.EOF_TYPE,
 		},
 	},
 	{
@@ -178,7 +178,7 @@ var mocks = []mock_input{
 			token.INCREMENT, token.RPAREN, token.DECREMENT,
 			token.RPAREN, token.POWER_OP, token.NUM_LITERAL,
 			token.EQUAL, token.IDENTIFIER, token.OR,
-			token.IDENTIFIER, token.AND, token.IDENTIFIER,
+			token.IDENTIFIER, token.AND, token.IDENTIFIER, token.EOF_TYPE,
 		},
 	},
 	{
@@ -195,7 +195,7 @@ var mocks = []mock_input{
 			token.NUM_LITERAL, token.COMMA, token.IDENTIFIER,
 			token.BIT_AND_EQ, token.NUM_LITERAL, token.COMMA,
 			token.IDENTIFIER, token.BIT_OR_EQ, token.NUM_LITERAL,
-			token.RPAREN,
+			token.RPAREN, token.EOF_TYPE,
 		},
 	},
 	{
@@ -204,7 +204,7 @@ var mocks = []mock_input{
 			token.IDENTIFIER, token.LBRACKET, token.NUM_LITERAL,
 			token.RBRACKET, token.BIT_OR_EQ, token.LPAREN,
 			token.LSHOVEL, token.IDENTIFIER, token.RPAREN,
-			token.RSHOVEL, token.NUM_LITERAL,
+			token.RSHOVEL, token.NUM_LITERAL, token.EOF_TYPE,
 		},
 	},
 	{
@@ -215,7 +215,7 @@ var mocks = []mock_input{
 			token.GREATER_THAN, token.IDENTIFIER, token.OR,
 			token.IDENTIFIER, token.LESS_THAN_EQ, token.IDENTIFIER,
 			token.OR, token.IDENTIFIER, token.GREATER_THAN_EQ,
-			token.IDENTIFIER,
+			token.IDENTIFIER, token.EOF_TYPE,
 		},
 	},
 }
@@ -246,15 +246,15 @@ var _ = Describe("Scanner", func() {
 		}
 
 		It("should produce 10 tokens", func() {
-			Expect(count).To(Equal(10))
+			Expect(count).To(Equal(11))
 		})
 
 		It("should have a 'for' token as the first token", func() {
 			Expect(first_tok.Class).To(Equal(token.FOR_KEYWORD))
 		})
 
-		It("should have an 'end' token as the last token", func() {
-			Expect(last_tok.Class).To(Equal(token.END_KEYWORD))
+		It("should have an EOF token as the last token", func() {
+			Expect(last_tok).To(Equal(token.EOF))
 		})
 	})
 
