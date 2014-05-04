@@ -11,6 +11,10 @@ HexDigit   => [0-9a-fA-F]
 HexDigits  => HexDigit HexDigits
            |  empty
 
+BinDigit   => [0-1]
+BinDigits  => BinDigit BinDigits
+           |  empty
+
 Ident       => [a-zA-Z_$][a-zA-Z0-9_?!$]*
 
 OptIdent    => Ident | empty
@@ -35,19 +39,28 @@ OptExpr     => Expr | empty
 
 Stmt        => VarDecl
             |  ReturnStmt
+            |  SpawnStmt
             |  AssignStmt
             |  ControlStructure
-            |  Exprs
+            |  Yield Expr
+            |  FuncCall
+            |  NewStmt
+            |  IncDecStmt
+            |  Comment
 
 PrgrmStmt   => VarDecl
             |  AssignStmt
+            |  SpawnStmt
             |  ControlStructure
             |  LanguageConstruct
-            |  Exprs
+            |  FuncCall
+            |  NewStmt
+            |  IncDecStmt
+            |  Comment
 
 ChanSendRcv => ChanSend | ChanRcv
 ChanSend    => Expr '->' Expr
-ChanRcv     => OptIdentList '<-' Expr
+ChanRcv     => OptIdent '<-' Expr
 
 Constructor => Ident '(' OptIdentList ')' '{' Stmts '}'
 
@@ -151,8 +164,9 @@ BuiltinLit => IntLit
            |  ChanLit
            |  ClosureLit
 
-IntLit     => IntDigits | HexLit
+IntLit     => IntDigits | HexLit | BinLit
 HexLit     => '0' ('x' | 'X') HexDigits
+BinLit     => '0' ('b' | 'B') BinDigits
 
 FloatLit   => IntDigits '.' IntDigits
 
@@ -176,7 +190,7 @@ ClosureDef  => '(' OptIdentList ')' '{' Stmts '}' OptParams
 LANGUAGE CONSTRUCTS
 --------------------------------------------------------------------------------
 
-LanguageConstruct => ClassDef | SpawnStmt | NewStmt | ImportStmt | ExportStmt
+LanguageConstruct => FuncDef | ClassDef | ImportStmt | ExportStmt
 
 ClassDef       => 'class' Ident ExtendInfo ClassInternals 'end'
 ExtendInfo     => 'extends' IdentList

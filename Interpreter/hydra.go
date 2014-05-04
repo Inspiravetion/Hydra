@@ -2,23 +2,23 @@ package main
 
 import (
 	// "fmt"
+	"hydra/parser"
 	"hydra/scanner"
-	"hydra/util"
-	"os"
+	// "hydra/util"
+	// "os"
 	"runtime"
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	file_tokens := scanner.New(scanner.FILE, os.Args[1]).Run()
+	// file_tokens := scanner.New(scanner.FILE, os.Args[1]).Run()
 
-	// string_tokens := scanner.New(scanner.STRING,
-	// 	"for val in obj do\n\tprint(val)\nend").Run()
+	string_tokens := scanner.New(scanner.STRING,
+		"for val in obj do\n\tprint(val)\nend").Run()
 
-	for tok := range file_tokens {
-		util.Logf("%+v", tok)
-	}
+	parser := parser.New(string_tokens)
+	parser.Parse()
 
 	// fmt.Printf("\n\n\n")
 

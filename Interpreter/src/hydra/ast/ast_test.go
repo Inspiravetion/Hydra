@@ -12,54 +12,59 @@ var _ = Describe("Ast", func() {
 		arr := []ProgramStmt{
 			&VarDecl{},
 			&AssignStmt{},
+			&SpawnStmt{},
 			&ForInLoop{},
 			&WhileLoop{},
 			&IfElse{},
 			&GivenIs{},
 			&WaitFor{},
 			&ClassDef{},
-			&SpawnStmt{},
-			&NewStmt{},
 			&FullImport{},
 			&PartialImport{},
 			&MultiImport{},
 			&SingleExport{},
 			&MultiExport{},
-			&Expr{},
+			&FuncDef{},
+			&FuncCall{},
+			&NewStmt{},
+			&IncDecStmt{},
 		}
 
-		Expect(len(arr)).To(Equal(16))
+		Expect(len(arr)).To(Equal(18))
 	})
 
 	Describe("Nodes implement Stmt", func() {
 		arr := []Stmt{
 			&VarDecl{},
 			&ReturnStmt{},
+			&SpawnStmt{},
 			&AssignStmt{},
-			&Expr{},
 			&ForInLoop{},
 			&WhileLoop{},
 			&IfElse{},
 			&GivenIs{},
 			&WaitFor{},
+			&YieldExpr{},
+			&FuncCall{},
+			&NewStmt{},
+			&IncDecStmt{},
 		}
 
-		Expect(len(arr)).To(Equal(9))
+		Expect(len(arr)).To(Equal(13))
 	})
 
 	Describe("Nodes implement LanguageConstruct", func() {
 		arr := []LanguageConstruct{
 			&ClassDef{},
-			&SpawnStmt{},
-			&NewStmt{},
 			&FullImport{},
 			&PartialImport{},
 			&MultiImport{},
 			&SingleExport{},
 			&MultiExport{},
+			&FuncDef{},
 		}
 
-		Expect(len(arr)).To(Equal(8))
+		Expect(len(arr)).To(Equal(7))
 	})
 
 	Describe("Nodes implement ClassInternal", func() {
@@ -92,6 +97,21 @@ var _ = Describe("Ast", func() {
 		}
 
 		Expect(len(arr)).To(Equal(5))
+	})
+
+	Describe("Nodes implement BuiltinLit", func() {
+		arr := []BuiltinLit{
+			&IntLit{},
+			&FloatLit{},
+			&StringLit{},
+			&RegexLit{},
+			&ArrayLit{},
+			&HashLit{},
+			&ChanLit{},
+			&ClosureLit{},
+		}
+
+		Expect(len(arr)).To(Equal(8))
 	})
 
 })
