@@ -27,7 +27,31 @@ func main() {
 		import func1, func2 from ~/root/dir/test.hy
 		
 		for val in obj do
-			print(val)
+			fmt.print(val)
+		end
+
+		class A 
+			//this is a single line comment
+
+			/* this is a multi line comment
+		     * about the following constructor
+		     */
+		    A(param1, params2){
+
+		    }
+
+		    gen function dumb_genny(num){
+		    	fmt.print(num)
+		    	num.inc()
+		    }
+
+		    function dumb_func(){
+
+		    }
+		end
+
+		class B extends A, B, C
+
 		end
 
 		export MutexEmitter 

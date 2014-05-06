@@ -41,6 +41,10 @@ func (this *Parser) tokPos() string {
 	return fmt.Sprintf(" %d:%d ", this.tok.Line, this.tok.Column)
 }
 
+func (this *Parser) at(typ token.Token_Type) bool {
+	return this.tok.Class == typ
+}
+
 func (this *Parser) program() string {
 
 	for {
@@ -50,7 +54,7 @@ func (this *Parser) program() string {
 
 		var err string
 
-		if this.tok.Class == token.FOR_KEYWORD {
+		if this.at(token.FOR_KEYWORD) {
 			if err = this.for_in_loop(); err != no_err {
 				return err
 			}
@@ -58,7 +62,7 @@ func (this *Parser) program() string {
 			continue
 		}
 
-		if this.tok.Class == token.IMPORT_KEYWORD {
+		if this.at(token.IMPORT_KEYWORD) {
 			if err = this.import_stmt(); err != no_err {
 				return err
 			}
@@ -66,8 +70,16 @@ func (this *Parser) program() string {
 			continue
 		}
 
-		if this.tok.Class == token.EXPORT_KEYWORD {
+		if this.at(token.EXPORT_KEYWORD) {
 			if err = this.export_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.CLASS_KEYWORD) {
+			if err = this.class_def(); err != no_err {
 				return err
 			}
 
@@ -87,7 +99,7 @@ func (this *Parser) program() string {
 func (this *Parser) for_in_loop() string {
 	var err string
 
-	if this.tok.Class != token.FOR_KEYWORD {
+	if !this.at(token.FOR_KEYWORD) {
 		return "for_in_loop() called when the current token is not 'for'"
 	}
 
@@ -97,7 +109,7 @@ func (this *Parser) for_in_loop() string {
 		return err
 	}
 
-	if this.tok.Class != token.IN_KEYWORD {
+	if !this.at(token.IN_KEYWORD) {
 		return "Expected 'in' in for_in loop at" + this.tokPos()
 	}
 
@@ -107,7 +119,7 @@ func (this *Parser) for_in_loop() string {
 		return err
 	}
 
-	if this.tok.Class != token.DO_KEYWORD {
+	if !this.at(token.DO_KEYWORD) {
 		return "Expected 'in' in for_in loop at" + this.tokPos()
 	}
 
@@ -117,7 +129,7 @@ func (this *Parser) for_in_loop() string {
 		return err
 	}
 
-	if this.tok.Class != token.END_KEYWORD {
+	if !this.at(token.END_KEYWORD) {
 		return "Expected 'end' at" + this.tokPos()
 	}
 
@@ -132,13 +144,13 @@ func (this *Parser) for_in_loop() string {
 
 func (this *Parser) import_stmt() string {
 
-	if this.tok.Class != token.IMPORT_KEYWORD {
+	if !this.at(token.IMPORT_KEYWORD) {
 		return "import_stmt() called when the current token is not 'import'"
 	}
 
 	this.next()
 
-	if this.tok.Class == token.IDENTIFIER {
+	if this.at(token.IDENTIFIER) {
 		if this.tok.Text != "std" && this.tok.Text != "pkg" {
 			return this.partial_import()
 		}
@@ -150,7 +162,7 @@ func (this *Parser) import_stmt() string {
 func (this *Parser) package_location(renameable bool) string {
 	var err string
 
-	if this.tok.Class == token.IDENTIFIER &&
+	if this.at(token.IDENTIFIER) &&
 		(this.tok.Text == "std" || this.tok.Text == "pkg") {
 
 		if err = this.builtin_pkg_location(); err != no_err {
@@ -164,7 +176,7 @@ func (this *Parser) package_location(renameable bool) string {
 		return no_err
 	}
 
-	if this.tok.Class == token.BIT_NEGATE || this.tok.Class == token.PERIOD {
+	if this.at(token.BIT_NEGATE) || this.at(token.PERIOD) {
 		if err = this.path_pkg_location(); err != no_err {
 			return err
 		}
@@ -184,7 +196,7 @@ func (this *Parser) builtin_pkg_location() string {
 	this.next()
 
 	for i := 0; i < 2; i++ {
-		if this.tok.Class != token.COLON {
+		if !this.at(token.COLON) {
 			return "Expected import deliminator at" + this.tokPos()
 		}
 
@@ -201,7 +213,7 @@ func (this *Parser) path_pkg_location() string {
 	this.next()
 
 	for {
-		if this.tok.Class != token.DIV_OP {
+		if !this.at(token.DIV_OP) {
 			if first {
 				return "Expected a '/' in the import stmt at" + this.tokPos()
 			}
@@ -218,13 +230,13 @@ func (this *Parser) path_pkg_location() string {
 		first = false
 	}
 
-	if this.tok.Class != token.PERIOD {
+	if !this.at(token.PERIOD) {
 		return "import paths must end in '.hy'"
 	}
 
 	this.next()
 
-	if this.tok.Class != token.IDENTIFIER || this.tok.Text != "hy" {
+	if !this.at(token.IDENTIFIER) || this.tok.Text != "hy" {
 		return "import paths must end in '.hy'"
 	}
 
@@ -235,19 +247,19 @@ func (this *Parser) path_pkg_location() string {
 
 func (this *Parser) partial_import() string {
 
-	if this.tok.Class != token.IDENTIFIER {
+	if !this.at(token.IDENTIFIER) {
 		return "import statement missing identifier at" + this.tokPos()
 	}
 
 	this.next()
 
-	if this.tok.Class == token.COMMA {
+	if this.at(token.COMMA) {
 		this.next()
 
 		return this.multi_import()
 	}
 
-	if this.tok.Class != token.FROM_KEYWORD {
+	if !this.at(token.FROM_KEYWORD) {
 		return "Expected 'from' at" + this.tokPos()
 	}
 
@@ -263,7 +275,7 @@ func (this *Parser) multi_import() string {
 		return err
 	}
 
-	if this.tok.Class != token.FROM_KEYWORD {
+	if !this.at(token.FROM_KEYWORD) {
 		return "Expected 'from' at" + this.tokPos()
 	}
 
@@ -273,7 +285,7 @@ func (this *Parser) multi_import() string {
 }
 
 func (this *Parser) as_rename() string {
-	if this.tok.Class == token.AS_KEYWORD {
+	if this.at(token.AS_KEYWORD) {
 
 		this.next()
 
@@ -290,7 +302,7 @@ func (this *Parser) as_rename() string {
 func (this *Parser) export_stmt() string {
 	var err string
 
-	if this.tok.Class != token.EXPORT_KEYWORD {
+	if !this.at(token.EXPORT_KEYWORD) {
 		return "export_stmt() called withou the current token being 'export'"
 	}
 
@@ -300,7 +312,7 @@ func (this *Parser) export_stmt() string {
 		return err
 	}
 
-	if this.tok.Class == token.COMMA {
+	if this.at(token.COMMA) {
 		this.next()
 
 		return this.ident_list()
@@ -308,6 +320,163 @@ func (this *Parser) export_stmt() string {
 
 	return this.as_rename()
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Class Definition                            //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) class_def() string {
+	var err, class_name string
+
+	if !this.at(token.CLASS_KEYWORD) {
+		return "class_def() called withou the current token being 'class'"
+	}
+
+	this.next()
+
+	//catch name here and make sure its the same as the constructor
+	//in the STMTS
+	if !this.at(token.IDENTIFIER) {
+		return "Expected identifier at" + this.tokPos()
+	}
+
+	class_name = this.tok.Text
+
+	this.next()
+
+	if this.at(token.EXTENDS_KEYWORD) {
+		this.next()
+
+		if err = this.ident_list(); err != no_err {
+			return err
+		}
+	}
+
+	if err = this.class_internals(class_name); err != no_err {
+		return err
+	}
+
+	if !this.at(token.END_KEYWORD) {
+		return "expected 'end' to finish class definition"
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) class_internals(class_name string) string {
+	var err string
+
+	for {
+		if this.at(token.GENERATOR_KEYWORD) || this.at(token.FUNC_KEYWORD) {
+			if err = this.func_def(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.IDENTIFIER) {
+			if err = this.constructor(class_name); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.SINGLELINE_COMMENT) || this.at(token.MULTILINE_COMMENT) {
+			this.next()
+			continue
+		}
+
+		//check for class var declarations ie. #var = 2
+		return no_err
+	}
+
+	return no_err
+}
+
+func (this *Parser) func_def() string {
+	var err string
+
+	if this.at(token.GENERATOR_KEYWORD) {
+		this.next()
+	}
+
+	if !this.at(token.FUNC_KEYWORD) {
+		return "Expected 'func' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.ident(); err != no_err {
+		return err
+	}
+
+	if err = this.def_params(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.LCURLY) {
+		return "Expected '{' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.RCURLY) {
+		fmt.Printf("%+v\n", this.tok)
+		return "Expected '}' at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) constructor(class_name string) string {
+	var err string
+
+	if !this.at(token.IDENTIFIER) {
+		return "Expected identifier at" + this.tokPos()
+	}
+
+	if this.tok.Text != class_name {
+		return "Constructor in class " + class_name + " must have the same name"
+	}
+
+	this.next()
+
+	if err = this.def_params(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.LCURLY) {
+		return "Expected '{' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.RCURLY) {
+		return "Expected '}' at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Building Blocks                             //
+////////////////////////////////////////////////////////////////////////////////
 
 func (this *Parser) ident_list() string {
 	var err string
@@ -319,7 +488,7 @@ func (this *Parser) ident_list() string {
 
 	//consume comma delimited identifiers and then return
 	for {
-		if this.tok.Class != token.COMMA {
+		if !this.at(token.COMMA) {
 			break
 		}
 
@@ -335,7 +504,7 @@ func (this *Parser) ident_list() string {
 
 func (this *Parser) expr() string {
 
-	if this.tok.Class != token.IDENTIFIER {
+	if !this.at(token.IDENTIFIER) {
 		return "Expected Identifier at" + this.tokPos()
 	}
 
@@ -345,15 +514,25 @@ func (this *Parser) expr() string {
 }
 
 func (this *Parser) stmts() string {
-	if err := this.func_call(); err != no_err {
-		return err
+
+	//stmts are optional
+	for {
+		if this.at(token.IDENTIFIER) {
+			if err := this.func_call(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		break
 	}
 
 	return no_err
 }
 
 func (this *Parser) ident() string {
-	if this.tok.Class != token.IDENTIFIER {
+	if !this.at(token.IDENTIFIER) {
 		return "Expected identifier at" + this.tokPos()
 	}
 
@@ -369,7 +548,7 @@ func (this *Parser) func_call() string {
 		return err
 	}
 
-	if err = this.params(); err != no_err {
+	if err = this.call_params(); err != no_err {
 		return err
 	}
 
@@ -384,7 +563,7 @@ func (this *Parser) dotted_expression() string {
 	}
 
 	for {
-		if this.tok.Class != token.PERIOD {
+		if !this.at(token.PERIOD) {
 			return no_err
 		}
 
@@ -399,9 +578,9 @@ func (this *Parser) dotted_expression() string {
 	}
 }
 
-func (this *Parser) params() string {
+func (this *Parser) call_params() string {
 
-	if this.tok.Class != token.LPAREN {
+	if !this.at(token.LPAREN) {
 		return "Expected '(' at" + this.tokPos()
 	}
 
@@ -411,7 +590,7 @@ func (this *Parser) params() string {
 		return err
 	}
 
-	if this.tok.Class != token.RPAREN {
+	if !this.at(token.RPAREN) {
 		return "Expected ')' at" + this.tokPos()
 	}
 
@@ -420,8 +599,28 @@ func (this *Parser) params() string {
 	return no_err
 }
 
-func (this *Parser) opt_exprs() string {
-	if this.tok.Class != token.IDENTIFIER {
+func (this *Parser) def_params() string {
+	if !this.at(token.LPAREN) {
+		return "Expected '(' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err := this.opt_idents(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.RPAREN) {
+		return "Expected ')' at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) opt_idents() string {
+	if !this.at(token.IDENTIFIER) {
 		return no_err
 	}
 
@@ -429,7 +628,29 @@ func (this *Parser) opt_exprs() string {
 
 	for {
 
-		if this.tok.Class != token.COMMA {
+		if !this.at(token.COMMA) {
+			return no_err
+		}
+
+		this.next()
+
+		if err := this.ident(); err != no_err {
+			return err
+		}
+	}
+}
+
+//TODO: this is going to have to change to accept all expressions
+func (this *Parser) opt_exprs() string {
+	if !this.at(token.IDENTIFIER) {
+		return no_err
+	}
+
+	this.next()
+
+	for {
+
+		if !this.at(token.COMMA) {
 			return no_err
 		}
 

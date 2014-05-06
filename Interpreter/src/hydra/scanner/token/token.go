@@ -98,6 +98,10 @@ const (
 	GIVEN_KEYWORD     // 'given'
 	IS_KEYWORD        // 'is'
 	EOF_TYPE          // EOF
+	PUB_CLASS_VAR     // '#'
+	PRIV_CLASS_VAR    // '#_'
+	PUB_INST_VAR      // '@'
+	PRIV_INST_VAR     // '@_'
 )
 
 var KeywordMap = map[string]Token_Type{
@@ -139,7 +143,7 @@ func New(val string, class Token_Type, line int, col int) *Token {
 }
 
 func (this *Token) String() string {
-	return fmt.Sprintf("{ line: %d, column: %d, val: %s, class: %s }", this.Line, this.Column, this.Text, this.Class)
+	return fmt.Sprintf("{ line: %d, column: %d, text: %s, class: %s }", this.Line, this.Column, this.Text, this.Class)
 }
 
 func (this Token_Type) String() string {

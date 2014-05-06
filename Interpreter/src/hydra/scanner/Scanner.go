@@ -529,6 +529,39 @@ func (this *Scanner) period_token() *token.Token {
 	}
 }
 
+func (this *Scanner) pub_priv_token(pub_str string, pub_type token.Token_Type,
+	priv_str string, priv_type token.Token_Type) *token.Token {
+
+	if char, err := this.get_next_char(); err == nil {
+
+		if r := to_rune(char); r == '_' {
+			return this.tok(priv_str, priv_type)
+		}
+
+		this.rewind()
+		return this.tok(pub_str, pub_type)
+	} else {
+
+		if err == io.EOF {
+			return this.tok(pub_str, pub_type)
+		}
+
+		return nil
+	}
+}
+
+func (this *Scanner) class_var_token() *token.Token {
+	return this.pub_priv_token(
+		token.PUB_CLASS_VAR_LIT, token.PUB_CLASS_VAR,
+		token.PRIV_CLASS_VAR_LIT, token.PRIV_CLASS_VAR)
+}
+
+func (this *Scanner) instance_var_token() *token.Token {
+	return this.pub_priv_token(
+		token.PUB_INST_VAR_LIT, token.PUB_INST_VAR,
+		token.PRIV_INST_VAR_LIT, token.PRIV_INST_VAR)
+}
+
 func (this *Scanner) consume_whitespace() {
 	for {
 		if char, err := this.get_next_char(); err == nil {
@@ -660,6 +693,14 @@ func (this *Scanner) get_next_token() *token.Token {
 
 		if curr_char == token.SINGLE_QUOTE_LIT {
 			return this.string_literal_token(token.SINGLE_QUOTE_LIT)
+		}
+
+		if curr_char == token.PUB_CLASS_VAR_LIT {
+			return this.class_var_token()
+		}
+
+		if curr_char == token.PUB_INST_VAR_LIT {
+			return this.instance_var_token()
 		}
 
 		if r := to_rune(curr_char); unicode.IsDigit(r) {

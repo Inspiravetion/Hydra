@@ -83,4 +83,8 @@ const (
 	BREAK_KEYWORD_LIT     = "break"
 	GIVEN_KEYWORD_LIT     = "given"
 	IS_KEYWORD_LIT        = "is"
+	PUB_CLASS_VAR_LIT     = "#"
+	PRIV_CLASS_VAR_LIT    = "#_"
+	PUB_INST_VAR_LIT      = "@"
+	PRIV_INST_VAR_LIT     = "@_"
 )

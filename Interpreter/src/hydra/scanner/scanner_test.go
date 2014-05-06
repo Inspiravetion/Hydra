@@ -109,6 +109,10 @@ var indiv_test_data_pairs = []token_pair{
 	{")", token.RPAREN},
 	{"[", token.LBRACKET},
 	{"]", token.RBRACKET},
+	{"#", token.PUB_CLASS_VAR},
+	{"#_", token.PRIV_CLASS_VAR},
+	{"@", token.PUB_INST_VAR},
+	{"@_", token.PRIV_INST_VAR},
 }
 
 // Real World Token Test Setup
@@ -216,6 +220,19 @@ var mocks = []mock_input{
 			token.IDENTIFIER, token.LESS_THAN_EQ, token.IDENTIFIER,
 			token.OR, token.IDENTIFIER, token.GREATER_THAN_EQ,
 			token.IDENTIFIER, token.EOF_TYPE,
+		},
+	},
+	{
+		`@a = 2
+		@_b = 3
+		#c = 4
+		#_d = 5`,
+		[]token.Token_Type{
+			token.PUB_INST_VAR, token.IDENTIFIER, token.ASSIGN,
+			token.NUM_LITERAL, token.PRIV_INST_VAR, token.IDENTIFIER, token.ASSIGN,
+			token.NUM_LITERAL, token.PUB_CLASS_VAR, token.IDENTIFIER, token.ASSIGN,
+			token.NUM_LITERAL, token.PRIV_CLASS_VAR, token.IDENTIFIER, token.ASSIGN,
+			token.NUM_LITERAL, token.EOF_TYPE,
 		},
 	},
 }
