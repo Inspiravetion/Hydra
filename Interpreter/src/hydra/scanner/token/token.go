@@ -97,6 +97,9 @@ const (
 	BREAK_KEYWORD     // 'break'
 	GIVEN_KEYWORD     // 'given'
 	IS_KEYWORD        // 'is'
+	VAR_KEYWORD       // 'var'
+	TRUE              // 'true'
+	FALSE             // 'false'
 	EOF_TYPE          // EOF
 	PUB_CLASS_VAR     // '#'
 	PRIV_CLASS_VAR    // '#_'
@@ -136,6 +139,9 @@ var KeywordMap = map[string]Token_Type{
 	BREAK_KEYWORD_LIT:     BREAK_KEYWORD,
 	GIVEN_KEYWORD_LIT:     GIVEN_KEYWORD,
 	IS_KEYWORD_LIT:        IS_KEYWORD,
+	VAR_KEYWORD_LIT:       VAR_KEYWORD,
+	TRUE_LIT:              TRUE,
+	FALSE_LIT:             FALSE,
 }
 
 func New(val string, class Token_Type, line int, col int) *Token {
@@ -240,6 +246,10 @@ func (this Token_Type) String() string {
 		return "STRING_LITERAL"
 	case NUM_LITERAL:
 		return "NUM_LITERAL"
+	case TRUE:
+		return "TRUE"
+	case FALSE:
+		return "FALSE"
 	case MULTILINE_COMMENT:
 		return "MULTILINE_COMMENT"
 	case SINGLELINE_COMMENT:

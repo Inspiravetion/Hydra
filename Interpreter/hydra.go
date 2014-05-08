@@ -26,12 +26,37 @@ func main() {
 		import sqrt, ceil from std::math
 		import func1, func2 from ~/root/dir/test.hy
 		
+		var test = passed, hopefully
+
+		var test, number2 = i_really, hope, it_passed
+
+		gen function genner(other){
+			var n 
+			var n1, n2, n3
+			for a, b, c in other do
+				//identifiers are the only expressions that work right now
+				var z = doSomething
+				var a = 1234
+				var b = (a.b(1, 2, 3)["key"]).funcCall()
+			end
+		}
+
+		function normal(a, b, c){
+			genner[0].a()
+		}
+
 		for val in obj do
 			fmt.print(val)
 		end
 
 		class A 
 			//this is a single line comment
+			#pub_var = some_other_var
+
+			//another comment
+			#_priv_var = abc
+
+			#a, #_b = a, b
 
 			/* this is a multi line comment
 		     * about the following constructor
