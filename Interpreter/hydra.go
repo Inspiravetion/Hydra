@@ -30,6 +30,8 @@ func main() {
 
 		var test, number2 = i_really, hope, it_passed
 
+		var arr, hash, chan = [1, "2", three()], {charlie:"lipford", a:1}, <-2->
+
 		gen function genner(other){
 			var n 
 			var n1, n2, n3

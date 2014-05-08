@@ -732,7 +732,7 @@ func (this *Parser) chan_lit() string {
 }
 
 func (this *Parser) array_expr() string {
-	if !this.at(token.LPAREN) {
+	if !this.at(token.LBRACKET) {
 		return "array_expr() called without being on a [ token at" + this.tokPos()
 	}
 
@@ -742,7 +742,7 @@ func (this *Parser) array_expr() string {
 		return err
 	}
 
-	if !this.at(token.RPAREN) {
+	if !this.at(token.RBRACKET) {
 		return "Expected ] at" + this.tokPos()
 	}
 
