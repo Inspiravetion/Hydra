@@ -62,6 +62,22 @@ func (this *Parser) program() string {
 			continue
 		}
 
+		if this.at(token.WHILE_KEYWORD) {
+			if err = this.while_loop(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.IF_KEYWORD) {
+			if err = this.if_else_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
 		if this.at(token.IMPORT_KEYWORD) {
 			if err = this.import_stmt(); err != no_err {
 				return err
@@ -96,6 +112,14 @@ func (this *Parser) program() string {
 
 		if this.at(token.VAR_KEYWORD) {
 			if err = this.var_decl(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.IDENTIFIER) {
+			if err = this.assign_stmt_or_func_call(); err != no_err {
 				return err
 			}
 
@@ -153,6 +177,128 @@ func (this *Parser) for_in_loop() string {
 	this.next()
 
 	return no_err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                While Loop                                  //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) while_loop() string {
+	var err string
+
+	if !this.at(token.WHILE_KEYWORD) {
+		return "while_loop() called when the current token is not 'while' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err, _ = this.expr(false); err != no_err {
+		return err
+	}
+
+	if !this.at(token.DO_KEYWORD) {
+		return "Expected do at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.END_KEYWORD) {
+		return "Expected 'end' to close while loop at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                If Else Stmt                                //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) if_else_stmt() string {
+	var err string
+
+	if !this.at(token.IF_KEYWORD) {
+		return "if_else_stmt() called when the current token is not 'if' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.exprs(false); err != no_err {
+		return err
+	}
+
+	if !this.at(token.DO_KEYWORD) {
+		return "Expected do at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if this.at(token.ELSE_KEYWORD) {
+		if err = this.else_branches(); err != no_err {
+			return err
+		}
+	}
+
+	if !this.at(token.END_KEYWORD) {
+		return "Expected 'end' to close if stmt at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) else_branches() string {
+	var err string
+	else_used := false
+
+	if !this.at(token.ELSE_KEYWORD) {
+		return "else_branches() called when token not on 'else' at" + this.tokPos()
+	}
+
+	this.next()
+
+	for {
+		if this.at(token.IF_KEYWORD) {
+			this.next()
+
+			if err = this.exprs(false); err != no_err {
+				return err
+			}
+
+		} else {
+			if else_used {
+				return "Cannot have two else clauses at" + this.tokPos()
+			}
+
+			else_used = true
+		}
+
+		if !this.at(token.DO_KEYWORD) {
+			return "Expected do at" + this.tokPos()
+		}
+
+		this.next()
+
+		if err = this.stmts(); err != no_err {
+			return err
+		}
+
+		if !this.at(token.ELSE_KEYWORD) {
+			return no_err
+		}
+
+		this.next()
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -849,7 +995,7 @@ func (this *Parser) stmts() string {
 	//stmts are optional
 	for {
 		if this.at(token.IDENTIFIER) {
-			if err = this.func_call(); err != no_err {
+			if err = this.assign_stmt_or_func_call(); err != no_err {
 				return err
 			}
 
@@ -863,6 +1009,22 @@ func (this *Parser) stmts() string {
 
 		if this.at(token.FOR_KEYWORD) {
 			if err = this.for_in_loop(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.WHILE_KEYWORD) {
+			if err = this.while_loop(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.IF_KEYWORD) {
+			if err = this.if_else_stmt(); err != no_err {
 				return err
 			}
 
@@ -893,15 +1055,19 @@ func (this *Parser) ident() string {
 	return no_err
 }
 
-func (this *Parser) func_call() string {
+func (this *Parser) assign_stmt_or_func_call() string {
 	var err string
 
-	if err = this.uncallable_compound_expr(); err != no_err {
+	if err = this.uncallable_compound_expr(); err != no_err { // need this for assignment statement
 		return err
 	}
 
-	if err = this.call_params(); err != no_err {
-		return err
+	if this.at(token.ASSIGN) {
+		return this.rhs_assignment(false)
+	}
+
+	if this.at(token.LPAREN) {
+		return this.call_params()
 	}
 
 	return no_err

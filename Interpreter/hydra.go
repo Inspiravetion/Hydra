@@ -32,14 +32,42 @@ func main() {
 
 		var arr, hash, chan = [1, "2", three()], {charlie:"lipford", a:1}, <-2->
 
+		var a, b, c
+		a = 1
+		b = "2"
+		c = 1.5
+
+		while a.lt(b) do
+			fmt.print(a)
+		end
+
+		if a do
+			something()
+		else if b do
+			something.elsfe()
+		else if c do
+			something.elsef()
+		else do
+			something.omething.elsee()
+		end
+
 		gen function genner(other){
 			var n 
 			var n1, n2, n3
+			n1 = [1, 2, 4]
 			for a, b, c in other do
 				//identifiers are the only expressions that work right now
 				var z = doSomething
 				var a = 1234
 				var b = (a.b(1, 2, 3)["key"]).funcCall()
+				if a do
+					fmt.print('abc')
+				end
+			end
+
+			while true do 
+				var a = 10
+				a.raise([2, 3])
 			end
 		}
 
@@ -68,7 +96,8 @@ func main() {
 		    }
 
 		    gen function dumb_genny(num){
-		    	fmt.print(num)
+		    	var a = num.raise(2)
+		    	fmt.print(a)
 		    	num.inc()
 		    }
 
