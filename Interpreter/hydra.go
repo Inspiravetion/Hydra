@@ -36,20 +36,48 @@ func main() {
 		a = 1
 		b = "2"
 		c = 1.5
+		a.b.c = 1
+		a = a.b.c
+		a = new SomeClass()
+		a, b['key'], c = 1, 2, 3
 
 		while a.lt(b) do
 			fmt.print(a)
+		end
+
+		given a 
+			is 1 do
+				a.incr(1)
+			is 3 do
+				a.minus(1)
+			else do
+				a.set(2)
+		end
+
+		given a 
+			is b do
+				c()
+		end
+
+		wait_for
+			either a <- producer then
+				do_something_with(a)
+			or do
+				nothing_with_(a)
+			end
 		end
 
 		if a do
 			something()
 		else if b do
 			something.elsfe()
-		else if c do
+		else if c.g() do
 			something.elsef()
 		else do
 			something.omething.elsee()
 		end
+
+		new Charlie(1, 2, 3).start()
 
 		gen function genner(other){
 			var n 
@@ -65,10 +93,24 @@ func main() {
 				end
 			end
 
+			var sc = new SomeClass('a')
+
 			while true do 
 				var a = 10
 				a.raise([2, 3])
 			end
+
+			given a() 
+				is b['key'] do
+					c.func()
+				is d.key do
+					e = 4
+				else do
+					fmt.print('aww screw it')
+					return 0, 1, 2, 3
+			end
+
+			return a
 		}
 
 		function normal(a, b, c){
@@ -118,28 +160,4 @@ func main() {
 
 	parser := parser.New(string_tokens)
 	parser.Parse()
-
-	// fmt.Printf("\n\n\n")
-
-	// for tok := range string_tokens {
-	// 	fmt.Printf("%+v\n", tok)
-	// }
-	// //
-	// util.Log("Hello from the logger")
-	// util.Debug("Debugging string")
-	// util.Error("AWWWW SHIZNIT")
-
-	// util.Logf("%s : %d", "asdfasdf", 546)
-	// util.Debugf("%s : %d", "asdfasdf", 546)
-	// util.Errorf("%s : %d", "asdfasdf", 546)
-
-	// util.For_Each("dfg", func(data interface{}) {
-	// 	str, ok := data.(string)
-
-	// 	if !ok {
-	// 		util.Error("not a string!")
-	// 	}
-
-	// 	util.Log(str)
-	// })
 }

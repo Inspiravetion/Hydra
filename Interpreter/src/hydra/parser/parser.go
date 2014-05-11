@@ -54,6 +54,14 @@ func (this *Parser) program() string {
 
 		var err string
 
+		if this.at(token.NEW_KEYWORD) {
+			if err = this.new_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
 		if this.at(token.FOR_KEYWORD) {
 			if err = this.for_in_loop(); err != no_err {
 				return err
@@ -72,6 +80,22 @@ func (this *Parser) program() string {
 
 		if this.at(token.IF_KEYWORD) {
 			if err = this.if_else_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.GIVEN_KEYWORD) {
+			if err = this.given_is_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.WAIT_FOR_KEYWORD) {
+			if err = this.wait_for(); err != no_err {
 				return err
 			}
 
@@ -123,6 +147,11 @@ func (this *Parser) program() string {
 				return err
 			}
 
+			continue
+		}
+
+		if this.at(token.SINGLELINE_COMMENT) || this.at(token.MULTILINE_COMMENT) {
+			this.next()
 			continue
 		}
 
@@ -243,7 +272,7 @@ func (this *Parser) if_else_stmt() string {
 	}
 
 	if this.at(token.ELSE_KEYWORD) {
-		if err = this.else_branches(); err != no_err {
+		if err = this.else_if_branches(); err != no_err {
 			return err
 		}
 	}
@@ -257,12 +286,12 @@ func (this *Parser) if_else_stmt() string {
 	return no_err
 }
 
-func (this *Parser) else_branches() string {
+func (this *Parser) else_if_branches() string {
 	var err string
 	else_used := false
 
 	if !this.at(token.ELSE_KEYWORD) {
-		return "else_branches() called when token not on 'else' at" + this.tokPos()
+		return "else_branch() called when token not on 'else' at" + this.tokPos()
 	}
 
 	this.next()
@@ -299,6 +328,237 @@ func (this *Parser) else_branches() string {
 
 		this.next()
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Given Is Statement                          //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) given_is_stmt() string {
+	var err string
+
+	if !this.at(token.GIVEN_KEYWORD) {
+		return "given_is_stmt() called when the current token is not 'given' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err, _ = this.expr(false); err != no_err {
+		return err
+	}
+
+	if !this.at(token.IS_KEYWORD) {
+		return "Expected 'is' in given is statement at" + this.tokPos()
+	}
+
+	if err = this.is_branches(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.END_KEYWORD) {
+		return "Expected 'end' to close given is statement at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) is_branches() string {
+	var err string
+
+	if !this.at(token.IS_KEYWORD) {
+		return "is_branches() called when current token is not 'is' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.exprs(false); err != no_err {
+		return err
+	}
+
+	if !this.at(token.DO_KEYWORD) {
+		return "Expected 'do' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if this.at(token.IS_KEYWORD) {
+		if err = this.is_branches(); err != no_err {
+			return err
+		}
+	}
+
+	if this.at(token.ELSE_KEYWORD) {
+		if err = this.else_branch(); err != no_err {
+			return err
+		}
+	}
+
+	return no_err
+}
+
+func (this *Parser) else_branch() string {
+	if !this.at(token.ELSE_KEYWORD) {
+		return "else_branch() called when the current token is not 'else' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if !this.at(token.DO_KEYWORD) {
+		return "Expected 'do' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err := this.stmts(); err != no_err {
+		return err
+	}
+
+	return no_err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Wait For Statement                          //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) wait_for() string {
+	var err string
+
+	if !this.at(token.WAIT_FOR_KEYWORD) {
+		return "wait_for() called "
+	}
+
+	this.next()
+
+	if err = this.either_branch(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.END_KEYWORD) {
+		return "Expected 'end' to finish wait_for stmt at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) either_branch() string {
+	var err string
+
+	if !this.at(token.EITHER_KEYWORD) {
+		return "Expected 'either' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.chan_send_recv(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.THEN_KEYWORD) {
+		return "Expected 'then' in wait_for stmt at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.OR_KEYWORD) {
+		return "Expected 'or' in wair_for stmt at" + this.tokPos()
+	}
+
+	if err = this.or_branch(); err != no_err {
+		return err
+	}
+
+	return no_err
+}
+
+func (this *Parser) or_branch() string {
+	var err string
+	deflt := false
+
+	if !this.at(token.OR_KEYWORD) {
+		return "or_branch called when the current token is not 'or'" + this.tokPos()
+	}
+
+	this.next()
+
+	if this.at(token.DO_KEYWORD) {
+		deflt = true
+		this.next()
+	}
+
+	if !deflt {
+		if err = this.chan_send_recv(); err != no_err {
+			return err
+		}
+
+		if !this.at(token.THEN_KEYWORD) {
+			return "Expected 'then' in wait_for stmt at" + this.tokPos()
+		}
+
+		this.next()
+	}
+
+	if err = this.stmts(); err != no_err {
+		return err
+	}
+
+	if !deflt {
+		if this.at(token.OR_KEYWORD) {
+			if err = this.or_branch(); err != no_err {
+				return err
+			}
+
+			return no_err
+		}
+	}
+
+	if !this.at(token.END_KEYWORD) {
+		return "Expected 'end' to finish or branch of wait_for statement at" + this.tokPos()
+	}
+
+	this.next()
+
+	return no_err
+}
+
+func (this *Parser) chan_send_recv() string {
+	var err string
+	var exists bool
+
+	if err, exists = this.expr(true); err != no_err {
+		return err
+	}
+
+	if exists {
+		if !this.at(token.CHAN_SEND) && !this.at(token.CHAN_RECV) {
+			return "Expected '<-' or '->' in wait_for stmt at" + this.tokPos()
+		}
+
+		this.next()
+	} else {
+		if !this.at(token.CHAN_RECV) {
+			return "Expected '<-' at" + this.tokPos()
+		}
+
+		this.next()
+	}
+
+	if err, _ = this.expr(false); err != no_err {
+		return err
+	}
+
+	return no_err
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -726,21 +986,6 @@ func (this *Parser) ident_list() string {
 	return no_err
 }
 
-// func (this *Parser) expr(optional bool) (string, bool) {
-
-// 	if !this.at(token.IDENTIFIER) {
-// 		if optional {
-// 			return no_err, false
-// 		}
-
-// 		return "Expected Identifier at" + this.tokPos(), false
-// 	}
-
-// 	this.next()
-
-// 	return no_err, true
-// }
-
 func (this *Parser) key_val_pair(optional bool) (string, bool) {
 
 	if !this.at(token.IDENTIFIER) {
@@ -772,64 +1017,55 @@ func (this *Parser) expr(optional bool) (string, bool) {
 	callable := false
 
 	//these don't compose any futher
-
-	if this.at(token.STRING_LITERAL) {
+	switch {
+	case this.at(token.STRING_LITERAL):
 		this.next()
-
 		return no_err, true
-	}
-
-	if this.at(token.NUM_LITERAL) {
+	case this.at(token.NUM_LITERAL):
 		if err = this.number(); err != no_err {
 			return err, false
 		}
-
 		return no_err, true
-	}
-
-	if this.at(token.TRUE) || this.at(token.FALSE) {
+	case this.at(token.TRUE) || this.at(token.FALSE):
 		this.next()
 		return no_err, true
-	}
-
-	if this.at(token.CHAN_RECV) {
+	case this.at(token.CHAN_RECV):
 		if err = this.chan_lit(); err != no_err {
 			return err, false
 		}
-
 		return no_err, true
-	}
-
 	//these need to check that they are done consuming the current expr
-
-	if this.at(token.LBRACKET) {
+	case this.at(token.LBRACKET):
 		if err = this.array_expr(); err != no_err {
 			return err, false
 		}
 		keepComposing = true
-	}
-
-	if this.at(token.LCURLY) {
+		break
+	case this.at(token.LCURLY):
 		if err = this.hash_expr(); err != no_err {
 			return err, false
 		}
 		keepComposing = true
-	}
-
-	if this.at(token.LPAREN) {
+		break
+	case this.at(token.LPAREN):
 		if err = this.paren_expr(); err != no_err {
 			return err, false
 		}
 		keepComposing = true
 		callable = true
-	}
-
-	if this.at(token.IDENTIFIER) {
+		break
+	case this.at(token.IDENTIFIER):
 		if err = this.ident(); err != no_err {
 			return err, false
 		}
 		keepComposing = true
 		callable = true
+		break
+	case this.at(token.NEW_KEYWORD):
+		if err = this.new_stmt(); err != no_err {
+			return err, false
+		}
+		return no_err, true
 	}
 
 	if keepComposing {
@@ -965,7 +1201,7 @@ func (this *Parser) expr_suffix(callable bool) string {
 
 		this.next()
 
-		return this.expr_suffix(callable)
+		return this.expr_suffix(true)
 	}
 
 	if callable {
@@ -989,6 +1225,36 @@ func (this *Parser) expr_suffix(callable bool) string {
 	return no_err
 }
 
+func (this *Parser) return_stmt() string {
+	if !this.at(token.RETURN_KEYWORD) {
+		return "called return_stmt() without the current token being 'return' at" + this.tokPos()
+	}
+
+	this.next()
+
+	return this.exprs(true)
+}
+
+func (this *Parser) new_stmt() string {
+	var err string
+
+	if !this.at(token.NEW_KEYWORD) {
+		return "called new_stmt when current token is not 'new' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.ident(); err != no_err {
+		return err
+	}
+
+	if err = this.call_params(); err != no_err {
+		return err
+	}
+
+	return this.expr_suffix(false)
+}
+
 func (this *Parser) stmts() string {
 	var err string
 
@@ -1004,6 +1270,22 @@ func (this *Parser) stmts() string {
 
 		if this.at(token.SINGLELINE_COMMENT) || this.at(token.MULTILINE_COMMENT) {
 			this.next()
+			continue
+		}
+
+		if this.at(token.RETURN_KEYWORD) {
+			if err = this.return_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.NEW_KEYWORD) {
+			if err = this.new_stmt(); err != no_err {
+				return err
+			}
+
 			continue
 		}
 
@@ -1025,6 +1307,22 @@ func (this *Parser) stmts() string {
 
 		if this.at(token.IF_KEYWORD) {
 			if err = this.if_else_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.GIVEN_KEYWORD) {
+			if err = this.given_is_stmt(); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.WAIT_FOR_KEYWORD) {
+			if err = this.wait_for(); err != no_err {
 				return err
 			}
 
@@ -1062,15 +1360,36 @@ func (this *Parser) assign_stmt_or_func_call() string {
 		return err
 	}
 
-	if this.at(token.ASSIGN) {
-		return this.rhs_assignment(false)
-	}
-
 	if this.at(token.LPAREN) {
 		return this.call_params()
 	}
 
+	for {
+		if !this.at(token.COMMA) {
+			break
+		}
+
+		this.next()
+
+		if err = this.uncallable_compound_expr(); err != no_err {
+			return err
+		}
+	}
+
+	if this.at(token.ASSIGN) {
+		return this.rhs_assignment(false)
+	}
+
 	return no_err
+}
+
+func (this *Parser) func_call() string {
+
+	if err := this.uncallable_compound_expr(); err != no_err { // need this for assignment statement
+		return err
+	}
+
+	return this.call_params()
 }
 
 func (this *Parser) uncallable_compound_expr() string {

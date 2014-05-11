@@ -37,25 +37,25 @@ TailExpr    => InfixOp Expr
 
 OptExpr     => Expr | empty
 
-Stmt        => VarDecl
-            |  ReturnStmt
+Stmt        => VarDecl x
+            |  ReturnStmt x
             |  SpawnStmt
-            |  AssignStmt
-            |  ControlStructure
+            |  AssignStmt x
+            |  ControlStructure x
             |  Yield Expr
-            |  FuncCall
-            |  NewStmt
+            |  FuncCall x
+            |  NewStmt x
             |  IncDecStmt
-            |  Comment
+            |  Comment x
 
-PrgrmStmt   => VarDecl
+PrgrmStmt   => VarDecl x
             |  SpawnStmt
-            |  ControlStructure
-            |  LanguageConstruct
-            |  NewStmt
-            |  Comment
-            |  AssignStmt
-            |  FuncCall
+            |  ControlStructure x
+            |  LanguageConstruct x
+            |  NewStmt x
+            |  Comment x
+            |  AssignStmt x
+            |  FuncCall x
             |  IncDecStmt
 
 

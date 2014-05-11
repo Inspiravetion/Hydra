@@ -100,6 +100,7 @@ const (
 	VAR_KEYWORD       // 'var'
 	TRUE              // 'true'
 	FALSE             // 'false'
+	NEW_KEYWORD       // 'new'
 	EOF_TYPE          // EOF
 	PUB_CLASS_VAR     // '#'
 	PRIV_CLASS_VAR    // '#_'
@@ -142,6 +143,7 @@ var KeywordMap = map[string]Token_Type{
 	VAR_KEYWORD_LIT:       VAR_KEYWORD,
 	TRUE_LIT:              TRUE,
 	FALSE_LIT:             FALSE,
+	NEW_KEYWORD_LIT:       NEW_KEYWORD,
 }
 
 func New(val string, class Token_Type, line int, col int) *Token {
@@ -318,6 +320,8 @@ func (this Token_Type) String() string {
 		return "BREAK_KEYWORD"
 	case GIVEN_KEYWORD:
 		return "GIVEN_KEYWORD"
+	case NEW_KEYWORD:
+		return "NEW_KEYWORD"
 	case IS_KEYWORD:
 		return "IS_KEYWORD"
 	}

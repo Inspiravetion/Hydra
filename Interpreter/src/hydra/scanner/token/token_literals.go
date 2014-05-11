@@ -86,6 +86,7 @@ const (
 	VAR_KEYWORD_LIT       = "var"
 	TRUE_LIT              = "true"
 	FALSE_LIT             = "false"
+	NEW_KEYWORD_LIT       = "new"
 	PUB_CLASS_VAR_LIT     = "#"
 	PRIV_CLASS_VAR_LIT    = "#_"
 	PUB_INST_VAR_LIT      = "@"
