@@ -2,6 +2,7 @@ package token
 
 const (
 	PERIOD_LIT                  = "."
+	BANG_LIT                    = "!"
 	QUESTION_LIT                = "?"
 	COMMA_LIT                   = ","
 	COLON_LIT                   = ":"
@@ -23,6 +24,7 @@ const (
 	LESS_THAN_EQ_LIT            = "<="
 	GREATER_THAN_EQ_LIT         = ">="
 	EQUAL_LIT                   = "=="
+	NOT_EQUAL_LIT               = "!="
 	PLUS_EQ_LIT                 = "+="
 	MIN_EQ_LIT                  = "-="
 	TIMES_EQ_LIT                = "*="
@@ -88,6 +90,8 @@ const (
 	TRUE_LIT                    = "true"
 	FALSE_LIT                   = "false"
 	NEW_KEYWORD_LIT             = "new"
+	UPTO_KEYWORD_LIT            = "upto"
+	THROUGH_KEYWORD_LIT         = "through"
 	PUB_CLASS_VAR_LIT           = "#"
 	PRIV_CLASS_VAR_LIT          = "#_"
 	PUB_INST_VAR_LIT            = "@"

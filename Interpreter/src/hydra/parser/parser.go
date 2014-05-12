@@ -11,8 +11,9 @@ import (
 var no_err string = ""
 
 type Parser struct {
-	tok    *token.Token
-	tokens <-chan *token.Token
+	tok       *token.Token
+	tokens    <-chan *token.Token
+	breakable bool
 }
 
 func New(tokens <-chan *token.Token) *Parser {
@@ -38,7 +39,7 @@ func (this *Parser) next() {
 }
 
 func (this *Parser) tokPos() string {
-	return fmt.Sprintf(" %d:%d ", this.tok.Line, this.tok.Column)
+	return fmt.Sprintf(" %d:%d (%s)", this.tok.Line, this.tok.Column, this.tok.Text)
 }
 
 func (this *Parser) at(typ token.Token_Type) bool {
@@ -53,6 +54,14 @@ func (this *Parser) program() string {
 		}
 
 		var err string
+
+		if this.at(token.SPAWN_KEYWORD) {
+			if err = this.spawn_stmt(false); err != no_err {
+				return err
+			}
+
+			continue
+		}
 
 		if this.at(token.NEW_KEYWORD) {
 			if err = this.new_stmt(false); err != no_err {
@@ -143,7 +152,7 @@ func (this *Parser) program() string {
 		}
 
 		if this.at(token.IDENTIFIER) {
-			if err = this.assign_stmt_or_func_call(false); err != no_err {
+			if err = this.assign_stmt_or_func_call_or_chan_send(false); err != no_err {
 				return err
 			}
 
@@ -167,6 +176,11 @@ func (this *Parser) program() string {
 
 func (this *Parser) for_in_loop(gen bool) string {
 	var err string
+
+	this.breakable = true
+	defer func() {
+		this.breakable = false
+	}()
 
 	if !this.at(token.FOR_KEYWORD) {
 		return "for_in_loop() called when the current token is not 'for'"
@@ -194,7 +208,7 @@ func (this *Parser) for_in_loop(gen bool) string {
 
 	this.next()
 
-	if err = this.loop_stmts(gen); err != no_err {
+	if err = this.stmts(gen); err != no_err {
 		return err
 	}
 
@@ -215,6 +229,11 @@ func (this *Parser) for_in_loop(gen bool) string {
 func (this *Parser) while_loop(gen bool) string {
 	var err string
 
+	this.breakable = true
+	defer func() {
+		this.breakable = false
+	}()
+
 	if !this.at(token.WHILE_KEYWORD) {
 		return "while_loop() called when the current token is not 'while' at" + this.tokPos()
 	}
@@ -231,7 +250,7 @@ func (this *Parser) while_loop(gen bool) string {
 
 	this.next()
 
-	if err = this.loop_stmts(gen); err != no_err {
+	if err = this.stmts(gen); err != no_err {
 		return err
 	}
 
@@ -240,6 +259,72 @@ func (this *Parser) while_loop(gen bool) string {
 	}
 
 	this.next()
+
+	return no_err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Spawn Stmt                                  //
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *Parser) spawn_stmt(gen bool) string {
+	var err string
+
+	if !this.at(token.SPAWN_KEYWORD) {
+		return "spawn_stmt() called when current token is not 'spawn' at" + this.tokPos()
+	}
+
+	this.next()
+
+	if this.at(token.LPAREN) {
+		if err = this.closure_def(gen); err != no_err {
+			return err
+		}
+	} else {
+		if err = this.func_call(gen); err != no_err {
+			return err
+		}
+	}
+
+	return no_err
+}
+
+func (this *Parser) closure_def(gen bool) string {
+	var err string
+
+	if err = this.def_params(); err != no_err {
+		return err
+	}
+
+	if !this.at(token.LCURLY) {
+		return "Expected '{' in closure literal of spawn stmt at" + this.tokPos()
+	}
+
+	this.next()
+
+	if err = this.stmts(gen); err != no_err {
+		return err
+	}
+
+	if !this.at(token.RCURLY) {
+		return "Expected '}' in closure literal of spawn stmt at" + this.tokPos()
+	}
+
+	this.next()
+
+	if this.at(token.LPAREN) {
+		this.next()
+
+		if err = this.exprs(true, gen); err != no_err {
+			return err
+		}
+
+		if !this.at(token.RPAREN) {
+			return "Expected ')' after closure at" + this.tokPos()
+		}
+
+		this.next()
+	}
 
 	return no_err
 }
@@ -278,6 +363,7 @@ func (this *Parser) if_else_stmt(gen bool) string {
 	}
 
 	if !this.at(token.END_KEYWORD) {
+		fmt.Printf("%+v", this.tok)
 		return "Expected 'end' to close if stmt at" + this.tokPos()
 	}
 
@@ -343,6 +429,11 @@ func (this *Parser) else_if_branches(gen bool) string {
 func (this *Parser) given_is_stmt(gen bool) string {
 	var err string
 
+	this.breakable = true
+	defer func() {
+		this.breakable = false
+	}()
+
 	if !this.at(token.GIVEN_KEYWORD) {
 		return "given_is_stmt() called when the current token is not 'given' at" + this.tokPos()
 	}
@@ -389,7 +480,7 @@ func (this *Parser) is_branches(gen bool) string {
 
 	this.next()
 
-	if err = this.loop_stmts(gen); err != no_err {
+	if err = this.stmts(gen); err != no_err {
 		return err
 	}
 
@@ -421,7 +512,7 @@ func (this *Parser) else_branch(gen bool) string {
 
 	this.next()
 
-	if err := this.loop_stmts(gen); err != no_err {
+	if err := this.stmts(gen); err != no_err {
 		return err
 	}
 
@@ -1019,7 +1110,60 @@ func (this *Parser) key_val_pair(optional bool, gen bool) (string, bool) {
 	return no_err, true
 }
 
+func (this *Parser) at_binary_op() bool {
+	return this.at(token.ADD_OP) ||
+		this.at(token.MIN_OP) ||
+		this.at(token.MULT_OP) ||
+		this.at(token.DIV_OP) ||
+		this.at(token.POWER_OP) ||
+		this.at(token.MOD_OP) ||
+		this.at(token.AND) ||
+		this.at(token.OR) ||
+		this.at(token.BIT_AND) ||
+		this.at(token.BIT_OR) ||
+		this.at(token.LESS_THAN) ||
+		this.at(token.GREATER_THAN) ||
+		this.at(token.ASSIGN) ||
+		this.at(token.LESS_THAN_EQ) ||
+		this.at(token.GREATER_THAN_EQ) ||
+		this.at(token.EQUAL) ||
+		this.at(token.NOT_EQUAL) ||
+		this.at(token.PLUS_EQ) ||
+		this.at(token.MIN_EQ) ||
+		this.at(token.TIMES_EQ) ||
+		this.at(token.DIV_EQ) ||
+		this.at(token.MOD_EQ) ||
+		this.at(token.POWER_EQ) ||
+		this.at(token.BIT_OR_EQ) ||
+		this.at(token.OR_EQ) ||
+		this.at(token.BIT_AND_EQ) ||
+		this.at(token.EXCL_RANGE) ||
+		this.at(token.INCL_RANGE) ||
+		this.at(token.UPTO_KEYWORD) ||
+		this.at(token.THROUGH_KEYWORD)
+}
+
 func (this *Parser) expr(optional bool, gen bool) (string, bool) {
+	var err string
+
+	if err, _ = this.base_expr(optional, gen); err != no_err {
+		return err, false
+	}
+
+	for {
+		if !this.at_binary_op() {
+			return no_err, true
+		}
+
+		this.next()
+
+		if err, _ = this.base_expr(false, gen); err != no_err {
+			return err, false
+		}
+	}
+}
+
+func (this *Parser) base_expr(optional bool, gen bool) (string, bool) {
 	var err string
 	keepComposing := false
 	callable := false
@@ -1104,6 +1248,14 @@ func (this *Parser) expr(optional bool, gen bool) (string, bool) {
 		}
 
 		return no_err, true
+	case this.at(token.PUB_INST_VAR) || this.at(token.PRIV_INST_VAR):
+		this.next()
+
+		if !this.at(token.IDENTIFIER) {
+			return "Expected identifier after '@' at" + this.tokPos(), false
+		}
+		keepComposing = true
+		callable = true
 	}
 
 	if keepComposing {
@@ -1118,6 +1270,7 @@ func (this *Parser) expr(optional bool, gen bool) (string, bool) {
 		return no_err, false
 	}
 
+	fmt.Printf("%+v", this.tok)
 	return "Expected an expression at" + this.tokPos(), false
 }
 
@@ -1192,13 +1345,15 @@ func (this *Parser) hash_expr(gen bool) string {
 }
 
 func (this *Parser) paren_expr(gen bool) string {
+	var err string
+
 	if !this.at(token.LPAREN) {
 		return "paren_expr() called without being on a ( token at" + this.tokPos()
 	}
 
 	this.next()
 
-	if err, _ := this.expr(false, gen); err != no_err {
+	if err, _ = this.expr(false, gen); err != no_err {
 		return err
 	}
 
@@ -1207,6 +1362,20 @@ func (this *Parser) paren_expr(gen bool) string {
 	}
 
 	this.next()
+
+	if this.at(token.LCURLY) {
+		this.next()
+
+		if err = this.stmts(gen); err != no_err {
+			return err
+		}
+
+		if !this.at(token.RCURLY) {
+			return "expected '}' to close closure definition"
+		}
+
+		this.next()
+	}
 
 	return no_err
 }
@@ -1239,7 +1408,7 @@ func (this *Parser) expr_suffix(callable bool, gen bool) string {
 
 		this.next()
 
-		return this.expr_suffix(true, gen)
+		return this.expr_suffix(callable, gen)
 	}
 
 	if callable {
@@ -1290,26 +1459,45 @@ func (this *Parser) new_stmt(gen bool) string {
 		return err
 	}
 
-	return this.expr_suffix(false, gen)
-}
+	if err = this.expr_suffix(true, gen); err != no_err {
+		return err
+	}
 
-func (this *Parser) loop_stmts(gen bool) string {
-	return this.base_stmts(true, gen)
+	// //TODO:this fixes the example but not the real problem
+	// if err = this.call_params(gen); err != no_err {
+	// 	return err
+	// }
+
+	return no_err
 }
 
 func (this *Parser) stmts(gen bool) string {
-	return this.base_stmts(false, gen)
-}
-
-func (this *Parser) base_stmts(loop bool, gen bool) string {
 	var err string
 
 	//stmts are optional
 	for {
 
-		if this.at(token.IDENTIFIER) {
-			if err = this.assign_stmt_or_func_call(gen); err != no_err {
+		if this.at(token.SPAWN_KEYWORD) {
+			if err = this.spawn_stmt(gen); err != no_err {
 				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.IDENTIFIER) {
+			if err = this.assign_stmt_or_func_call_or_chan_send(gen); err != no_err {
+				return err
+			}
+
+			continue
+		}
+
+		if this.at(token.PUB_INST_VAR) || this.at(token.PRIV_INST_VAR) {
+			this.next()
+
+			if !this.at(token.IDENTIFIER) {
+				return "expected identifier after '@' at" + this.tokPos()
 			}
 
 			continue
@@ -1384,7 +1572,7 @@ func (this *Parser) base_stmts(loop bool, gen bool) string {
 			continue
 		}
 
-		if loop {
+		if this.breakable {
 			if this.at(token.BREAK_KEYWORD) {
 				this.next()
 				continue
@@ -1423,7 +1611,7 @@ func (this *Parser) ident() string {
 	return no_err
 }
 
-func (this *Parser) assign_stmt_or_func_call(gen bool) string {
+func (this *Parser) assign_stmt_or_func_call_or_chan_send(gen bool) string {
 	var err string
 
 	if err = this.uncallable_compound_expr(gen); err != no_err { // need this for assignment statement
@@ -1450,7 +1638,17 @@ func (this *Parser) assign_stmt_or_func_call(gen bool) string {
 		return this.rhs_assignment(false, gen)
 	}
 
-	return no_err
+	if this.at(token.CHAN_SEND) {
+		this.next()
+
+		if err, _ = this.expr(false, gen); err != no_err {
+			return err
+		}
+
+		return no_err
+	}
+
+	return "Expected either an assignment, function call, or channel sent at" + this.tokPos()
 }
 
 func (this *Parser) func_call(gen bool) string {
@@ -1499,7 +1697,6 @@ func (this *Parser) uncallable_compound_expr(gen bool) string {
 func (this *Parser) call_params(gen bool) string {
 
 	if !this.at(token.LPAREN) {
-		fmt.Printf("%+v", this.tok)
 		return "Expected '(' at" + this.tokPos()
 	}
 

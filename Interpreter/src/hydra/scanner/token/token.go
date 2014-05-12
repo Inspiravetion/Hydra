@@ -18,6 +18,7 @@ type Token_Type int
 const (
 	IDENTIFIER         Token_Type = iota // 'my_var'
 	PERIOD                               // '.'
+	BANG                                 // '!'
 	QUESTION                             // '?'
 	COMMA                                // ','
 	COLON                                // ':'
@@ -39,6 +40,7 @@ const (
 	LESS_THAN_EQ                         // '<='
 	GREATER_THAN_EQ                      // '>='
 	EQUAL                                // '=='
+	NOT_EQUAL                            // '!='
 	PLUS_EQ                              // '+='
 	MIN_EQ                               // '-='
 	TIMES_EQ                             // '*='
@@ -103,6 +105,8 @@ const (
 	TRUE              // 'true'
 	FALSE             // 'false'
 	NEW_KEYWORD       // 'new'
+	UPTO_KEYWORD      // 'upto'
+	THROUGH_KEYWORD   // 'through'
 	EOF_TYPE          // EOF
 	PUB_CLASS_VAR     // '#'
 	PRIV_CLASS_VAR    // '#_'
@@ -148,6 +152,8 @@ var KeywordMap = map[string]Token_Type{
 	TRUE_LIT:              TRUE,
 	FALSE_LIT:             FALSE,
 	NEW_KEYWORD_LIT:       NEW_KEYWORD,
+	UPTO_KEYWORD_LIT:      UPTO_KEYWORD,
+	THROUGH_KEYWORD_LIT:   THROUGH_KEYWORD,
 }
 
 func New(val string, class Token_Type, line int, col int) *Token {
@@ -332,6 +338,14 @@ func (this Token_Type) String() string {
 		return "NEW_KEYWORD"
 	case IS_KEYWORD:
 		return "IS_KEYWORD"
+	case BANG:
+		return "BANG"
+	case NOT_EQUAL:
+		return "NOT_EQUAL"
+	case UPTO_KEYWORD:
+		return "UPTO_KEYWORD"
+	case THROUGH_KEYWORD:
+		return "THROUGH_KEYWORD"
 	}
 	return ""
 }

@@ -271,6 +271,12 @@ func (this *Scanner) less_than_token() *token.Token {
 	return tok
 }
 
+func (this *Scanner) bang_token() *token.Token {
+	return this.default_or_assign_token(
+		token.BANG_LIT, token.BANG, token.NOT_EQUAL_LIT, token.NOT_EQUAL,
+	)
+}
+
 func (this *Scanner) or_token() *token.Token {
 	return this.default_or_assign_token(
 		token.OR_LIT, token.OR, token.OR_EQ_LIT, token.OR_EQ,
@@ -514,11 +520,30 @@ func (this *Scanner) period_token() *token.Token {
 
 	if char, err := this.get_next_char(); err == nil {
 		if char == token.PERIOD_LIT {
-			return this.tok(token.EXCL_RANGE_LIT, token.EXCL_RANGE)
+			return this.range_token()
 		}
 
 		this.rewind()
 		return this.tok(token.PERIOD_LIT, token.PERIOD)
+	} else {
+
+		if err == io.EOF {
+			return this.tok(token.PERIOD_LIT, token.PERIOD)
+		}
+
+		return nil
+	}
+}
+
+func (this *Scanner) range_token() *token.Token {
+
+	if char, err := this.get_next_char(); err == nil {
+		if char == token.PERIOD_LIT {
+			return this.tok(token.INCL_RANGE_LIT, token.INCL_RANGE)
+		}
+
+		this.rewind()
+		return this.tok(token.EXCL_RANGE_LIT, token.EXCL_RANGE)
 	} else {
 
 		if err == io.EOF {
@@ -685,6 +710,10 @@ func (this *Scanner) get_next_token() *token.Token {
 
 		if curr_char == token.ASSIGN_LIT {
 			return this.equal_token()
+		}
+
+		if curr_char == token.BANG_LIT {
+			return this.bang_token()
 		}
 
 		if curr_char == token.DOUBLE_QUOTE_LIT {
