@@ -67,13 +67,13 @@ func main() {
 			end
 		end
 
-		if a do
+		if a then
 			something()
-		else if b do
+		else if b then
 			something.elsfe()
-		else if c.g() do
+		else if c.g() then
 			something.elsef()
-		else do
+		else 
 			something.omething.elsee()
 		end
 
@@ -88,10 +88,17 @@ func main() {
 				var z = doSomething
 				var a = 1234
 				var b = (a.b(1, 2, 3)["key"]).funcCall()
-				if a do
+				if a then
 					fmt.print('abc')
+					yield a
 				end
+
+				a = yield a, b, 3
+
+				b = [yield, (yield 1) , yield]
 			end
+
+			yield
 
 			var sc = new SomeClass('a')
 

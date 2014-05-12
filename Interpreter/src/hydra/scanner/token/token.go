@@ -95,6 +95,8 @@ const (
 	EITHER_KEYWORD    // 'either'
 	WAIT_FOR_KEYWORD  // 'wait_for'
 	BREAK_KEYWORD     // 'break'
+	CONTINUE_KEYWORD  // 'continue'
+	YIELD_KEYWORD     // 'yield'
 	GIVEN_KEYWORD     // 'given'
 	IS_KEYWORD        // 'is'
 	VAR_KEYWORD       // 'var'
@@ -138,6 +140,8 @@ var KeywordMap = map[string]Token_Type{
 	EITHER_KEYWORD_LIT:    EITHER_KEYWORD,
 	WAIT_FOR_KEYWORD_LIT:  WAIT_FOR_KEYWORD,
 	BREAK_KEYWORD_LIT:     BREAK_KEYWORD,
+	CONTINUE_KEYWORD_LIT:  CONTINUE_KEYWORD,
+	YIELD_KEYWORD_LIT:     YIELD_KEYWORD,
 	GIVEN_KEYWORD_LIT:     GIVEN_KEYWORD,
 	IS_KEYWORD_LIT:        IS_KEYWORD,
 	VAR_KEYWORD_LIT:       VAR_KEYWORD,
@@ -318,6 +322,10 @@ func (this Token_Type) String() string {
 		return "WAIT_FOR_KEYWORD"
 	case BREAK_KEYWORD:
 		return "BREAK_KEYWORD"
+	case CONTINUE_KEYWORD:
+		return "CONTINUE_KEYWORD"
+	case YIELD_KEYWORD:
+		return "YIELD_KEYWORD"
 	case GIVEN_KEYWORD:
 		return "GIVEN_KEYWORD"
 	case NEW_KEYWORD:
