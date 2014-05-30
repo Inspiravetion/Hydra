@@ -2,12 +2,12 @@ import std::sync
 import ~/root/dir/test.hy
 import TestClass from ~/root/dir/test.hy
 import TestClass from ~/root/dir/test.hy as T
-import Mutex from std::sync 
+import Mutex from std::sync
 import Mutex from std::sync as M
 import sqrt, ceil from std::math
 import func1, func2 from ~/root/dir/test.hy
 
-var test = passed, hopefully 
+var test = passed, hopefully
 var test, number2 = i_really, hope, it_passed
 
 var arr, hash, chan = [1, "2", three()], {charlie:"lipford", a:1}, <-2->
@@ -41,7 +41,7 @@ for i in 0..10 do
     print(i) //0, 2, 4, 6
 end
 
-given a 
+given a
     is 1 do
         a.incr(1)
     is 3 do
@@ -50,7 +50,7 @@ given a
         a.set(2)
 end
 
-given a 
+given a
     is b do
         c()
 end
@@ -69,14 +69,14 @@ else if b then
     something.elsfe()
 else if c.g() then
     something.elsef()
-else 
+else
     something.omething.elsee()
 end
 
 new Charlie(1, 2, 3).start()
 
 gen function genner(other){
-    var n 
+    var n
     var n1, n2, n3
     n1 = [1, 2, 4]
     for a, b, c in other do
@@ -100,14 +100,16 @@ gen function genner(other){
 
     yield
 
-    var sc = new SomeClass('a')
+    var sc = new SomeClass('a').val.init()
 
-    while true do 
+    while true do
         var a = 10
         a.raise([2, 3])
     end
 
-    given a() 
+    while !abc do print(a) end 
+
+    given a()
         is b['key'] do
             c.func()
         is d.key do
@@ -128,7 +130,7 @@ for val in obj do
     fmt.print(val)
 end
 
-class A 
+class A
     //this is a single line comment
     #pub_var = some_other_var
 
@@ -137,7 +139,7 @@ class A
 
     #a, #_b = a, b
 
-    /* this is a multi line comment
+    /** this is a multi line comment
      * about the following constructor
      */
     A(param1, params2){
@@ -188,6 +190,10 @@ function main() {
     end
 }
 
-export MutexEmitter 
+var a = *(b){
+    return b + c
+}
+
+export MutexEmitter
 export MutexEmitter as Memitter
 export a, b, a

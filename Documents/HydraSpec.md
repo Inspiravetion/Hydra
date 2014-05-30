@@ -285,7 +285,7 @@ f.bar //5
 ```
 
 ###Generators:
-Generator instances are created by calling generator functions, both named and anonymous. Once created, generators can be used to generate a sequence of values. To get a value from a generator, simply call it like a function. It will return a boolean signifying if it is done followed by the variables that the generator yields.
+Generator instances are created by calling generator functions, both named and anonymous. Once created, generators can be used to generate a sequence of values. To get a value from a generator, simply call it like a function. It will return a boolean signifying if it is done followed by the variables that the generator yields. There are two built in generators that generate a range of numbers. The first is an exclusive range generator that can be instantiated by either ```<start> upto <end>``` or ```<start> .. <end>```. The second range generator is inclusive and can be instantiated by either ```<start> through <end>``` or ```<start> ... <end>```.
 
 ```hydra
 gen function nums(max){
@@ -670,35 +670,35 @@ f.bar(1)  // 'lols im not what you meant to call'
 A for in loop takes a generator or class instance and loops through its values. If a class instance is given, for in will look for a public generator function on the object with the name 'for_in' to get its generator from. Alternatively, for in can be given a generator instance that it will call directly. The variables between the 'for' and 'in' are restricted to the loop scope and after every iteration they are passed back into the generator so that it can take into account their change if need be. Otherwise the generator can ignore the change and make the loop un-alterable once it starts. If the object after 'in' is not a generator, changing it in the loop will only change the loop if that objects 'for_in' generator function takes it into account.
 ```hydra
   function map_for_in(){
-    var map = { one: 1, two: 2 };
+    var map = { one: 1, two: 2 }
 
     for key, val in map do
-      print('key: ' + key + ' val: ' + val);
+      print('key: ' + key + ' val: ' + val)
     end
   }
 
   function arr_for_in(){
-    var arr = ['1', '2', '3'];
+    var arr = ['1', '2', '3']
 
     for i, val in arr do
-      print('index: ' + i + ' val: ' + val);
+      print('index: ' + i + ' val: ' + val)
     end
   }
 
   function str_for_in(){
-    var str = 'abc123';
+    var str = 'abc123'
 
     for i, char in str do
-      print('index: ' + i + ' char: ' + char);
+      print('index: ' + i + ' char: ' + char)
     end
   }
 
   function chan_for_in(chan){
     for val in chan do
-      print('recieved ' + val + ' from channel');
+      print('recieved ' + val + ' from channel')
     end
 
-    print('channel closed');
+    print('channel closed')
   }
 ```
 As long as the for in loop gets a generator instance, it doesn't matter if it came from a closure or is returned from a function call.
@@ -755,22 +755,22 @@ A while loop takes a boolean literal, a comparison, a variable, or a function ca
     var bool = true
 
     while bool do
-      bool = some_func_call();
+      bool = some_func_call()
     end
   }
 
   function comparison_while_loop(){
-    var char = get_next_char();
+    var char = get_next_char()
 
     while char != EOF do
-      print(char);
-      char = get_next_char();
+      print(char)
+      char = get_next_char()
     end
   }
 
   function func_call_while_loop(){
     while still_running() do
-      print('still going!');
+      print('still going!')
     end
   }
 ```
@@ -793,16 +793,16 @@ The ```given is``` statement goes through each one of its arms comparing the obj
   function given_is(obj){
     given obj
       is String do
-        string_stuff(obj);
-        break;
+        string_stuff(obj)
+        break
       is Array do
-        array_stuff(obj);
-        break;
+        array_stuff(obj)
+        break
       is 0 or 2 do //allow to check for multiple cases
-        number_stuff(obj);
-        break;
+        number_stuff(obj)
+        break
       else do
-        default();
+        default()
     end
   }
 ```
@@ -811,7 +811,7 @@ The ```given is``` statement goes through each one of its arms comparing the obj
 The ```wait_for``` statement lets you sudo-randomly choose and communicate over an arbitrary number of sending/receiving channels. It takes channel send/receive cases and checks to see which ones would not block if executed. From the pool of executable cases, it chooses one and executes it. If none of the cases are executable it blocks until one is ready and then executes it. A default case can be added to the end which will run if no other case is executable.
 ```hydra
   function wait_for_either_or(in_chan1, in_chan2, out_chan){
-    var recvd, clsd;
+    var recvd, clsd
 
     while true do
       wait_for
@@ -837,7 +837,7 @@ The ```wait_for``` statement lets you sudo-randomly choose and communicate over 
 ##Value/Reference Semantics:
 
 ###Function Parameters:
-String, Int, Float, and Boolean parameters get passed by value. Parameters that are a Hash, Array, Channel, Generator instance, or any other Object get passed by reference.
+String, Int, Float, and Boolean parameters get passed by value. Parameters that are a Hash, Array, Channel, Regex, Generator instance, or any other Object get passed by reference.
 ```hydra
 function negate(b){
   b = !b
@@ -852,7 +852,7 @@ function inc(a){
   a += a
 }
 
-var num = 1;
+var num = 1
 inc(num)
 print(num) //1
 
@@ -953,7 +953,7 @@ c = builtin.chan
 print(<-builtin.chan) //1
 ```
 ###Binding Closure Parameters:
-
+With the exception of channels and the ```@``` instance reference operator, closures copy all values that they close around. However, variables may be passed by reference by binding them to parameters. The closure will then see any changes to variables bound to its parameters by outside mutation. The syntax for binding is a parenthesised list of expressions following the closure definition.
 ```hydra
 //Closure closing over values, copying some and taking references of others
 

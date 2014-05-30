@@ -1256,6 +1256,38 @@ func (this *Parser) base_expr(optional bool, gen bool) (string, bool) {
 		}
 		keepComposing = true
 		callable = true
+	case this.at(token.BANG):
+		this.next()
+
+		if err, _ = this.expr(false, gen); err != no_err {
+			return err, false
+		}
+
+		return no_err, true
+	case this.at(token.MULT_OP):
+		this.next()
+
+		if err = this.def_params(); err != no_err {
+			return err, false
+		}
+
+		if !this.at(token.LCURLY) {
+			return "expected '{' to open closure definition", false
+		}
+
+		this.next()
+
+		if err = this.stmts(gen); err != no_err {
+			return err, false
+		}
+
+		if !this.at(token.RCURLY) {
+			return "expected '}' to close closure definition", false
+		}
+
+		this.next()
+
+		return no_err, true
 	}
 
 	if keepComposing {
@@ -1462,11 +1494,6 @@ func (this *Parser) new_stmt(gen bool) string {
 	if err = this.expr_suffix(true, gen); err != no_err {
 		return err
 	}
-
-	// //TODO:this fixes the example but not the real problem
-	// if err = this.call_params(gen); err != no_err {
-	// 	return err
-	// }
 
 	return no_err
 }
