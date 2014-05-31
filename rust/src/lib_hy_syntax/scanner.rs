@@ -166,7 +166,7 @@ impl<B: Buffer> Scanner<B> {
     fn change_pos(&mut self, c : char) {
         if c == '\n' {
             self.line += 1;
-            self.col = 0;
+            self.col = 1;
         } else {
             self.col += 1;
         };
@@ -311,6 +311,80 @@ impl<B: Buffer> Scanner<B> {
         Some(self.tok())
     }
 
+    fn dash_token(&mut self, c : char) -> Option<Token> {
+        self.consume(c);
+
+        if !self.next_char_is(c){
+            if !self.next_char_is('>'){
+                self.consume_next_if('=');
+            }
+        }
+
+        Some(self.tok())
+    }
+
+    fn less_than_token(&mut self, c : char) -> Option<Token> {
+        self.consume(c);
+
+        if !self.next_char_is(c){
+            if !self.next_char_is('-'){
+                self.consume_next_if('=');
+            }
+        }
+
+        Some(self.tok())
+    }
+
+    fn class_inst_var_token(&mut self, c : char) -> Option<Token> {
+        self.consume(c);
+
+        self.consume_next_if('_');
+
+        Some(self.tok())
+    }
+
+    fn string_lit_token(&mut self, quote : char) -> Option<Token> {
+        self.consume(quote);
+
+        self.consume_while(|c : char| -> bool {
+            c != quote
+        });
+
+        self.consume_next_if(quote);
+
+        Some(self.tok())
+    }
+
+    fn backslash_token(&mut self, c : char) -> Option<Token> {
+        self.consume(c);
+
+        if !self.next_char_is('='){
+            //TODO: validate escaped strings
+            if self.next_char_is('*'){
+                let mut last_char = ' ';
+                
+                self.consume_while(|c : char| -> bool {
+
+                    let continu = if c == '/' && last_char == '*' {
+                        false
+                    } else {
+                        true
+                    };
+
+                    last_char = c;
+                    continu
+                });
+
+            } else if self.next_char_is(c) {
+                self.consume_while(|c : char| -> bool {
+                    c != '\n'
+                });
+            }
+        }
+
+        Some(self.tok())
+    }
+
     fn next_token(&mut self) -> Option<Token> {
         match self.next_char() {
             Some(c) => {
@@ -337,23 +411,23 @@ impl<B: Buffer> Scanner<B> {
                     },
                     '-' => {
                         //-, -=, ->, --
-                        None
+                        self.dash_token(c)
                     },
                     '<' => {
                         //<, <<, <=, <-
-                        None
+                        self.less_than_token(c)
                     },
                     '@' | '#' => {
                         //@, @_, #, #_
-                        None
+                        self.class_inst_var_token(c)
                     },
                     '\'' | '"' => {
                         //'myString', "myString"
-                        None
+                        self.string_lit_token(c)
                     },
                     '/' => {
                         // /, /=, //, /*
-                        None
+                        self.backslash_token(c)
                     },
                     '0' => {
                         //0b10110, 0B101001, 0xdeadBeef, 0XDeadBEEf
@@ -462,6 +536,41 @@ fn double_or_equal_tokens(){
         Add_Op, Increment, Plus_Eq, Bit_And, Logical_And, Bit_And_Eq, 
         Greater_Than, Rshovel, Greater_Than_Eq
     ]);
+}
+
+#[test]
+fn dash_tokens(){
+    test_types!("- -- -= ->" -> [
+        Min_Op, Decrement, Min_Eq, Chan_Send
+    ]);
+}
+
+#[test]
+fn less_than_tokens(){
+    test_types!("< << <= <-" -> [
+        Less_Than, Lshovel, Less_Than_Eq, Chan_Recv
+    ]);
+}
+
+#[test]
+fn class_inst_var_tokens(){
+    test_types!("@ @_ # #_" -> [
+        Pub_Inst_Var, Priv_Inst_Var, Pub_Class_Var, Priv_Class_Var
+    ]);
+}
+
+#[test]
+fn string_lit_tokens(){
+    test_types!("'abc123$%^&*   ' \"abc123#$%&*  \" " -> [
+        String_Literal, String_Literal
+    ]);
+}
+
+#[test]
+fn backslash_tokens(){
+    test_types!("/ /= //this is a comment\n /****This is a \n multiline comment****/" -> [
+        Div_Op, Div_Eq, Singleline_Comment, Multiline_Comment
+    ])
 }
 
 #[test]
