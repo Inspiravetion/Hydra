@@ -10,6 +10,7 @@
 #![allow(unused_variable)]
 #![allow(unused_mut)]
 #![allow(non_camel_case_types)]
+#![allow(dead_assignment)]
 
 extern crate native;
 

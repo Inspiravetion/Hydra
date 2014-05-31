@@ -10,22 +10,25 @@ fn main(){
 
     let path_str = args[1].as_slice();
 
-    println!("{:?}", scanner::tokenize_str("sfs"));
-    println!("{:?}", scanner::tokenize_file(path_str));
+    for tok in scanner::tokenize_str("?,~;:{}()[] abc def! ghi? _private").iter() {
+        println!("{}", tok);
+    }
 
-    let tokens = scanner::stream_from_str("sdf");
+    // println!("{:?}", scanner::tokenize_file(path_str));
+
+    let tokens = scanner::stream_from_str(". .. ...");
 
     for tok in tokens.iter() {
         println!("{}", tok);
     }
 
-    println!("---------");
+    // println!("---------");
 
-    let tokens = scanner::stream_from_file(path_str);
+    // let tokens = scanner::stream_from_file(path_str);
 
-    for tok in tokens.iter() {
-        println!("{}", tok);
-    }
+    // for tok in tokens.iter() {
+    //     println!("{}", tok);
+    // }
 }
 
 

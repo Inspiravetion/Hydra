@@ -15,5 +15,10 @@ build: libs
 doc: build
 	$(RUSTDOC) src/lib_hy_syntax/lib.rs -o doc -L ./build
 
+test: libs
+	mkdir -p test
+	rustc src/lib_hy_syntax/lib.rs --test -o test/syntax-test
+	test/syntax-test
+
 clean:
 	rm -rf build/*
