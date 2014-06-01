@@ -375,6 +375,12 @@ impl<B: Buffer> Scanner<B> {
                     continu
                 });
 
+                self.consume_next_if('/');
+
+                if !self.text_buff.as_slice().contains("*/") {
+                    fail!("Failed to end multiline comment");
+                }
+
             } else if self.next_char_is(c) {
                 self.consume_while(|c : char| -> bool {
                     c != '\n'
@@ -568,8 +574,8 @@ fn string_lit_tokens(){
 
 #[test]
 fn backslash_tokens(){
-    test_types!("/ /= //this is a comment\n /****This is a \n multiline comment****/" -> [
-        Div_Op, Div_Eq, Singleline_Comment, Multiline_Comment
+    test_types!("/ /= /****This is a \n multiline comment****///this is a comment\n/****This is a \n multiline comment****/" -> [
+        Div_Op, Div_Eq, Multiline_Comment, Singleline_Comment, Multiline_Comment
     ])
 }
 

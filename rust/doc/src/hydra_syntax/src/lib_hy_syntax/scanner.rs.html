@@ -632,6 +632,12 @@
 <span id='592'>592</span>
 <span id='593'>593</span>
 <span id='594'>594</span>
+<span id='595'>595</span>
+<span id='596'>596</span>
+<span id='597'>597</span>
+<span id='598'>598</span>
+<span id='599'>599</span>
+<span id='600'>600</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufReader</span>, <span class='ident'>BufferedReader</span>, <span class='ident'>Buffer</span>, <span class='ident'>File</span>, <span class='ident'>EndOfFile</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::{<span class='ident'>channel</span>, <span class='ident'>Sender</span>, <span class='ident'>Receiver</span>};
@@ -1010,6 +1016,12 @@
                     <span class='ident'>continu</span>
                 });
 
+                <span class='self'>self</span>.<span class='ident'>consume_next_if</span>(<span class='string'>&#39;/&#39;</span>);
+
+                <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>text_buff</span>.<span class='ident'>as_slice</span>().<span class='ident'>contains</span>(<span class='string'>&quot;*/&quot;</span>) {
+                    <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to end multiline comment&quot;</span>);
+                }
+
             } <span class='kw'>else</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='ident'>c</span>) {
                 <span class='self'>self</span>.<span class='ident'>consume_while</span>(<span class='op'>|</span><span class='ident'>c</span> : <span class='ident'>char</span><span class='op'>|</span> <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
                     <span class='ident'>c</span> <span class='op'>!=</span> <span class='string'>&#39;\n&#39;</span>
@@ -1203,8 +1215,8 @@
 
 <span class='attribute'>#[<span class='ident'>test</span>]</span>
 <span class='kw'>fn</span> <span class='ident'>backslash_tokens</span>(){
-    <span class='macro'>test_types</span><span class='macro'>!</span>(<span class='string'>&quot;/ /= //this is a comment\n /****This is a \n multiline comment****/&quot;</span> <span class='op'>-&gt;</span> [
-        <span class='ident'>Div_Op</span>, <span class='ident'>Div_Eq</span>, <span class='ident'>Singleline_Comment</span>, <span class='ident'>Multiline_Comment</span>
+    <span class='macro'>test_types</span><span class='macro'>!</span>(<span class='string'>&quot;/ /= /****This is a \n multiline comment****///this is a comment\n/****This is a \n multiline comment****/&quot;</span> <span class='op'>-&gt;</span> [
+        <span class='ident'>Div_Op</span>, <span class='ident'>Div_Eq</span>, <span class='ident'>Multiline_Comment</span>, <span class='ident'>Singleline_Comment</span>, <span class='ident'>Multiline_Comment</span>
     ])
 }
 

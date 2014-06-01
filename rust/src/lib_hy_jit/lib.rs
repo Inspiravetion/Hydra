@@ -1,5 +1,5 @@
-#![crate_id = "hydra_syntax"]
-#![comment = "Hydra Tokens, Scanner, Parser, and AST"]
+#![crate_id = "hydra_jit"]
+#![comment = "Hydra Code Generation and Jit"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
@@ -12,8 +12,4 @@
 #![allow(non_camel_case_types)]
 #![allow(dead_assignment)]
 
-extern crate native;
-extern crate jit = "hydra_jit";
-
-pub mod token;
-pub mod scanner;
+pub mod codegen;
