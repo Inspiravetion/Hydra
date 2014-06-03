@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_syntax library documentation.">
+    <meta name="description" content="The hydra_jit library documentation.">
 
     <title>lib.rs.html -- source</title>
 
@@ -59,9 +59,12 @@
 <span id='19'>19</span>
 <span id='20'>20</span>
 <span id='21'>21</span>
+<span id='22'>22</span>
+<span id='23'>23</span>
+<span id='24'>24</span>
 </pre><pre class='rust '>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;hydra_syntax&quot;</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Hydra Tokens, Scanner, Parser, and AST&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;hydra_jit&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Hydra Code Generation and Jit&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;dylib&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;rlib&quot;</span>]</span>
@@ -73,14 +76,17 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unused_mut</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>non_camel_case_types</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_assignment</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unused_imports</span>)]</span>
 
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>native</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit</span> <span class='op'>=</span> <span class='string'>&quot;hydra_jit&quot;</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>collections</span>;
 
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>token</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>scanner</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>ast</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>parser</span>;
+<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>u</span> (
+    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>e</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> ( <span class='kw'>unsafe</span> { <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>e</span> }; )
+)
+
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>codegen</span>;
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -120,7 +126,7 @@
 
     <script>
         var rootPath = "../../../../";
-        var currentCrate = "hydra_syntax";
+        var currentCrate = "hydra_jit";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>

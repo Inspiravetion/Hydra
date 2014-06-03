@@ -3,10 +3,7 @@ RUSTDOC ?= rustdoc
 
 LIB_DIRS = lib_hy_jit lib_hy_syntax
 
-all: doc
-
-doc: build
-	$(RUSTDOC) src/lib_hy_syntax/lib.rs -o doc -L ./build
+all: build
 
 build: libs
 	$(RUSTC) src/hydra/hydra.rs -L ./build
@@ -16,6 +13,7 @@ libs: $(LIB_DIRS)
 $(LIB_DIRS):
 	mkdir -p build
 	cd build && $(RUSTC) ../src/$@/lib.rs -L .
+	$(RUSTDOC) src/$@/lib.rs -o doc -L ./build
 
 test: libs
 	mkdir -p test

@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_syntax library documentation.">
+    <meta name="description" content="The hydra_jit library documentation.">
 
-    <title>hydra_syntax::scanner - Rust</title>
+    <title>hydra_jit::codegen - Rust</title>
 
     <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
           rel='stylesheet' type='text/css'>
@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='../index.html'>hydra_syntax</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../ast/index.html'>ast</a><br/><a class='mod ' href='../parser/index.html'>parser</a><br/><a class='mod current' href='../scanner/index.html'>scanner</a><br/><a class='mod ' href='../token/index.html'>token</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_jit</a></p><div class='block mod'><h2>Modules</h2><a class='mod current' href='../codegen/index.html'>codegen</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,30 +39,62 @@
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Module <a href='../index.html'>hydra_syntax</a>::<a class='mod' href=''>scanner</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/scanner.rs.html#1-600'>[src]</a></h1>
-<h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<h1 class='fqn'>Module <a href='../index.html'>hydra_jit</a>::<a class='mod' href=''>codegen</a><a class='source' href='../../src/hydra_jit/src/lib_hy_jit/codegen.rs.html#1-276'>[src]</a></h1>
+<h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr>
-                        <td><a class='fn' href='fn.stream_from_file.html'
-                               title='hydra_syntax::scanner::stream_from_file'>stream_from_file</a></td>
+                        <td><a class='struct' href='struct.Builder.html'
+                               title='hydra_jit::codegen::Builder'>Builder</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                    <tr>
+                        <td><a class='trait' href='trait.CodeGenerator.html'
+                               title='hydra_jit::codegen::CodeGenerator'>CodeGenerator</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                    <tr>
+                        <td><a class='type' href='type.Block.html'
+                               title='hydra_jit::codegen::Block'>Block</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.stream_from_str.html'
-                               title='hydra_syntax::scanner::stream_from_str'>stream_from_str</a></td>
+                        <td><a class='type' href='type.Context.html'
+                               title='hydra_jit::codegen::Context'>Context</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.tokenize_file.html'
-                               title='hydra_syntax::scanner::tokenize_file'>tokenize_file</a></td>
+                        <td><a class='type' href='type.LLVMBuilder.html'
+                               title='hydra_jit::codegen::LLVMBuilder'>LLVMBuilder</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.tokenize_str.html'
-                               title='hydra_syntax::scanner::tokenize_str'>tokenize_str</a></td>
+                        <td><a class='type' href='type.Package.html'
+                               title='hydra_jit::codegen::Package'>Package</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='type' href='type.Scope.html'
+                               title='hydra_jit::codegen::Scope'>Scope</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='type' href='type.Type.html'
+                               title='hydra_jit::codegen::Type'>Type</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='type' href='type.Value.html'
+                               title='hydra_jit::codegen::Value'>Value</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 </table></section>
@@ -103,7 +135,7 @@
 
     <script>
         var rootPath = "../../";
-        var currentCrate = "hydra_syntax";
+        var currentCrate = "hydra_jit";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>

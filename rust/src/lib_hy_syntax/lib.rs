@@ -17,3 +17,5 @@ extern crate jit = "hydra_jit";
 
 pub mod token;
 pub mod scanner;
+pub mod ast;
+pub mod parser;
