@@ -39,15 +39,21 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>ast</a>::<a class='type' href=''>ExprData</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/ast.rs.html#11-18'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>ast</a>::<a class='type' href=''>ExprData</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/ast.rs.html#13-26'>[src]</a></h1>
 <pre class='rust enum'>pub enum ExprData {
     FuncCall(<a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='type' href='../../hydra_syntax/ast/type.Ident.html' title='hydra_syntax::ast::Ident'>Ident</a>&gt;, <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>&gt;),
-    InclusiveRange(int, int),
-    ExlusiveRange(int, int),
+    InclusiveRange(<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>, <a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>),
+    ExclusiveRange(<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>, <a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>),
+    Int(int),
+    IdentExpr(<a class='type' href='../../hydra_syntax/ast/type.Ident.html' title='hydra_syntax::ast::Ident'>Ident</a>),
+    BinaryExpr(<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>, <a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>, <a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>),
 }</pre><h2 class='variants'>Variants</h2>
 <table><tr><td id='variant.FuncCall'><code>FuncCall</code></td><td><div class='docblock'><p>A call to a function including its qualifying path and passed parameters</p>
 </div></td></tr><tr><td id='variant.InclusiveRange'><code>InclusiveRange</code></td><td><div class='docblock'><p>An inclusive range 0...10 or 0 through 10</p>
-</div></td></tr><tr><td id='variant.ExlusiveRange'><code>ExlusiveRange</code></td><td><div class='docblock'><p>An exclusive range 0..10 or 0 upto 10</p>
+</div></td></tr><tr><td id='variant.ExclusiveRange'><code>ExclusiveRange</code></td><td><div class='docblock'><p>An exclusive range 0..10 or 0 upto 10</p>
+</div></td></tr><tr><td id='variant.Int'><code>Int</code></td><td><div class='docblock'><p>An integer expression</p>
+</div></td></tr><tr><td id='variant.IdentExpr'><code>IdentExpr</code></td><td><div class='docblock'><p>An identifier</p>
+</div></td></tr><tr><td id='variant.BinaryExpr'><code>BinaryExpr</code></td><td><div class='docblock'><p>A binary expression</p>
 </div></td></tr></table></section>
     <section id='search' class="content hidden"></section>
 

@@ -1,5 +1,7 @@
 use jit::codegen::{CodeGenerator, Builder};
+use token::Token;
 use std::vec::Vec;
+use std::owned::Box;
 
 pub trait Node : CodeGenerator {
     
@@ -12,14 +14,20 @@ pub enum ExprData {
     ///A call to a function including its qualifying path and passed parameters
     FuncCall(Vec<Ident>, Vec<Expr>),
     ///An inclusive range 0...10 or 0 through 10
-    InclusiveRange(int, int),
+    InclusiveRange(Expr, Expr),
     ///An exclusive range 0..10 or 0 upto 10
-    ExlusiveRange(int, int)
+    ExclusiveRange(Expr, Expr),
+    ///An integer expression
+    Int(int),
+    ///An identifier
+    IdentExpr(Ident),
+    ///A binary expression
+    BinaryExpr(Expr, Token, Expr)
 }
 
 pub enum StmtData {
     ///A stmt that is also an expression, function calls and var++/-- etc.
-    StmtExpr(Expr),
+    ExprStmt(Expr),
     ///For in loop bound variables, generator expression, and block of stmts
     ForInLoop(Vec<Ident>, Expr, Vec<Stmt>),
     ///While loop condition expression and block of stmts
@@ -27,7 +35,7 @@ pub enum StmtData {
 }
 
 pub struct Expr {
-    pub data : ExprData
+    pub data : Box<ExprData>
 }
 
 pub struct Stmt {
@@ -35,8 +43,8 @@ pub struct Stmt {
 }
 
 impl Expr {
-    fn new(expr : ExprData) -> Expr {
-        Expr { data : expr }
+    pub fn new(expr : ExprData) -> Expr {
+        Expr { data : box expr }
     }
 }
 
@@ -51,7 +59,7 @@ impl CodeGenerator for Expr {
 }
 
 impl Stmt {
-    fn new(stmt : StmtData) -> Stmt {
+    pub fn new(stmt : StmtData) -> Stmt {
         Stmt { data : stmt }
     }
 }

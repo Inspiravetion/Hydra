@@ -268,10 +268,13 @@
 <span id='228'>228</span>
 <span id='229'>229</span>
 <span id='230'>230</span>
+<span id='231'>231</span>
+<span id='232'>232</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Show</span>, <span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>char</span>;
 
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>TokenType</span> {
     <span class='ident'>Identifier</span>,
     <span class='ident'>Period</span>,
@@ -374,6 +377,7 @@
     <span class='ident'>Singleline_Comment</span>
 }
 
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Token</span> {
     <span class='kw'>pub</span> <span class='ident'>text</span> : <span class='kw-2'>~</span><span class='ident'>str</span>,
     <span class='kw'>pub</span> <span class='ident'>typ</span>  : <span class='ident'>TokenType</span>,

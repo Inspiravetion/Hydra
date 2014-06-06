@@ -5,6 +5,7 @@
 #![crate_type = "rlib"]
 
 #![feature(macro_rules)]
+#![feature(globs)]
 
 #![allow(dead_code)]
 #![allow(unused_variable)]

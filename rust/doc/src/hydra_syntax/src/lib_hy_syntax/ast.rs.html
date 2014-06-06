@@ -105,9 +105,19 @@
 <span id='65'>65</span>
 <span id='66'>66</span>
 <span id='67'>67</span>
+<span id='68'>68</span>
+<span id='69'>69</span>
+<span id='70'>70</span>
+<span id='71'>71</span>
+<span id='72'>72</span>
+<span id='73'>73</span>
+<span id='74'>74</span>
+<span id='75'>75</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>jit</span>::<span class='ident'>codegen</span>::{<span class='ident'>CodeGenerator</span>, <span class='ident'>Builder</span>};
+<span class='kw'>use</span> <span class='ident'>token</span>::<span class='ident'>Token</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>::<span class='ident'>Vec</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>owned</span>::<span class='ident'>Box</span>;
 
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Node</span> : <span class='ident'>CodeGenerator</span> {
     
@@ -120,14 +130,20 @@
     <span class='doccomment'>///A call to a function including its qualifying path and passed parameters
 </span>    <span class='ident'>FuncCall</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
     <span class='doccomment'>///An inclusive range 0...10 or 0 through 10
-</span>    <span class='ident'>InclusiveRange</span>(<span class='ident'>int</span>, <span class='ident'>int</span>),
+</span>    <span class='ident'>InclusiveRange</span>(<span class='ident'>Expr</span>, <span class='ident'>Expr</span>),
     <span class='doccomment'>///An exclusive range 0..10 or 0 upto 10
-</span>    <span class='ident'>ExlusiveRange</span>(<span class='ident'>int</span>, <span class='ident'>int</span>)
+</span>    <span class='ident'>ExclusiveRange</span>(<span class='ident'>Expr</span>, <span class='ident'>Expr</span>),
+    <span class='doccomment'>///An integer expression
+</span>    <span class='ident'>Int</span>(<span class='ident'>int</span>),
+    <span class='doccomment'>///An identifier
+</span>    <span class='ident'>IdentExpr</span>(<span class='ident'>Ident</span>),
+    <span class='doccomment'>///A binary expression
+</span>    <span class='ident'>BinaryExpr</span>(<span class='ident'>Expr</span>, <span class='ident'>Token</span>, <span class='ident'>Expr</span>)
 }
 
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StmtData</span> {
     <span class='doccomment'>///A stmt that is also an expression, function calls and var++/-- etc.
-</span>    <span class='ident'>StmtExpr</span>(<span class='ident'>Expr</span>),
+</span>    <span class='ident'>ExprStmt</span>(<span class='ident'>Expr</span>),
     <span class='doccomment'>///For in loop bound variables, generator expression, and block of stmts
 </span>    <span class='ident'>ForInLoop</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span>),
     <span class='doccomment'>///While loop condition expression and block of stmts
@@ -135,7 +151,7 @@
 }
 
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Expr</span> {
-    <span class='kw'>pub</span> <span class='ident'>data</span> : <span class='ident'>ExprData</span>
+    <span class='kw'>pub</span> <span class='ident'>data</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>ExprData</span><span class='op'>&gt;</span>
 }
 
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Stmt</span> {
@@ -143,8 +159,8 @@
 }
 
 <span class='kw'>impl</span> <span class='ident'>Expr</span> {
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>expr</span> : <span class='ident'>ExprData</span>) <span class='op'>-&gt;</span> <span class='ident'>Expr</span> {
-        <span class='ident'>Expr</span> { <span class='ident'>data</span> : <span class='ident'>expr</span> }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>expr</span> : <span class='ident'>ExprData</span>) <span class='op'>-&gt;</span> <span class='ident'>Expr</span> {
+        <span class='ident'>Expr</span> { <span class='ident'>data</span> : <span class='kw'>box</span> <span class='ident'>expr</span> }
     }
 }
 
@@ -159,7 +175,7 @@
 }
 
 <span class='kw'>impl</span> <span class='ident'>Stmt</span> {
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stmt</span> : <span class='ident'>StmtData</span>) <span class='op'>-&gt;</span> <span class='ident'>Stmt</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stmt</span> : <span class='ident'>StmtData</span>) <span class='op'>-&gt;</span> <span class='ident'>Stmt</span> {
         <span class='ident'>Stmt</span> { <span class='ident'>data</span> : <span class='ident'>stmt</span> }
     }
 }

@@ -1,14 +1,18 @@
+#![allow(unused_imports)]
+#![allow(unused_variable)]
+
 extern crate syntax = "hydra_syntax";
 extern crate jit = "hydra_jit";
 
 use syntax::scanner;
+use syntax::parser::{Parser, HydraParser};
 use jit::codegen::Builder;
 
 use std::os;
 
 fn main(){
-    let args = os::args();
-    let args = args.as_slice();
+    // let args = os::args();
+    // let args = args.as_slice();
 
     // let path_str = args[1].as_slice();
 
@@ -18,8 +22,9 @@ fn main(){
 
     // println!("{:?}", scanner::tokenize_file(path_str));
 
-    // let tokens = scanner::stream_from_str("for i in 0 upto 10 do\n\tprint(i)\nend");
-
+    let tokens = scanner::stream_from_str("for i in 0 upto 10 do\n\tprint(i)\nend");
+    let mut parser = Parser::new(tokens);
+    println!("{:?}", parser.parse().get(0));
     // for tok in tokens.iter() {
     //     println!("{}", tok);
     // }

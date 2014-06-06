@@ -39,13 +39,13 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>ast</a>::<a class='type' href=''>StmtData</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/ast.rs.html#20-27'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>ast</a>::<a class='type' href=''>StmtData</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/ast.rs.html#28-35'>[src]</a></h1>
 <pre class='rust enum'>pub enum StmtData {
-    StmtExpr(<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>),
+    ExprStmt(<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>),
     ForInLoop(<a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='type' href='../../hydra_syntax/ast/type.Ident.html' title='hydra_syntax::ast::Ident'>Ident</a>&gt;, <a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>, <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;),
     WhileLoop(<a class='struct' href='../../hydra_syntax/ast/struct.Expr.html' title='hydra_syntax::ast::Expr'>Expr</a>, <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;),
 }</pre><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.StmtExpr'><code>StmtExpr</code></td><td><div class='docblock'><p>A stmt that is also an expression, function calls and var++/-- etc.</p>
+<table><tr><td id='variant.ExprStmt'><code>ExprStmt</code></td><td><div class='docblock'><p>A stmt that is also an expression, function calls and var++/-- etc.</p>
 </div></td></tr><tr><td id='variant.ForInLoop'><code>ForInLoop</code></td><td><div class='docblock'><p>For in loop bound variables, generator expression, and block of stmts</p>
 </div></td></tr><tr><td id='variant.WhileLoop'><code>WhileLoop</code></td><td><div class='docblock'><p>While loop condition expression and block of stmts</p>
 </div></td></tr></table></section>

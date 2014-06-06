@@ -1,6 +1,7 @@
 use std::fmt::{Show, Formatter, Result};
 use std::char;
 
+#[deriving(Clone, Eq)]
 pub enum TokenType {
     Identifier,
     Period,
@@ -103,6 +104,7 @@ pub enum TokenType {
     Singleline_Comment
 }
 
+#[deriving(Clone)]
 pub struct Token {
     pub text : ~str,
     pub typ  : TokenType,
