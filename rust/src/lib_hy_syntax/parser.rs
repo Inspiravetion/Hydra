@@ -3,19 +3,24 @@ use token::*;
 use ast::*;
 use std::from_str::from_str;
 
-pub struct Parser {
+pub struct AsyncParser {
     tokens   : Receiver<Token>,
     peek_tok : Option<Token>,
     tok      : Token
 }
 
-pub trait HydraParser : ParserBase {
+pub struct SyncParser {
+    tokens : Vec<Token>,
+    tok_idx : uint
+}
+
+pub trait HydraParser : HydraBaseParser {
     fn parse(&mut self) -> Vec<Stmt> {
         self.program_stmts()
     }  
 }
 
-trait ParserBase {
+trait HydraBaseParser {
     ///Returns the current token
     fn tok(&mut self) -> Token;
     ///Returns the next token or None if at EOF
@@ -293,8 +298,8 @@ trait ParserBase {
     }
 }
 
-impl Parser {
-    pub fn new(toks : Receiver<Token>) -> Parser {
+impl AsyncParser {
+    pub fn new(toks : Receiver<Token>) -> AsyncParser {
         let first = match toks.recv_opt() {
             Ok(t) => t,
             Err(_)  => fail!("Created parser with empty input")
@@ -305,7 +310,7 @@ impl Parser {
             Err(_)  => None
         };
 
-        Parser {
+        AsyncParser {
             tokens   : toks,
             peek_tok : peek,
             tok      : first
@@ -313,9 +318,9 @@ impl Parser {
     }
 }
 
-impl HydraParser for Parser {}
+impl HydraParser for AsyncParser {}
 
-impl ParserBase for Parser {
+impl HydraBaseParser for AsyncParser {
     ///Try to advance to next token. If at EOF return false, otherwise true
     fn next_opt(&mut self) -> bool {
         match self.peek() {
@@ -339,5 +344,44 @@ impl ParserBase for Parser {
 
     fn tok(&mut self) -> Token {
         self.tok.clone()
+    }
+}
+
+impl SyncParser {
+    pub fn new(toks : Vec<Token>) -> SyncParser {
+        SyncParser {
+            tokens : toks,
+            tok_idx : 0
+        }
+    }
+}
+
+impl HydraParser for SyncParser {}
+
+impl HydraBaseParser for SyncParser {
+    ///Try to advance to next token. If at EOF return false, otherwise true
+    fn next_opt(&mut self) -> bool {
+        match self.peek() {
+            Some(tok) => {
+                self.tok_idx += 1;
+                true
+            },
+            None => false
+        }
+    }
+
+    ///Return the next token pr none if at EOF
+    fn peek(&mut self) -> Option<Token> {
+        if self.tok_idx >= (self.tokens.len() - 1) {
+            None
+        } else {
+            let peek_idx = self.tok_idx + 1;
+            Some(self.tokens.get(peek_idx).clone())
+        }
+    }
+
+    fn tok(&mut self) -> Token {
+        let idx = self.tok_idx;
+        self.tokens.get(idx).clone()
     }
 }

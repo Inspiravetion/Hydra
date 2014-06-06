@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='../index.html'>hydra_syntax</a>&#8203;::<a href='index.html'>parser</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Parser.html'>Parser</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.HydraParser.html'>HydraParser</a><br/><a class='trait ' href='trait.ParserBase.html'>ParserBase</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_syntax</a>&#8203;::<a href='index.html'>parser</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.AsyncParser.html'>AsyncParser</a><br/><a class='struct ' href='struct.SyncParser.html'>SyncParser</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.HydraBaseParser.html'>HydraBaseParser</a><br/><a class='trait current' href='trait.HydraParser.html'>HydraParser</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,8 +39,8 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>parser</a>::<a class='trait' href=''>HydraParser</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/parser.rs.html#12-16'>[src]</a></h1>
-<pre class='rust trait'>pub trait HydraParser: <a class='trait' href='../../hydra_syntax/parser/trait.ParserBase.html' title='hydra_syntax::parser::ParserBase'>ParserBase</a> {
+<h1 class='fqn'>Trait <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>parser</a>::<a class='trait' href=''>HydraParser</a><a class='source' href='../../src/hydra_syntax/src/lib_hy_syntax/parser.rs.html#17-21'>[src]</a></h1>
+<pre class='rust trait'>pub trait HydraParser: <a class='trait' href='../../hydra_syntax/parser/trait.HydraBaseParser.html' title='hydra_syntax::parser::HydraBaseParser'>HydraBaseParser</a> {
     fn <a href='#method.parse' class='fnname'>parse</a>(&amp;mut self) -&gt; <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt; { ... }
 }</pre>
             <h2 id='provided-methods'>Provided Methods</h2>
@@ -48,7 +48,7 @@
         <h3 id='method.parse' class='method'><code>fn <a href='#method.parse' class='fnname'>parse</a>(&amp;mut self) -&gt; <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;</code></h3></div>
                 <h2 id='implementors'>Implementors</h2>
                 <ul class='item-list'>
-            <li><code><a class='struct' href='../../hydra_syntax/parser/struct.Parser.html' title='hydra_syntax::parser::Parser'>Parser</a></code></li></ul></section>
+            <li><code><a class='struct' href='../../hydra_syntax/parser/struct.SyncParser.html' title='hydra_syntax::parser::SyncParser'>SyncParser</a></code></li><li><code><a class='struct' href='../../hydra_syntax/parser/struct.AsyncParser.html' title='hydra_syntax::parser::AsyncParser'>AsyncParser</a></code></li></ul></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
