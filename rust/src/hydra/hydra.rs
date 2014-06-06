@@ -6,6 +6,7 @@ extern crate jit = "hydra_jit";
 
 use syntax::scanner;
 use syntax::parser::{AsyncParser, SyncParser, HydraParser};
+use syntax::parser;
 use jit::codegen::Builder;
 
 use std::os;
@@ -22,15 +23,18 @@ fn main(){
 
     // println!("{:?}", scanner::tokenize_file(path_str));
 
-    let tokens = scanner::stream_from_str("for i in 0 upto 10 do\n\tprint(i)\nend");
-    let mut parser = AsyncParser::new(tokens);
-    println!("{:?}", parser.parse().get(0));
+    let ast = parser::parse_str_async("for i in 0 upto 10 do\n\tprint(i)\nend\nfor i in 0 upto 10 do\n\tprint(i)\nend");
+    println!("{:?}", ast.get(0));
+    println!("---------");
+    println!("{:?}", ast.get(1));
 
     println!("---------");
 
-    let tokens = scanner::tokenize_str("for i in 0 upto 10 do\n\tprint(i)\nend");
-    let mut parser = SyncParser::new(tokens);
-    println!("{:?}", parser.parse().get(0));
+    let ast = parser::parse_str_sync("for i in 0 upto 10 do\n\tprint(i)\nend\nfor i in 0 upto 10 do\n\tprint(i)\nend");
+    println!("{:?}", ast.get(0));
+    println!("---------");
+    println!("{:?}", ast.get(1));
+
     
     
     // let mut builder = Builder::new();

@@ -2,6 +2,31 @@ use std::comm::Receiver;
 use token::*;
 use ast::*;
 use std::from_str::from_str;
+use scanner;
+
+///Scan and Parse a file in parallel
+pub fn parse_file_async(path : &str) -> Vec<Stmt> {
+    let tokens = scanner::stream_from_file(path);
+    AsyncParser::new(tokens).parse()
+}
+
+///Scan and then Parse a file
+pub fn parse_file_sync(path : &str) -> Vec<Stmt> {
+    let tokens = scanner::tokenize_file(path);
+    SyncParser::new(tokens).parse()
+}
+
+///Scan and Parse a string in parallel
+pub fn parse_str_async(code : &str) -> Vec<Stmt> {
+    let tokens = scanner::stream_from_str(code);
+    AsyncParser::new(tokens).parse()
+}
+
+///Scan and then Parse a string
+pub fn parse_str_sync(code : &str) -> Vec<Stmt> {
+    let tokens = scanner::tokenize_str(code);
+    SyncParser::new(tokens).parse()
+}
 
 pub struct AsyncParser {
     tokens   : Receiver<Token>,
@@ -21,10 +46,13 @@ pub trait HydraParser : HydraBaseParser {
 }
 
 trait HydraBaseParser {
+    
     ///Returns the current token
     fn tok(&mut self) -> Token;
+
     ///Returns the next token or None if at EOF
     fn peek(&mut self) -> Option<Token>;
+
     ///Consumes the next token and returns true if
     ///possible, otherwise returns false if at EOF
     fn next_opt(&mut self) -> bool;
@@ -36,8 +64,8 @@ trait HydraBaseParser {
         };
     }
 
-    //if the next token is the passed token type then shift it to self.tok
-    //and return true, otherwise false
+    ///If the next token is the passed token type, then consume it and return 
+    ///true, otherwise false
     fn next_is(&mut self, typ : TokenType) -> bool {
         match self.peek() {
             Some(tok) => {
@@ -52,8 +80,7 @@ trait HydraBaseParser {
         }
     }
 
-    ///If the next token is of the expected token type, run the callback,
-    ///otherwise fail!
+    ///Consume the next token if it is of the expected token type, otherwise fail!
     fn expect(&mut self, typ : TokenType){
         if !self.next_is(typ) {
             let tok = self.tok();
@@ -321,7 +348,7 @@ impl AsyncParser {
 impl HydraParser for AsyncParser {}
 
 impl HydraBaseParser for AsyncParser {
-    ///Try to advance to next token. If at EOF return false, otherwise true
+
     fn next_opt(&mut self) -> bool {
         match self.peek() {
             Some(tok) => {
@@ -337,7 +364,6 @@ impl HydraBaseParser for AsyncParser {
         }
     }
 
-    ///Return the next token pr none if at EOF
     fn peek(&mut self) -> Option<Token> {
         self.peek_tok.clone() 
     }
@@ -359,7 +385,7 @@ impl SyncParser {
 impl HydraParser for SyncParser {}
 
 impl HydraBaseParser for SyncParser {
-    ///Try to advance to next token. If at EOF return false, otherwise true
+
     fn next_opt(&mut self) -> bool {
         match self.peek() {
             Some(tok) => {
@@ -370,7 +396,6 @@ impl HydraBaseParser for SyncParser {
         }
     }
 
-    ///Return the next token pr none if at EOF
     fn peek(&mut self) -> Option<Token> {
         if self.tok_idx >= (self.tokens.len() - 1) {
             None
