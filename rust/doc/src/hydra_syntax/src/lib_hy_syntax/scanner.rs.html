@@ -632,12 +632,6 @@
 <span id='592'>592</span>
 <span id='593'>593</span>
 <span id='594'>594</span>
-<span id='595'>595</span>
-<span id='596'>596</span>
-<span id='597'>597</span>
-<span id='598'>598</span>
-<span id='599'>599</span>
-<span id='600'>600</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufReader</span>, <span class='ident'>BufferedReader</span>, <span class='ident'>Buffer</span>, <span class='ident'>File</span>, <span class='ident'>EndOfFile</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::{<span class='ident'>channel</span>, <span class='ident'>Sender</span>, <span class='ident'>Receiver</span>};
@@ -663,15 +657,11 @@
     <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='ident'>path_str</span>);
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>file</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>File</span>::<span class='ident'>open</span>(<span class='ident'>path</span>) {
-        <span class='prelude-val'>Ok</span>(<span class='ident'>f</span>) <span class='op'>=&gt;</span> <span class='ident'>f</span>,
+        <span class='prelude-val'>Ok</span>(<span class='ident'>f</span>) <span class='op'>=&gt;</span> <span class='ident'>BufferedReader</span>::<span class='ident'>new</span>(<span class='ident'>f</span>),
         <span class='prelude-val'>Err</span>(<span class='ident'>msg</span>) <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='ident'>msg</span>) 
     };
 
-    <span class='kw'>let</span> <span class='ident'>contents</span> <span class='op'>=</span> <span class='ident'>file</span>.<span class='ident'>read_to_end</span>().<span class='ident'>unwrap</span>();
-    <span class='kw'>let</span> <span class='ident'>reader</span> <span class='op'>=</span> <span class='ident'>BufReader</span>::<span class='ident'>new</span>(<span class='ident'>contents</span>.<span class='ident'>as_slice</span>());
-    <span class='kw'>let</span> <span class='ident'>buf_reader</span> <span class='op'>=</span> <span class='ident'>BufferedReader</span>::<span class='ident'>new</span>(<span class='ident'>reader</span>);
-
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>scanner</span> <span class='op'>=</span> <span class='ident'>Scanner</span>::<span class='ident'>new</span>(<span class='ident'>buf_reader</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>scanner</span> <span class='op'>=</span> <span class='ident'>Scanner</span>::<span class='ident'>new</span>(<span class='ident'>file</span>);
 
     <span class='ident'>scanner</span>.<span class='ident'>collect</span>()
 }
@@ -700,15 +690,11 @@
         <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='ident'>path_str</span>);
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>file</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>File</span>::<span class='ident'>open</span>(<span class='ident'>path</span>) {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>f</span>) <span class='op'>=&gt;</span> <span class='ident'>f</span>,
+            <span class='prelude-val'>Ok</span>(<span class='ident'>f</span>) <span class='op'>=&gt;</span> <span class='ident'>BufferedReader</span>::<span class='ident'>new</span>(<span class='ident'>f</span>),
             <span class='prelude-val'>Err</span>(<span class='ident'>msg</span>) <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='ident'>msg</span>) 
         };
 
-        <span class='kw'>let</span> <span class='ident'>contents</span> <span class='op'>=</span> <span class='ident'>file</span>.<span class='ident'>read_to_end</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>reader</span> <span class='op'>=</span> <span class='ident'>BufReader</span>::<span class='ident'>new</span>(<span class='ident'>contents</span>.<span class='ident'>as_slice</span>());
-        <span class='kw'>let</span> <span class='ident'>buf_reader</span> <span class='op'>=</span> <span class='ident'>BufferedReader</span>::<span class='ident'>new</span>(<span class='ident'>reader</span>);
-
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>scanner</span> <span class='op'>=</span> <span class='ident'>Scanner</span>::<span class='ident'>new</span>(<span class='ident'>buf_reader</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>scanner</span> <span class='op'>=</span> <span class='ident'>Scanner</span>::<span class='ident'>new</span>(<span class='ident'>file</span>);
 
         <span class='ident'>scanner</span>.<span class='ident'>stream</span>(<span class='ident'>sendr</span>);
     });
@@ -717,27 +703,25 @@
 }
 
 <span class='kw'>struct</span> <span class='ident'>Scanner</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
-    <span class='ident'>input</span>     : <span class='ident'>B</span>,
-    <span class='ident'>peek_buff</span> : <span class='ident'>StrBuf</span>,
-    <span class='ident'>text_buff</span> : <span class='ident'>StrBuf</span>,
-    <span class='ident'>line</span>      : <span class='ident'>uint</span>,
-    <span class='ident'>col</span>       : <span class='ident'>uint</span>
+    <span class='ident'>input</span>      : <span class='ident'>B</span>,
+    <span class='ident'>peek_buff</span>  : <span class='ident'>StrBuf</span>,
+    <span class='ident'>text_buff</span>  : <span class='ident'>StrBuf</span>,
+    <span class='ident'>line</span>       : <span class='ident'>uint</span>,
+    <span class='ident'>col</span>        : <span class='ident'>uint</span>,
+    <span class='ident'>buf_offset</span> : <span class='ident'>uint</span>
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>B</span>: <span class='ident'>Buffer</span><span class='op'>&gt;</span> <span class='ident'>Scanner</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>input</span> : <span class='ident'>B</span>) <span class='op'>-&gt;</span> <span class='ident'>Scanner</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>{
         <span class='ident'>Scanner</span> { 
-            <span class='ident'>input</span>     : <span class='ident'>input</span>, 
-            <span class='ident'>line</span>      : <span class='number'>1</span>,
-            <span class='ident'>col</span>       : <span class='number'>1</span>,
-            <span class='ident'>peek_buff</span> : <span class='ident'>StrBuf</span>::<span class='ident'>new</span>(),
-            <span class='ident'>text_buff</span> : <span class='ident'>StrBuf</span>::<span class='ident'>new</span>()
+            <span class='ident'>peek_buff</span>  : <span class='ident'>StrBuf</span>::<span class='ident'>new</span>(),
+            <span class='ident'>text_buff</span>  : <span class='ident'>StrBuf</span>::<span class='ident'>new</span>(),
+            <span class='ident'>input</span>      : <span class='ident'>input</span>, 
+            <span class='ident'>line</span>       : <span class='number'>1</span>,
+            <span class='ident'>col</span>        : <span class='number'>1</span>,
+            <span class='ident'>buf_offset</span> : <span class='number'>0</span>
         }
-    }
-
-    <span class='kw'>fn</span> <span class='ident'>reset_text_buf</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        
     }
 
     <span class='kw'>fn</span> <span class='ident'>tok</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Token</span> {<span class='comment'>
@@ -747,14 +731,16 @@
         <span class='kw'>let</span> <span class='ident'>text_buff</span> <span class='op'>=</span> <span class='ident'>clone_buf</span>.<span class='ident'>as_slice</span>();
         <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='ident'>text_buff</span>.<span class='ident'>to_owned</span>();
         <span class='kw'>let</span> <span class='ident'>l</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>col</span> <span class='op'>-</span> <span class='ident'>text</span>.<span class='ident'>len</span>();
+        <span class='kw'>let</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buf_offset</span> <span class='op'>-</span> <span class='ident'>text</span>.<span class='ident'>as_bytes</span>().<span class='ident'>len</span>();
 
         <span class='self'>self</span>.<span class='ident'>text_buff</span>.<span class='ident'>clear</span>();
 
         <span class='ident'>Token</span> {
-            <span class='ident'>text</span> : <span class='ident'>text</span>,
-            <span class='ident'>typ</span>  : <span class='ident'>token</span>::<span class='ident'>str_to_type</span>(<span class='ident'>text_buff</span>),
-            <span class='ident'>line</span> : <span class='self'>self</span>.<span class='ident'>line</span>,
-            <span class='ident'>col</span>  : <span class='ident'>l</span> 
+            <span class='ident'>text</span>       : <span class='ident'>text</span>,
+            <span class='ident'>typ</span>        : <span class='ident'>token</span>::<span class='ident'>str_to_type</span>(<span class='ident'>text_buff</span>),
+            <span class='ident'>line</span>       : <span class='self'>self</span>.<span class='ident'>line</span>,
+            <span class='ident'>col</span>        : <span class='ident'>l</span>,
+            <span class='ident'>buf_offset</span> : <span class='ident'>offset</span>
         }
     }
 
@@ -814,10 +800,8 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>next_char</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>char</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>result</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>char</span><span class='op'>&gt;</span>;
-
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_buff</span>.<span class='ident'>is_empty</span>() {
-            <span class='ident'>result</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>input</span>.<span class='ident'>read_char</span>() {
+        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_buff</span>.<span class='ident'>is_empty</span>() {
+            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>input</span>.<span class='ident'>read_char</span>() {
                 <span class='prelude-val'>Ok</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>c</span>),
                 <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
                     <span class='kw'>if</span> <span class='ident'>e</span>.<span class='ident'>kind</span> <span class='op'>!=</span> <span class='ident'>EndOfFile</span> {
@@ -827,7 +811,11 @@
                 }
             }
         } <span class='kw'>else</span> {
-            <span class='ident'>result</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>peek_buff</span>.<span class='ident'>pop_char</span>().<span class='ident'>unwrap</span>());
+            <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>peek_buff</span>.<span class='ident'>pop_char</span>().<span class='ident'>unwrap</span>())
+        };
+
+        <span class='kw'>if</span> <span class='ident'>result</span>.<span class='ident'>is_some</span>() {
+            <span class='self'>self</span>.<span class='ident'>buf_offset</span> <span class='op'>+=</span> <span class='ident'>char</span>::<span class='ident'>len_utf8_bytes</span>(<span class='ident'>result</span>.<span class='ident'>unwrap</span>());
         }
 
         <span class='ident'>result</span>

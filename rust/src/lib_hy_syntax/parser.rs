@@ -375,6 +375,10 @@ impl HydraBaseParser for AsyncParser {
 
 impl SyncParser {
     pub fn new(toks : Vec<Token>) -> SyncParser {
+        if toks.is_empty() {
+            fail!("Created parser with empty input");
+        }
+
         SyncParser {
             tokens : toks,
             tok_idx : 0

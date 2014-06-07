@@ -22,15 +22,11 @@ pub fn tokenize_file(path_str : &str) -> Vec<Token> {
     let path = &Path::new(path_str);
 
     let mut file = match File::open(path) {
-        Ok(f) => f,
+        Ok(f) => BufferedReader::new(f),
         Err(msg) => fail!(msg) 
     };
 
-    let contents = file.read_to_end().unwrap();
-    let reader = BufReader::new(contents.as_slice());
-    let buf_reader = BufferedReader::new(reader);
-
-    let mut scanner = Scanner::new(buf_reader);
+    let mut scanner = Scanner::new(file);
 
     scanner.collect()
 }
@@ -59,15 +55,11 @@ pub fn stream_from_file(path_str : &str) -> Receiver<Token> {
         let path = &Path::new(path_str);
 
         let mut file = match File::open(path) {
-            Ok(f) => f,
+            Ok(f) => BufferedReader::new(f),
             Err(msg) => fail!(msg) 
         };
 
-        let contents = file.read_to_end().unwrap();
-        let reader = BufReader::new(contents.as_slice());
-        let buf_reader = BufferedReader::new(reader);
-
-        let mut scanner = Scanner::new(buf_reader);
+        let mut scanner = Scanner::new(file);
 
         scanner.stream(sendr);
     });
@@ -76,27 +68,25 @@ pub fn stream_from_file(path_str : &str) -> Receiver<Token> {
 }
 
 struct Scanner<B> {
-    input     : B,
-    peek_buff : StrBuf,
-    text_buff : StrBuf,
-    line      : uint,
-    col       : uint
+    input      : B,
+    peek_buff  : StrBuf,
+    text_buff  : StrBuf,
+    line       : uint,
+    col        : uint,
+    buf_offset : uint
 }
 
 impl<B: Buffer> Scanner<B> {
 
     pub fn new(input : B) -> Scanner<B>{
         Scanner { 
-            input     : input, 
-            line      : 1,
-            col       : 1,
-            peek_buff : StrBuf::new(),
-            text_buff : StrBuf::new()
+            peek_buff  : StrBuf::new(),
+            text_buff  : StrBuf::new(),
+            input      : input, 
+            line       : 1,
+            col        : 1,
+            buf_offset : 0
         }
-    }
-
-    fn reset_text_buf(&mut self) {
-        
     }
 
     fn tok(&mut self) -> Token {
@@ -106,14 +96,16 @@ impl<B: Buffer> Scanner<B> {
         let text_buff = clone_buf.as_slice();
         let text = text_buff.to_owned();
         let l = self.col - text.len();
+        let offset = self.buf_offset - text.as_bytes().len();
 
         self.text_buff.clear();
 
         Token {
-            text : text,
-            typ  : token::str_to_type(text_buff),
-            line : self.line,
-            col  : l 
+            text       : text,
+            typ        : token::str_to_type(text_buff),
+            line       : self.line,
+            col        : l,
+            buf_offset : offset
         }
     }
 
@@ -173,10 +165,8 @@ impl<B: Buffer> Scanner<B> {
     }
 
     fn next_char(&mut self) -> Option<char> {
-        let result : Option<char>;
-
-        if self.peek_buff.is_empty() {
-            result = match self.input.read_char() {
+        let result = if self.peek_buff.is_empty() {
+            match self.input.read_char() {
                 Ok(c) => Some(c),
                 Err(e) => {
                     if e.kind != EndOfFile {
@@ -186,7 +176,11 @@ impl<B: Buffer> Scanner<B> {
                 }
             }
         } else {
-            result = Some(self.peek_buff.pop_char().unwrap());
+            Some(self.peek_buff.pop_char().unwrap())
+        };
+
+        if result.is_some() {
+            self.buf_offset += char::len_utf8_bytes(result.unwrap());
         }
 
         result

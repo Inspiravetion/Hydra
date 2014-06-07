@@ -106,10 +106,21 @@ pub enum TokenType {
 
 #[deriving(Clone)]
 pub struct Token {
-    pub text : ~str,
-    pub typ  : TokenType,
-    pub line : uint,
-    pub col  : uint
+    pub text       : ~str,
+    pub typ        : TokenType,
+    pub line       : uint,
+    pub col        : uint,
+    pub buf_offset : uint
+}
+
+impl Token {
+    pub fn start(self) -> uint {
+        self.buf_offset
+    }
+
+    pub fn end(self) -> uint {
+        self.buf_offset + self.text.as_bytes().len()
+    }
 }
 
 impl Show for Token {

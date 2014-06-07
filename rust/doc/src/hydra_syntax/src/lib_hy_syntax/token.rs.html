@@ -270,6 +270,17 @@
 <span id='230'>230</span>
 <span id='231'>231</span>
 <span id='232'>232</span>
+<span id='233'>233</span>
+<span id='234'>234</span>
+<span id='235'>235</span>
+<span id='236'>236</span>
+<span id='237'>237</span>
+<span id='238'>238</span>
+<span id='239'>239</span>
+<span id='240'>240</span>
+<span id='241'>241</span>
+<span id='242'>242</span>
+<span id='243'>243</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Show</span>, <span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>char</span>;
@@ -379,10 +390,21 @@
 
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Token</span> {
-    <span class='kw'>pub</span> <span class='ident'>text</span> : <span class='kw-2'>~</span><span class='ident'>str</span>,
-    <span class='kw'>pub</span> <span class='ident'>typ</span>  : <span class='ident'>TokenType</span>,
-    <span class='kw'>pub</span> <span class='ident'>line</span> : <span class='ident'>uint</span>,
-    <span class='kw'>pub</span> <span class='ident'>col</span>  : <span class='ident'>uint</span>
+    <span class='kw'>pub</span> <span class='ident'>text</span>       : <span class='kw-2'>~</span><span class='ident'>str</span>,
+    <span class='kw'>pub</span> <span class='ident'>typ</span>        : <span class='ident'>TokenType</span>,
+    <span class='kw'>pub</span> <span class='ident'>line</span>       : <span class='ident'>uint</span>,
+    <span class='kw'>pub</span> <span class='ident'>col</span>        : <span class='ident'>uint</span>,
+    <span class='kw'>pub</span> <span class='ident'>buf_offset</span> : <span class='ident'>uint</span>
+}
+
+<span class='kw'>impl</span> <span class='ident'>Token</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>start</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
+        <span class='self'>self</span>.<span class='ident'>buf_offset</span>
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>end</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
+        <span class='self'>self</span>.<span class='ident'>buf_offset</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>text</span>.<span class='ident'>as_bytes</span>().<span class='ident'>len</span>()
+    }
 }
 
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Token</span> {
