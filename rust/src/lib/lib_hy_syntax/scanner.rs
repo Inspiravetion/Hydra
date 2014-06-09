@@ -90,19 +90,16 @@ impl<B: Buffer> Scanner<B> {
     }
 
     fn tok(&mut self) -> Token {
-        //TODO: probably a better way of doing this
-        //cnt find docs for StrBuf though...
-        let clone_buf = self.text_buff.clone();
-        let text_buff = clone_buf.as_slice();
-        let text = text_buff.to_owned();
-        let l = self.col - text.len();
+        let text   = self.text_buff.as_slice().to_owned();
+        let l      = self.col - text.len();
         let offset = self.buf_offset - text.as_bytes().len();
+        let typ    = token::str_to_type(text);
 
         self.text_buff.clear();
 
         Token {
             text       : text,
-            typ        : token::str_to_type(text_buff),
+            typ        : typ,
             line       : self.line,
             col        : l,
             buf_offset : offset

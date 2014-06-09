@@ -53,7 +53,7 @@ impl Node for Expr {
 }
 
 impl CodeGenerator for Expr {
-    fn gen_code(&mut self, builder : &Builder){
+    fn gen_code(self, builder : &Builder){
 
     }
 }
@@ -62,6 +62,16 @@ impl Stmt {
     pub fn new(stmt : StmtData) -> Stmt {
         Stmt { data : stmt }
     }
+
+    fn gen_for_in_loop(self, builder : &Builder) {
+        let (vars, range, stmts) = match self.data {
+            ForInLoop(ref v, ref r, ref s) => (v, r, s),
+            _ => fail!("Called gen_for_in_loop on Stmt that is not a for in loop")
+        };
+        //1.init and resolve range...for objects make sure they have a function called 'for_in'
+        //2.open scope with the builder...make local variables for the vars and set them to the result of the yield
+        //3. call gen_code(builder) on all ths stmts
+    }
 }
 
 impl Node for Stmt {
@@ -69,7 +79,10 @@ impl Node for Stmt {
 }
 
 impl CodeGenerator for Stmt {
-    fn gen_code(&mut self, builder : &Builder){
-
+    fn gen_code(self, builder : &Builder){
+        match self.data {
+            ForInLoop(_, _, _) => self.gen_for_in_loop(builder),
+            _ => {}
+        };
     }
 }

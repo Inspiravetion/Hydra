@@ -14,7 +14,7 @@ pub type LLVMBuilder = BuilderRef;
 pub type Block       = BasicBlockRef;
 
 pub trait CodeGenerator {
-    fn gen_code(&mut self, &Builder);
+    fn gen_code(self, &Builder);
 }
 
 pub struct Builder {
@@ -77,6 +77,7 @@ impl Builder {
     pub fn create_function(&mut self, name : &str, args : Vec<Type>, ret : Type, cb : |&mut Builder|) {
         let typ = self.func_type(args, ret, False);
         self.curr_func = Some(u!(llvm::LLVMAddFunction(self.curr_pkg.unwrap(), chars(name), typ)));
+        self.new_block("");
         cb(self);
         self.curr_func = None;
     }
@@ -91,11 +92,15 @@ impl Builder {
     pub fn call(&mut self, name : &str, args : Vec<Value>, variable_name : &str) -> Value {
         u!(llvm::LLVMBuildCall(
             self.builder,
-            llvm::LLVMGetNamedFunction(self.curr_pkg.unwrap(), chars(name)),
+            self.get_function(name),
             args.as_ptr(),
             args.len() as c_uint,
             chars(variable_name)
         ))
+    }
+
+    pub fn get_function(&mut self, name : &str) -> Value {
+        u!(llvm::LLVMGetNamedFunction(self.curr_pkg.unwrap(), chars(name)))
     }
 
     pub fn  get_param(&mut self, param_index : int) -> Value {
@@ -104,6 +109,10 @@ impl Builder {
 
     pub fn ret(&mut self, val : Value) {
         u!(llvm::LLVMBuildRet(self.builder, val));
+    }
+
+    pub fn ret_void(&mut self) {
+        u!(llvm::LLVMBuildRetVoid(self.builder));
     }
 
     /*
@@ -174,6 +183,18 @@ impl Builder {
         u!(llvm::LLVMBuildAShr(self.builder, lhs, rhs, chars(variable_name)))
     }
 
+    pub fn store(&mut self, val : Value, mem : Value) -> Value {
+        u!(llvm::LLVMBuildStore(self.builder, val, mem))
+    }
+
+    pub fn load(&mut self, mem : Value, name : &str) -> Value {
+        u!(llvm::LLVMBuildLoad(
+            self.builder,
+            mem,
+            chars(name)
+        ))
+    }
+
     /*
         PHI NODES
      */
@@ -226,6 +247,61 @@ impl Builder {
         u!(llvm::LLVMBuildBr(self.builder, block));
     }
 
+    pub fn block_address(&mut self, func : Value, block : Block) -> Value {
+        u!(llvm::LLVMBlockAddress(func, block))
+    }
+
+    pub fn indirect_break(&mut self, addr : Value, blocks : Vec<Block>) {
+        let ibreak = u!(llvm::LLVMBuildIndirectBr(self.builder, addr, blocks.len() as c_uint));
+        for block in blocks.iter() {
+            u!(llvm::LLVMAddDestination(
+                ibreak, 
+                *block
+            ));
+        }
+    }
+
+    pub fn get_entry_block(&mut self, func : Value) -> Block {
+        u!(llvm::LLVMGetEntryBasicBlock(func))
+    }
+
+    pub fn get_first_block(&mut self, func : Value) -> Block {
+        u!(llvm::LLVMGetFirstBasicBlock(func))
+    }
+
+
+    /*
+        User Created Types
+     */
+    pub fn create_type(&mut self, field_typs : Vec<Type>, typ_name : &str) -> Type {
+        let typ = u!(llvm::LLVMStructCreateNamed(self.ctx, chars(typ_name)));
+        u!(llvm::LLVMStructSetBody(
+            typ,
+            field_typs.as_ptr(), 
+            field_typs.len() as c_uint, 
+            False
+        ));
+
+        typ
+    }
+
+    pub fn alloca(&mut self, obj_typ : Type, name : &str) -> Value {
+        u!(llvm::LLVMBuildAlloca(
+            self.builder, 
+            obj_typ, 
+            chars(name)
+        ))
+    }
+
+    pub fn get_obj_property(&mut self, obj : Value, prop_idx : int, name : &str) -> Value {
+        u!(llvm::LLVMBuildStructGEP(
+            self.builder,
+            obj,
+            prop_idx as c_uint,
+            chars(name)
+        ))
+    }
+
     /*
         TYPES
      */
@@ -242,7 +318,20 @@ impl Builder {
     }
 
     pub fn string_type(&mut self) -> Type {
-        u!(llvm::LLVMPointerType(self.char_type(), 0))
+        let char_typ = self.char_type();
+        self.to_ptr_type(char_typ)
+    }
+
+    pub fn void_type(&mut self) -> Type {
+        u!(llvm::LLVMVoidTypeInContext(self.ctx))
+    }
+
+    pub fn label_type(&mut self) -> Type {
+        u!(llvm::LLVMLabelTypeInContext(self.ctx))
+    }
+
+    pub fn to_ptr_type(&mut self, typ : Type) -> Type {
+        u!(llvm::LLVMPointerType(typ, 0))
     }
 
     /*
