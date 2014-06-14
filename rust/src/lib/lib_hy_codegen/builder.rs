@@ -1,41 +1,206 @@
-use rustc::lib::llvm::{llvm, Bool, TypeRef, ContextRef, ModuleRef, BuilderRef, 
-                       ValueRef, BasicBlockRef, False, True, IntEQ, IntNE, 
-                       IntSGT, IntSGE, IntSLT, IntSLE};
+use rustc::lib::llvm::{llvm, Bool, False, True, IntEQ, IntNE, IntSGT, IntSGE, IntSLT, IntSLE};
 use collections::hashmap::HashMap;
-use std::hash::sip::SipHasher;
 use libc::{c_uint, c_ulonglong};
-
-pub type Package     = ModuleRef;
-pub type Context     = ContextRef;
-pub type Scope       = BasicBlockRef;
-pub type Value       = ValueRef;
-pub type Type        = TypeRef;
-pub type LLVMBuilder = BuilderRef;
-pub type Block       = BasicBlockRef;
-
-pub trait CodeGenerator {
-    fn gen_code(self, &Builder);
-}
+use generator::{Generator, RANGE_GEN_ID, RANGE_GEN_INIT, RANGE_GEN_NEXT};
+use generator;
+use lltype::*;
+use std::owned::Box;
 
 pub struct Builder {
-    builder : LLVMBuilder,
-    ctx  : Context,
-    pkgs : HashMap<~str, Package>,
-    curr_pkg  : Option<Package>,
-    curr_func : Option<Value>
+    builder    : LLVMBuilder,
+    ctx        : Context,
+    types      : HashMap<~str, Type>,
+    pkgs       : HashMap<~str, Package>,
+    curr_pkg   : Option<Package>,
+    curr_func  : Option<Value>,
+    curr_scope : Box<Scope>
+}
+
+#[deriving(Clone)]
+enum Scope {
+    Global(HashMap<~str, Value>),
+    Inner(HashMap<~str, Value>, Box<Scope>)
+}
+
+// struct Scope {
+//     pub vars   : HashMap<~str, Value>,
+//     pub parent : Option<Box<Scope>>
+// }
+
+impl Scope {
+    pub fn new_global() -> Box<Scope> {
+       box Global(HashMap::new())
+    }
+
+    pub fn new_inner(parent: Box<Scope>) -> Box<Scope> {
+       box Inner(HashMap::new(), parent)
+    }
+
+    pub fn get(&mut self, var_ident : &str) -> Option<Value> {
+        match *self {
+            Global(ref mut vars) => {
+                match vars.find(&var_ident.to_owned()) {
+                    Some(val) => Some(*val),
+                    None      => None
+                }
+            },
+            Inner(ref mut vars, ref mut parent) => {
+                match vars.find(&var_ident.to_owned()) {
+                    Some(val) => Some(*val),
+                    None      => parent.get(var_ident)
+                }
+            }
+        }
+    }
+
+    pub fn put(&mut self, var_ident : &str, val : Value) {
+        match *self {
+            Global(ref mut vars) => {
+                vars.insert(var_ident.to_owned(), val);
+            },
+            Inner(ref mut vars, _) => {
+                vars.insert(var_ident.to_owned(), val);                
+            }
+        };
+    }
 }
 
 impl Builder {
     pub fn new() -> Builder {
         let context = u!(llvm::LLVMContextCreate());
+        let builder = u!(llvm::LLVMCreateBuilderInContext(context));
 
-        Builder {
-            builder : u!(llvm::LLVMCreateBuilderInContext(context)),
-            ctx  : context,
-            pkgs : HashMap::new() , 
-            curr_pkg : None,
-            curr_func : None
-        }
+        let mut b = Builder {
+            builder    : builder,
+            ctx        : context,
+            types      : HashMap::new(),
+            pkgs       : HashMap::new() , 
+            curr_pkg   : None,
+            curr_func  : None,
+            curr_scope : Scope::new_global()
+        };
+
+        b.create_package("hydra");
+        b.add_builtin_types();
+
+        b
+    }
+
+    pub fn open_scope(&mut self) {
+        let inner_scope = Scope::new_inner(self.curr_scope.clone());
+        self.curr_scope = inner_scope;
+    }
+
+    pub fn close_scope(&mut self) {
+        let p = match *self.curr_scope {
+            Inner(_,ref parent) => parent.clone(),
+            Global(_) => fail!("tried to close global scope")
+        };
+
+        self.curr_scope = p;
+    }
+
+    pub fn get_var(&mut self, name : &str) -> Option<Value> {
+        self.curr_scope.get(name)
+    }
+
+    pub fn set_var(&mut self, name : &str, val : Value) {
+        self.curr_scope.put(name, val);
+    }
+
+    fn add_builtin_types(&mut self) {
+        self.define_range_gen_builtin_type();
+    }
+
+    pub fn define_range_gen_builtin_type(&mut self) {
+        let string_type = self.string_type();
+        let int_type    = self.int32_type();
+        let void_type   = self.void_type();
+        
+        //                next_block   start_var end_var   ret_val1
+        let fields = vec!(string_type, int_type, int_type, int_type);
+        let range_gen_typ = self.create_type(fields, RANGE_GEN_ID);
+
+        self.types.insert(RANGE_GEN_ID.to_owned(), range_gen_typ);
+
+        let struct_ptr_typ = self.to_ptr_type(range_gen_typ);
+        let next_args = vec!(struct_ptr_typ);
+        //TODO this is veryyyy hacky
+        let mut blocks = Vec::new();
+        self.create_function(RANGE_GEN_NEXT, next_args, int_type, |fb : &mut Builder|{
+        
+            let entry = fb.new_block("entry");
+            let cond = fb.new_block("cond");
+            let incr = fb.new_block("incr");
+            let yield1 = fb.new_block("yield1");
+            let exit = fb.new_block("exit");
+            blocks.push(cond);
+
+            // //check which block to resume on
+            fb.goto_block(entry);
+
+            let gen_ctx = fb.get_param(0);
+            let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
+            let ctx_index = fb.get_obj_property(gen_ctx, 1, "ctx_index");
+            let ctx_end   = fb.get_obj_property(gen_ctx, 2, "ctx_end");
+            let ctx_ret   = fb.get_obj_property(gen_ctx, 3, "ctx_ret");
+
+            let label = fb.load(ctx_state, "dest");
+            fb.indirect_break(label, vec!(cond, incr));
+
+            //check if index < end...goto yield if true, exit if false
+            fb.goto_block(cond);
+            let idx = fb.load(ctx_index, "index");
+            let end = fb.load(ctx_end, "end");
+            let cmp = fb.cmp_less_than(idx, end, "cmp_tmp");
+            fb.conditional_break(cmp, yield1, exit);
+
+            //incr index and break to cond
+            fb.goto_block(incr);
+            let idx = fb.load(ctx_index, "index");
+            let one = fb.int(1);
+            let add_tmp = fb.add_op(idx, one, "add_tmp");
+            fb.store(add_tmp, ctx_index);
+            fb.break_to(cond);
+
+            //setup incr as the next block and yield
+            fb.goto_block(yield1);
+            let next = fb.get_function(RANGE_GEN_NEXT);
+            let resume_block = fb.block_address(next, incr);
+            fb.store(resume_block, ctx_state);
+
+            let ret_val = fb.load(ctx_index, "ret1");
+            fb.store(ret_val, ctx_ret);
+
+            let done = fb.int(1);
+            fb.ret(done);
+            
+            fb.goto_block(exit);
+            let done = fb.int(0);
+            fb.ret(done);
+        });
+
+        let init_args = vec!(struct_ptr_typ, int_type, int_type);
+        self.create_function(RANGE_GEN_INIT, init_args, void_type, |fb : &mut Builder |{
+            fb.goto_first_block();
+
+            let context_obj = fb.get_param(0);
+            let start       = fb.get_param(1);
+            let end         = fb.get_param(2);
+
+            let context_state = fb.get_obj_property(context_obj, 0, "state");
+            let context_start = fb.get_obj_property(context_obj, 1, "start");
+            let context_end   = fb.get_obj_property(context_obj, 2, "end");
+
+            let next = fb.get_function(RANGE_GEN_NEXT);
+            let gen_entry = fb.block_address(next , blocks.as_slice()[0]);
+
+            fb.store(gen_entry, context_state);
+            fb.store(start, context_start);
+            fb.store(end, context_end);
+
+            fb.ret_void();
+        });
     }
 
     pub fn dump(&mut self) {
@@ -230,13 +395,17 @@ impl Builder {
             chars(name)
         ));
 
-        u!(llvm::LLVMPositionBuilderAtEnd(self.builder, block));
-
         block
     }
 
     pub fn goto_block(&mut self, block : Block){
         u!(llvm::LLVMPositionBuilderAtEnd(self.builder, block));
+    }
+
+    pub fn goto_first_block(&mut self) {
+        let this_fn   = self.curr_func.unwrap();
+        let first_blk = self.get_first_block(this_fn);
+        self.goto_block(first_blk);
     }
 
     pub fn conditional_break(&mut self, cond : Value, true_block : Block, false_block : Block) {
@@ -300,6 +469,30 @@ impl Builder {
             prop_idx as c_uint,
             chars(name)
         ))
+    }
+
+    pub fn get_type(&mut self, id : &str) -> Type {
+        *self.types.get(&id.to_owned())
+    }
+
+    pub fn get_range_gen_type(&mut self) -> Type {
+        self.get_type(RANGE_GEN_ID)
+    }
+
+    pub fn range_gen(&mut self, start : int, end : int) -> Generator {
+        let range_type = self.get_range_gen_type();
+        let gen        = self.alloca(range_type, "range_generator");
+        let args       = vec!(gen, self.int(start), self.int(end));
+
+        Generator {
+            typ       : range_type,
+            gen       : gen,
+            init_args : args,
+            init_func : RANGE_GEN_INIT.to_owned(),
+            next_func : RANGE_GEN_NEXT.to_owned(),
+            var_count : 2,
+            ret_count : 1
+        }
     }
 
     /*

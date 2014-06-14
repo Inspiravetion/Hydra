@@ -454,6 +454,11 @@
 <span id='414'>414</span>
 <span id='415'>415</span>
 <span id='416'>416</span>
+<span id='417'>417</span>
+<span id='418'>418</span>
+<span id='419'>419</span>
+<span id='420'>420</span>
+<span id='421'>421</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -621,6 +626,11 @@
                     <span class='ident'>Identifier</span> <span class='op'>=&gt;</span> {
                         <span class='kw'>let</span> <span class='ident'>expr</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>func_call</span>();
                         <span class='kw'>let</span> <span class='ident'>stmt</span> <span class='op'>=</span> <span class='ident'>Stmt</span>::<span class='ident'>new</span>(<span class='ident'>ExprStmt</span>(<span class='ident'>expr</span>));
+                        <span class='prelude-val'>Some</span>(<span class='ident'>stmt</span>)
+                    },
+                    <span class='ident'>For</span> <span class='op'>=&gt;</span> {
+                        <span class='self'>self</span>.<span class='ident'>next</span>();
+                        <span class='kw'>let</span> <span class='ident'>stmt</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>for_in_loop</span>();
                         <span class='prelude-val'>Some</span>(<span class='ident'>stmt</span>)
                     },
                     _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>

@@ -166,6 +166,11 @@ trait HydraBaseParser {
                         let stmt = Stmt::new(ExprStmt(expr));
                         Some(stmt)
                     },
+                    For => {
+                        self.next();
+                        let stmt = self.for_in_loop();
+                        Some(stmt)
+                    },
                     _ => None
                 }
             },

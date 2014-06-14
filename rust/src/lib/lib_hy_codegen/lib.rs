@@ -1,10 +1,11 @@
-#![crate_id = "hydra_jit"]
+#![crate_id = "hydra_codegen"]
 #![comment = "Hydra Code Generation and Jit"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 
 #![feature(macro_rules)]
+#![feature(globs)]
 
 #![allow(dead_code)]
 #![allow(unused_variable)]
@@ -21,4 +22,12 @@ macro_rules! u (
     ($e:expr) => ( unsafe { $e }; )
 )
 
-pub mod codegen;
+pub mod lltype;
+pub mod generator;
+pub mod builder;
+
+pub trait CodeGenerator {
+    fn gen_code(&mut self, &mut builder::Builder);
+}
+
+

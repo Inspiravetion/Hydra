@@ -1,7 +1,7 @@
 RUSTC ?= rustc
 RUSTDOC ?= rustdoc
 
-LIB_DIRS = lib_hy_jit lib_hy_syntax
+LIB_DIRS = lib_hy_codegen lib_hy_syntax
 
 all: build
 

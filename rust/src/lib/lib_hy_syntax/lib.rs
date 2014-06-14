@@ -14,7 +14,8 @@
 #![allow(dead_assignment)]
 
 extern crate native;
-extern crate jit = "hydra_jit";
+extern crate collections;
+extern crate codegen = "hydra_codegen";
 
 pub mod token;
 pub mod scanner;

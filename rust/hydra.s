@@ -1,61 +1,74 @@
 	.section	__TEXT,__text,regular,pure_instructions
-	.globl	_fac
+	.globl	"_!range_gen_next"
 	.align	4, 0x90
-_fac:                                   ## @fac
-	.cfi_startproc
-## BB#0:                                ## %entry
-	pushq	%rbx
-Ltmp2:
-	.cfi_def_cfa_offset 16
-Ltmp3:
-	.cfi_offset %rbx, -16
-	movl	%edi, %ebx
-	movl	$1, %eax
-	testl	%ebx, %ebx
-	je	LBB0_2
-## BB#1:                                ## %if_false
-	leal	-1(%rbx), %edi
-	callq	_fac
-	imull	%eax, %ebx
-	movl	%ebx, %eax
-LBB0_2:                                 ## %end
-	popq	%rbx
-	ret
-	.cfi_endproc
-
-	.globl	_range_gen_next
-	.align	4, 0x90
-_range_gen_next:                        ## @range_gen_next
+"_!range_gen_next":                     ## @"!range_gen_next"
 	.cfi_startproc
 ## BB#0:                                ## %entry
 	jmpq	*(%rdi)
-Ltmp4:                                  ## Block address taken
-LBB1_1:                                 ## %incr
+Ltmp0:                                  ## Block address taken
+LBB0_1:                                 ## %incr
 	incl	8(%rdi)
-Ltmp5:                                  ## Block address taken
-LBB1_2:                                 ## %cond
+Ltmp1:                                  ## Block address taken
+LBB0_2:                                 ## %cond
 	movl	8(%rdi), %eax
 	cmpl	12(%rdi), %eax
-	jge	LBB1_4
+	jge	LBB0_4
 ## BB#3:                                ## %yield1
-	leaq	Ltmp4(%rip), %rax
+	leaq	Ltmp0(%rip), %rax
 	movq	%rax, (%rdi)
+	movl	8(%rdi), %eax
+	movl	%eax, 16(%rdi)
 	movl	$1, %eax
 	ret
-LBB1_4:                                 ## %exit
+LBB0_4:                                 ## %exit
 	xorl	%eax, %eax
 	ret
 	.cfi_endproc
 
-	.globl	_range_gen_init
+	.globl	"_!range_gen_init"
 	.align	4, 0x90
-_range_gen_init:                        ## @range_gen_init
+"_!range_gen_init":                     ## @"!range_gen_init"
 	.cfi_startproc
 ## BB#0:
-	leaq	Ltmp5(%rip), %rax
+	leaq	Ltmp1(%rip), %rax
 	movq	%rax, (%rdi)
 	movl	%esi, 8(%rdi)
 	movl	%edx, 12(%rdi)
+	ret
+	.cfi_endproc
+
+	.globl	_print_int
+	.align	4, 0x90
+_print_int:                             ## @print_int
+	.cfi_startproc
+## BB#0:
+	pushq	%rbp
+Ltmp5:
+	.cfi_def_cfa_offset 16
+	pushq	%rbx
+Ltmp6:
+	.cfi_def_cfa_offset 24
+	pushq	%rax
+Ltmp7:
+	.cfi_def_cfa_offset 32
+Ltmp8:
+	.cfi_offset %rbx, -24
+Ltmp9:
+	.cfi_offset %rbp, -16
+	movl	%edi, %ebp
+	movl	$20, %edi
+	callq	_malloc
+	movq	%rax, %rbx
+	leaq	L_global_gen_fmt(%rip), %rsi
+	xorl	%eax, %eax
+	movq	%rbx, %rdi
+	movl	%ebp, %edx
+	callq	_sprintf
+	movq	%rbx, %rdi
+	callq	_puts
+	addq	$8, %rsp
+	popq	%rbx
+	popq	%rbp
 	ret
 	.cfi_endproc
 
@@ -63,87 +76,72 @@ _range_gen_init:                        ## @range_gen_init
 	.align	4, 0x90
 _main:                                  ## @main
 	.cfi_startproc
-## BB#0:                                ## %entry
+## BB#0:                                ## %for_loop_init
 	pushq	%rbp
-Ltmp9:
+Ltmp13:
 	.cfi_def_cfa_offset 16
-Ltmp10:
+Ltmp14:
 	.cfi_offset %rbp, -16
 	movq	%rsp, %rbp
-Ltmp11:
-	.cfi_def_cfa_register %rbp
-	pushq	%r15
-	pushq	%r14
-	pushq	%r12
-	pushq	%rbx
-Ltmp12:
-	.cfi_offset %rbx, -48
-Ltmp13:
-	.cfi_offset %r12, -40
-Ltmp14:
-	.cfi_offset %r14, -32
 Ltmp15:
-	.cfi_offset %r15, -24
-	movl	$4, %edi
-	callq	_fac
-	movl	%eax, %r14d
-	movl	$20, %edi
-	callq	_malloc
-	movq	%rax, %rbx
-	leaq	L_global_fmt(%rip), %rsi
-	xorl	%eax, %eax
-	movq	%rbx, %rdi
-	movl	%r14d, %edx
-	callq	_sprintf
-	movq	%rbx, %rdi
-	callq	_puts
-	movq	%rsp, %r15
-	addq	$-16, %r15
-	movq	%r15, %rsp
+	.cfi_def_cfa_register %rbp
+	pushq	%r14
+	pushq	%rbx
+	subq	$32, %rsp
+Ltmp16:
+	.cfi_offset %rbx, -32
+Ltmp17:
+	.cfi_offset %r14, -24
+	leaq	-40(%rbp), %r14
 	xorl	%esi, %esi
-	movl	$10, %edx
-	movq	%r15, %rdi
-	callq	_range_gen_init
-	leaq	L_global_gen_fmt(%rip), %r14
+	movl	$11, %edx
+	movq	%r14, %rdi
+	callq	"_!range_gen_init"
 	jmp	LBB3_1
 	.align	4, 0x90
-LBB3_2:                                 ## %loop_stmts
+LBB3_2:                                 ## %for_loop_init2
                                         ##   in Loop: Header=BB3_1 Depth=1
-	movl	8(%r15), %r12d
-	movl	$20, %edi
-	callq	_malloc
-	movq	%rax, %rbx
-	xorl	%eax, %eax
+	movl	-24(%rbp), %edi
+	callq	_print_int
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	xorl	%esi, %esi
+	movl	$6, %edx
 	movq	%rbx, %rdi
-	movq	%r14, %rsi
-	movl	%r12d, %edx
-	callq	_sprintf
+	callq	"_!range_gen_init"
+	jmp	LBB3_3
+	.align	4, 0x90
+LBB3_4:                                 ## %for_loop_stmts4
+                                        ##   in Loop: Header=BB3_3 Depth=2
+	movl	16(%rbx), %edi
+	callq	_print_int
+LBB3_3:                                 ## %for_loop_check3
+                                        ##   Parent Loop BB3_1 Depth=1
+                                        ## =>  This Inner Loop Header: Depth=2
 	movq	%rbx, %rdi
-	callq	_puts
-LBB3_1:                                 ## %loop_check
-                                        ## =>This Inner Loop Header: Depth=1
-	movq	%r15, %rdi
-	callq	_range_gen_next
+	callq	"_!range_gen_next"
+	testl	%eax, %eax
+	jne	LBB3_4
+LBB3_1:                                 ## %for_loop_check
+                                        ## =>This Loop Header: Depth=1
+                                        ##     Child Loop BB3_3 Depth 2
+	movq	%r14, %rdi
+	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	jne	LBB3_2
-## BB#3:                                ## %exit
+## BB#5:                                ## %for_loop_exit
 	xorl	%eax, %eax
-	leaq	-32(%rbp), %rsp
+	leaq	-16(%rbp), %rsp
 	popq	%rbx
-	popq	%r12
 	popq	%r14
-	popq	%r15
 	popq	%rbp
 	ret
 	.cfi_endproc
 
 	.section	__TEXT,__cstring,cstring_literals
-L_global_fmt:                           ## @global_fmt
-	.asciz	"fac(4) = %d"
-
-	.align	4                       ## @global_gen_fmt
-L_global_gen_fmt:
-	.asciz	"generator returned => %d"
+L_global_gen_fmt:                       ## @global_gen_fmt
+	.asciz	"%d"
 
 
 .subsections_via_symbols
