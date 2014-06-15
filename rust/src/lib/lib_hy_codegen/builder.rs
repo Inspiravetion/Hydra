@@ -479,10 +479,10 @@ impl Builder {
         self.get_type(RANGE_GEN_ID)
     }
 
-    pub fn range_gen(&mut self, start : int, end : int) -> Generator {
+    pub fn range_gen(&mut self, start : Value, end : Value) -> Generator {
         let range_type = self.get_range_gen_type();
         let gen        = self.alloca(range_type, "range_generator");
-        let args       = vec!(gen, self.int(start), self.int(end));
+        let args       = vec!(gen, start, end);
 
         Generator {
             typ       : range_type,

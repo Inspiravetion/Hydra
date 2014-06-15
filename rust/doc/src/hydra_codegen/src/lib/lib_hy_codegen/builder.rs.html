@@ -1078,10 +1078,10 @@
         <span class='self'>self</span>.<span class='ident'>get_type</span>(<span class='ident'>RANGE_GEN_ID</span>)
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>range_gen</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>start</span> : <span class='ident'>int</span>, <span class='ident'>end</span> : <span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>range_gen</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>start</span> : <span class='ident'>Value</span>, <span class='ident'>end</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
         <span class='kw'>let</span> <span class='ident'>range_type</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_range_gen_type</span>();
         <span class='kw'>let</span> <span class='ident'>gen</span>        <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alloca</span>(<span class='ident'>range_type</span>, <span class='string'>&quot;range_generator&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>args</span>       <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>gen</span>, <span class='self'>self</span>.<span class='ident'>int</span>(<span class='ident'>start</span>), <span class='self'>self</span>.<span class='ident'>int</span>(<span class='ident'>end</span>));
+        <span class='kw'>let</span> <span class='ident'>args</span>       <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>gen</span>, <span class='ident'>start</span>, <span class='ident'>end</span>);
 
         <span class='ident'>Generator</span> {
             <span class='ident'>typ</span>       : <span class='ident'>range_type</span>,

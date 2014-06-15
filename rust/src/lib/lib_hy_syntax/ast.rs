@@ -8,136 +8,274 @@ use std::vec::Vec;
 use std::owned::Box;
 use std::iter::FromIterator;
 
-pub trait Node : CodeGenerator {
-    
-}
-
 ///Identifier expressions, variable names etc.
 pub type Ident = ~str;
 
-pub enum ExprData {
-    ///A call to a function including its qualifying path and passed parameters
-    FuncCall(Vec<Ident>, Vec<Expr>),
-    ///An inclusive range 0...10 or 0 through 10
-    InclusiveRange(Expr, Expr),
-    ///An exclusive range 0..10 or 0 upto 10
-    ExclusiveRange(Expr, Expr),
-    ///An integer expression
-    Int(int),
-    ///An identifier
-    IdentExpr(Ident),
-    ///A binary expression
-    BinaryExpr(Expr, Token, Expr)
+pub trait Node : CodeGenerator {
+    // fn span() -> Span
 }
 
-pub enum StmtData {
-    ///A stmt that is also an expression, function calls and var++/-- etc.
-    ExprStmt(Expr),
-    ///For in loop bound variables, generator expression, and block of stmts
-    ForInLoop(Vec<Ident>, Expr, Vec<Stmt>),
-    ///While loop condition expression and block of stmts
-    WhileLoop(Expr, Vec<Stmt>)
-}
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//                                Expressions                                 //                
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
 
-pub struct Expr {
-    pub data : Box<ExprData>
-}
-
-pub struct Stmt {
-    pub data : StmtData
-}
-
-impl Expr {
-    pub fn new(expr : ExprData) -> Expr {
-        Expr { data : box expr }
-    }
-
+pub trait Expr : Node {
     ///Return a Generator struct with the params for its llvm init function already
     ///created
-    pub fn to_generator(&mut self, builder : &mut Builder) -> Generator {
-        match *self.data {
-            InclusiveRange(ref start_exp, ref end_exp) => {
-                let start = match *start_exp.data {
-                    Int(i) => i,
-                    _ => fail!("Ranges must take integers")
-                };
-
-                let end = match *end_exp.data {
-                    Int(i) => i,
-                    _ => fail!("Ranges must take integers")
-                };
-
-                builder.range_gen(start, end + 1)
-            },
-            ExclusiveRange(ref start_exp, ref end_exp) => {
-                let start = match *start_exp.data {
-                    Int(i) => i,
-                    _ => fail!("Ranges must take integers")
-                };
-
-                let end = match *end_exp.data {
-                    Int(i) => i,
-                    _ => fail!("Ranges must take integers")
-                };
-
-                builder.range_gen(start, end)
-            },
-            _ => fail!("Object not a generator")
-        }   
+    fn to_generator(&mut self, &mut Builder) -> Generator {
+        fail!("to_generator called on non generator type");
     }
 
-    pub fn gen_func_call(&mut self, builder : &mut Builder) {
-        let (prop_path, params) = match *self.data {
-            FuncCall(ref mut props, ref mut p) => (props, p),
-            _ => fail!("called gen_func_call on an expression that isn't a func call")  
-        };
-
-        let param_vals : Vec<Value> = FromIterator::from_iter(params.iter().map(|param| param.to_value(builder)));
-
-        let func_name = prop_path.get(0).as_slice();
-        builder.call(func_name, param_vals, "");
+    fn to_value(&mut self, &mut Builder) -> Value {
+        fail!("to_value called on type that cannot be resolved to a value");        
     }
+}
 
-    pub fn to_value(&self, builder : &mut Builder) -> Value {
-        match *self.data {
-            IdentExpr(ref ident) => {
-                match builder.get_var(ident.as_slice()) {
-                    Some(val) => val,
-                    None => fail!("No {} in current scope", ident)
-                }
-            },
-            _ => fail!("Only expression values work right now")
+///////////////////////////////////////
+//              FuncCall             //
+///////////////////////////////////////
+
+///A call to a function including its qualifying path and passed parameters
+pub struct FuncCall {
+    prop_path : Vec<Ident>,
+    params    : Vec<Box<Expr>>
+}
+
+impl CodeGenerator for FuncCall {
+    fn gen_code(&mut self, builder : &mut Builder){
+        let mut params = Vec::new();
+        for param in self.params.mut_iter() {
+            params.push(param.to_value(builder));
+        }
+
+        //getting the function name will change later
+        let func_name = self.prop_path.get(0).as_slice();
+        builder.call(func_name, params, "");   
+    }
+}
+
+impl Node for FuncCall {}
+
+impl Expr for FuncCall {}
+
+impl FuncCall {
+    pub fn new(prop_path : Vec<Ident>, params : Vec<Box<Expr>>) -> Box<Expr> {
+        box FuncCall {
+            prop_path : prop_path,
+            params    : params
+        } as Box<Expr>
+    }
+}
+
+///////////////////////////////////////
+//           InclusiveRange          //
+///////////////////////////////////////
+
+///An inclusive range 0...10 or 0 through 10
+pub struct InclusiveRange {
+    start : Box<Expr>, 
+    end   : Box<Expr>
+}
+
+impl CodeGenerator for InclusiveRange {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for InclusiveRange {}
+
+impl Expr for InclusiveRange {
+    fn to_generator(&mut self, builder : &mut Builder) -> Generator {
+        let start = self.start.to_value(builder);
+        let end = self.end.to_value(builder);
+
+        let one = builder.int(1);
+        let end_plus_one = builder.add_op(end, one, "add_tmp");
+        builder.range_gen(start, end_plus_one)
+    }
+}
+
+impl InclusiveRange {
+    pub fn new(start : Box<Expr>, end : Box<Expr>) -> Box<Expr> {
+        box InclusiveRange {
+            start : start, 
+            end   : end
+        } as Box<Expr>
+    }
+}
+
+///////////////////////////////////////
+//           ExclusiveRange          //
+///////////////////////////////////////
+
+///An exclusive range 0..10 or 0 upto 10
+pub struct ExclusiveRange {
+    start : Box<Expr>, 
+    end   : Box<Expr>
+}
+
+impl CodeGenerator for ExclusiveRange {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for ExclusiveRange {}
+
+impl Expr for ExclusiveRange {
+    fn to_generator(&mut self, builder : &mut Builder) -> Generator {
+        let start = self.start.to_value(builder);
+        let end = self.end.to_value(builder);
+
+        builder.range_gen(start, end)
+    }
+}
+
+impl ExclusiveRange {
+    pub fn new(start : Box<Expr>, end : Box<Expr>) -> Box<Expr> {
+        box ExclusiveRange {
+            start : start, 
+            end   : end
+        } as Box<Expr>
+    }
+}
+
+///////////////////////////////////////
+//                 Int               //
+///////////////////////////////////////
+
+///An integer expression
+pub struct Int {
+    value : int
+}
+
+impl CodeGenerator for Int {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for Int {}
+
+impl Expr for Int {
+    fn to_value(&mut self, builder : &mut Builder) -> Value {
+        builder.int(self.value)
+    }
+}
+
+impl Int {
+    pub fn new(value : int) -> Box<Expr> {
+        box Int {
+            value : value
+        } as Box<Expr>
+    }
+}
+
+///////////////////////////////////////
+//             Identifier            //
+///////////////////////////////////////
+
+///An identifier
+pub struct IdentExpr {
+    value : Ident
+}
+
+impl CodeGenerator for IdentExpr {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for IdentExpr {}
+
+impl Expr for IdentExpr {
+    fn to_value(&mut self, builder : &mut Builder) -> Value {
+        match builder.get_var(self.value.as_slice()) {
+            Some(val) => val,
+            None => fail!("No {} in current scope", self.value)
         }
     }
 }
 
-impl Node for Expr {
+impl IdentExpr {
+    pub fn new(value : Ident) -> Box<Expr> {
+        box IdentExpr {
+            value : value
+        } as Box<Expr>
+    }
+}
+
+///////////////////////////////////////
+//         Binary Expression         //
+///////////////////////////////////////
+
+///A binary expression
+pub struct BinaryExpr {
+    lhs : Box<Expr>, 
+    op  : Token, 
+    rhs : Box<Expr>
+}
+
+impl CodeGenerator for BinaryExpr {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for BinaryExpr {}
+
+impl Expr for BinaryExpr {}
+
+impl BinaryExpr {
     
 }
 
-impl CodeGenerator for Expr {
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//                                Statements                                  //                
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+pub trait Stmt : Node {
+    
+}
+
+///////////////////////////////////////
+//        Expression Statement       //
+///////////////////////////////////////
+
+///A stmt that is also an expression, function calls and var++/-- etc.
+pub struct ExprStmt {
+    expr : Box<Expr>
+}
+
+impl CodeGenerator for ExprStmt {
     fn gen_code(&mut self, builder : &mut Builder){
-        match *self.data {
-            FuncCall(_, _) => self.gen_func_call(builder),
-            _ => fail!("The expression you tried to generate code for is not supported yet")
-        };
+        self.expr.gen_code(builder);
     }
 }
 
-impl Stmt {
-    pub fn new(stmt : StmtData) -> Stmt {
-        Stmt { data : stmt }
+impl Node for ExprStmt {}
+
+impl Stmt for ExprStmt {}
+
+impl ExprStmt {
+    pub fn new(expr : Box<Expr>) -> Box<Stmt> {
+        box ExprStmt {
+            expr : expr
+        } as Box<Stmt>
     }
+}
 
-    fn gen_for_in_loop(&mut self, builder : &mut Builder) {
-        let (vars_ref, gen_ref, stmts_ref) = match self.data {
-            ForInLoop(ref v, ref mut r, ref mut s) => (v, r, s),
-            _ => fail!("Called gen_for_in_loop on Stmt that is not a for in loop")
-        };
+///////////////////////////////////////
+//            For In Loop            //
+///////////////////////////////////////
 
+///For in loop bound variables, generator expression, and block of stmts
+pub struct ForInLoop {
+    vars  : Vec<Ident>,
+    gen   : Box<Expr>, 
+    stmts : Vec<Box<Stmt>>
+}
+
+impl CodeGenerator for ForInLoop {
+    fn gen_code(&mut self, builder : &mut Builder){
         builder.open_scope();
 
-        let gen = gen_ref.to_generator(builder);
+        let gen = self.gen.to_generator(builder);
 
         //init generator
         let loop_init  = builder.new_block("for_loop_init");
@@ -168,13 +306,13 @@ impl Stmt {
         //run loop stmts...but first bind yielded values to loop local vars
         builder.goto_block(loop_stmts);
 
-        if(vars_ref.len() > gen.ret_count) {
+        if(self.vars.len() > gen.ret_count) {
             fail!("Trying to bind to more variables than the generator returns");
         }
 
         let start_pos = gen.var_count + 1;
         let end_pos   = gen.var_count + gen.ret_count + 1;
-        let mut vars  = vars_ref.iter();
+        let mut vars  = self.vars.iter();
 
         for i in range(start_pos, end_pos) {
             let var_name = vars.next().unwrap().as_slice();
@@ -183,8 +321,7 @@ impl Stmt {
             builder.set_var(var_name, var_val);
         }
 
-        //TODO: use the scope to generate the stmts in the for loop
-        for stmt in stmts_ref.mut_iter(){
+        for stmt in self.stmts.mut_iter(){
             stmt.gen_code(builder);
         }
         builder.break_to(loop_check);
@@ -193,19 +330,42 @@ impl Stmt {
 
         //make sure following stmts start from the loop exit block
         builder.goto_block(loop_exit);
+
     }
 }
 
-impl Node for Stmt {
+impl Node for ForInLoop {}
 
+impl Stmt for ForInLoop {}
+
+impl ForInLoop {
+    pub fn new(vars : Vec<Ident>, gen : Box<Expr>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+        box ForInLoop {
+            vars  : vars,
+            gen   : gen, 
+            stmts : stmts
+        } as Box<Stmt>
+    }
 }
 
-impl CodeGenerator for Stmt {
-    fn gen_code(&mut self, builder : &mut Builder){
-        match self.data {
-            ForInLoop(_, _, _)     => self.gen_for_in_loop(builder),
-            ExprStmt(ref mut expr) => expr.gen_code(builder),
-            _ => {}
-        };
-    }
+///////////////////////////////////////
+//             While Loop            //
+///////////////////////////////////////
+
+///While loop condition expression and block of stmts
+pub struct WhileLoop {
+    cond  : Box<Expr>, 
+    stmts : Vec<Box<Stmt>>
+}
+
+impl CodeGenerator for WhileLoop {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for WhileLoop {}
+
+impl Stmt for WhileLoop {}
+
+impl WhileLoop {
+    
 }

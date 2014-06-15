@@ -5,25 +5,25 @@ use std::from_str::from_str;
 use scanner;
 
 ///Scan and Parse a file in parallel
-pub fn parse_file_async(path : &str) -> Vec<Stmt> {
+pub fn parse_file_async(path : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::stream_from_file(path);
     AsyncParser::new(tokens).parse()
 }
 
 ///Scan and then Parse a file
-pub fn parse_file_sync(path : &str) -> Vec<Stmt> {
+pub fn parse_file_sync(path : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::tokenize_file(path);
     SyncParser::new(tokens).parse()
 }
 
 ///Scan and Parse a string in parallel
-pub fn parse_str_async(code : &str) -> Vec<Stmt> {
+pub fn parse_str_async(code : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::stream_from_str(code);
     AsyncParser::new(tokens).parse()
 }
 
 ///Scan and then Parse a string
-pub fn parse_str_sync(code : &str) -> Vec<Stmt> {
+pub fn parse_str_sync(code : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::tokenize_str(code);
     SyncParser::new(tokens).parse()
 }
@@ -40,7 +40,7 @@ pub struct SyncParser {
 }
 
 pub trait HydraParser : HydraBaseParser {
-    fn parse(&mut self) -> Vec<Stmt> {
+    fn parse(&mut self) -> Vec<Box<Stmt>> {
         self.program_stmts()
     }  
 }
@@ -94,7 +94,7 @@ trait HydraBaseParser {
         }
     }
 
-    fn program_stmts(&mut self) -> Vec<Stmt> {
+    fn program_stmts(&mut self) -> Vec<Box<Stmt>> {
         let mut stmts = Vec::new();
         let mut not_at_eof = true;
         loop {
@@ -115,7 +115,7 @@ trait HydraBaseParser {
         } 
     }
 
-    fn for_in_loop(&mut self) -> Stmt {
+    fn for_in_loop(&mut self) -> Box<Stmt> {
         let start = self.tok();//use to make span
 
         let bound_vars = self.idents();
@@ -124,9 +124,7 @@ trait HydraBaseParser {
         let generator = self.expr();
         let stmts = self.do_block();
 
-        let for_in_loop = ForInLoop(bound_vars, generator, stmts);
-
-        Stmt::new(for_in_loop)
+        ForInLoop::new(bound_vars, generator, stmts)
     }
 
     fn property_path(&mut self) -> Vec<Ident> {
@@ -146,24 +144,22 @@ trait HydraBaseParser {
         return idents
     }
 
-    fn func_call(&mut self) -> Expr {
+    fn func_call(&mut self) -> Box<Expr> {
         let prop_path = self.property_path();
         self.expect(Lparen);
         let params = self.exprs();
         self.expect(Rparen);
 
-        let func_call = FuncCall(prop_path, params);
-
-        Expr::new(func_call)
+        FuncCall::new(prop_path, params)
     }
 
-    fn stmt_opt(&mut self) -> Option<Stmt> {
+    fn stmt_opt(&mut self) -> Option<Box<Stmt>> {
         match self.peek() {
             Some(tok) => {
                 match tok.typ {
                     Identifier => {
                         let expr = self.func_call();
-                        let stmt = Stmt::new(ExprStmt(expr));
+                        let stmt = ExprStmt::new(expr);
                         Some(stmt)
                     },
                     For => {
@@ -178,26 +174,24 @@ trait HydraBaseParser {
         }
     }
 
-    fn stmt(&mut self) -> Stmt {
+    fn stmt(&mut self) -> Box<Stmt> {
         match self.stmt_opt() {
             Some(stmt) => stmt,
             None => fail!("Expected statement at {}:{}", self.tok().line, self.tok().col)
         }
     }
 
-    fn incl_range(&mut self, start : Expr) -> Expr {
+    fn incl_range(&mut self, start : Box<Expr>) -> Box<Expr> {
         let end = self.expr();
-        let range = InclusiveRange(start, end);
-        Expr::new(range)   
+        InclusiveRange::new(start, end)
     }
 
-    fn excl_range(&mut self, start : Expr) -> Expr {
+    fn excl_range(&mut self, start : Box<Expr>) -> Box<Expr> {
         let end = self.expr();
-        let range = ExclusiveRange(start, end);
-        Expr::new(range)   
+        ExclusiveRange::new(start, end)
     }
 
-    fn expr_opt(&mut self) -> Option<Expr> {
+    fn expr_opt(&mut self) -> Option<Box<Expr>> {
         //integers and binary exp
         let expr_opt = match self.peek() {
             Some(tok) => {
@@ -205,11 +199,11 @@ trait HydraBaseParser {
                     Int_Literal => {
                         self.next();
                         let num = from_str::<int>(self.tok().text).unwrap();
-                        Some(Expr::new(Int(num)))
+                        Some(Int::new(num))
                     },
                     Identifier => {
                         self.next();
-                        Some(Expr::new(IdentExpr(tok.text)))
+                        Some(IdentExpr::new(tok.text))
                     }
                     _ => None
                 }
@@ -239,7 +233,7 @@ trait HydraBaseParser {
         }
     }
 
-    fn expr(&mut self) -> Expr {
+    fn expr(&mut self) -> Box<Expr> {
         match self.expr_opt() {
             Some(expr) => expr,
             None => fail!("Expected expr at {}:{}", self.tok().line, self.tok().col)
@@ -260,7 +254,7 @@ trait HydraBaseParser {
     }
 
     //always optional
-    fn stmts(&mut self) -> Vec<Stmt> {
+    fn stmts(&mut self) -> Vec<Box<Stmt>> {
         let mut stmts = Vec::new();
 
         loop {
@@ -275,7 +269,7 @@ trait HydraBaseParser {
         stmts
     }
 
-    fn exprs(&mut self) -> Vec<Expr> {
+    fn exprs(&mut self) -> Vec<Box<Expr>> {
         let mut exprs = Vec::new();
 
         match self.expr_opt() {
@@ -313,7 +307,7 @@ trait HydraBaseParser {
         return idents
     }
 
-    fn block(&mut self) -> Vec<Stmt> {
+    fn block(&mut self) -> Vec<Box<Stmt>> {
         self.expect(Lcurly);
         let stmts = self.stmts();
         self.expect(Rcurly);
@@ -321,7 +315,7 @@ trait HydraBaseParser {
         stmts
     }
 
-    fn do_block(&mut self) -> Vec<Stmt> {
+    fn do_block(&mut self) -> Vec<Box<Stmt>> {
         self.expect(Do);
         let stmts = self.stmts();
         self.expect(End);
