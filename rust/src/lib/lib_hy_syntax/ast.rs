@@ -2,11 +2,13 @@ use codegen::CodeGenerator;
 use codegen::builder::Builder; 
 use codegen::generator::Generator; 
 use codegen::lltype::Value;
-use collections::hashmap::HashMap;
-use token::Token;
+// use collections::hashmap::HashMap;
 use std::vec::Vec;
 use std::owned::Box;
-use std::iter::FromIterator;
+// use std::iter::FromIterator;
+// use std::strbuf::StrBuf;
+// use std::fmt::{Show, Formatter, Result};
+use token::{Token, Add_Op, Mod_Op, Min_Op, Mult_Op, Div_Op, Power_Op };
 
 ///Identifier expressions, variable names etc.
 pub type Ident = ~str;
@@ -217,10 +219,31 @@ impl CodeGenerator for BinaryExpr {
 
 impl Node for BinaryExpr {}
 
-impl Expr for BinaryExpr {}
+impl Expr for BinaryExpr {
+    fn to_value(&mut self, builder : &mut Builder) -> Value {
+        let left_val  = self.lhs.to_value(builder);
+        let right_val = self.rhs.to_value(builder);
+
+        match self.op.typ {
+            Add_Op => builder.add_op(left_val, right_val, "add_tmp"),
+            Mod_Op => builder.mod_op(left_val, right_val, "mod_tmp"),
+            Min_Op => builder.sub_op(left_val, right_val, "sub_tmp"), 
+            Mult_Op => builder.mul_op(left_val, right_val, "mul_tmp"),
+            Div_Op => builder.div_op(left_val, right_val, "div_tmp"),
+            // Power_Op => builder.mod_op(left_val, right_val, "pwr_tmp"),
+            _ => fail!("expression with {:?} cant be resolved to a value", self.op.typ)
+        }
+    }
+}
 
 impl BinaryExpr {
-    
+    pub fn new(lhs : Box<Expr>, op : Token, rhs : Box<Expr>) -> Box<Expr> {
+        box BinaryExpr {
+            lhs : lhs,
+            op  : op,
+            rhs : rhs
+        } as Box<Expr>
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -347,6 +370,34 @@ impl ForInLoop {
         } as Box<Stmt>
     }
 }
+
+// impl Show for ForInLoop {
+//     fn fmt(&self, f: &mut Formatter) -> Result {
+//         let mut vars = StrBuf::new();
+//         vars.push_str("vars: ");
+//         for var in self.vars.iter() {
+//             vars.push_str(var.as_slice());
+//         }
+
+//         let mut gen = StrBuf::new();
+//         gen.push_str("gen: ");
+//         gen.push_str(format!("{:?}", self.gen));
+
+//         let mut stmts = StrBuf::new();
+//         stmts.push_str("stmts: ");
+//         for stmt in self.stmts.iter() {
+//             stmts.push_str(format!("{:?}", stmt));
+//         }
+
+//         let for_in_loop = format!(
+//             "ForInLoop \\{\n{}\n{}\n{}\n\\}", 
+//             vars.as_slice(),
+//             gen.as_slice(),
+//             stmts.as_slice()
+//         );
+//         write!(f, "{}", for_in_loop)
+//     }
+// }
 
 ///////////////////////////////////////
 //             While Loop            //

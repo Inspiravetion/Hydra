@@ -15,7 +15,7 @@ pub enum TokenType {
     Bit_Negate,
     Add_Op,
     Min_Op,
-    Mult_Op,
+    Mult_Op,    
     Div_Op,
     Mod_Op,
     Power_Op,

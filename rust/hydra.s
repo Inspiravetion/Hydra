@@ -101,7 +101,9 @@ Ltmp17:
 	.align	4, 0x90
 LBB3_2:                                 ## %for_loop_init2
                                         ##   in Loop: Header=BB3_1 Depth=1
-	movl	-24(%rbp), %edi
+	movl	-24(%rbp), %eax
+	leal	-4(,%rax,4), %edi
+	sarl	%edi
 	callq	_print_int
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
@@ -130,7 +132,48 @@ LBB3_1:                                 ## %for_loop_check
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	jne	LBB3_2
-## BB#5:                                ## %for_loop_exit
+## BB#5:                                ## %for_loop_init11
+	movq	%rsp, %r14
+	addq	$-32, %r14
+	movq	%r14, %rsp
+	movl	$1, %esi
+	movl	$2, %edx
+	movq	%r14, %rdi
+	callq	"_!range_gen_init"
+	jmp	LBB3_6
+	.align	4, 0x90
+LBB3_7:                                 ## %for_loop_stmts13
+                                        ##   in Loop: Header=BB3_6 Depth=1
+	movl	16(%r14), %ebx
+	movl	%ebx, %edi
+	callq	_print_int
+	movl	$3, %edi
+	subl	%ebx, %edi
+	callq	_print_int
+	leal	(%rbx,%rbx,2), %edi
+	callq	_print_int
+	movl	$4, %eax
+	xorl	%edx, %edx
+	idivl	%ebx
+	movl	%eax, %edi
+	callq	_print_int
+	movslq	%ebx, %rdi
+	imulq	$1717986919, %rdi, %rax ## imm = 0x66666667
+	movq	%rax, %rcx
+	shrq	$63, %rcx
+	sarq	$33, %rax
+	addl	%ecx, %eax
+	leal	(%rax,%rax,4), %eax
+	subl	%eax, %edi
+                                        ## kill: EDI<def> EDI<kill> RDI<kill>
+	callq	_print_int
+LBB3_6:                                 ## %for_loop_check12
+                                        ## =>This Inner Loop Header: Depth=1
+	movq	%r14, %rdi
+	callq	"_!range_gen_next"
+	testl	%eax, %eax
+	jne	LBB3_7
+## BB#8:                                ## %for_loop_exit14
 	xorl	%eax, %eax
 	leaq	-16(%rbp), %rsp
 	popq	%rbx

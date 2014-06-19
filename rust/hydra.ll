@@ -75,12 +75,17 @@ for_loop_check:                                   ; preds = %for_loop_exit5, %fo
 for_loop_stmts:                                   ; preds = %for_loop_check
   %ctx_ret = getelementptr inbounds %"!range_gen"* %range_generator, i32 0, i32 3
   %i = load i32* %ctx_ret
-  call void @print_int(i32 %i)
+  %add_tmp = add i32 %i, 1
+  %sub_tmp = sub i32 %add_tmp, 2
+  %mul_tmp = mul i32 %sub_tmp, 4
+  %div_tmp = sdiv i32 %mul_tmp, 2
+  call void @print_int(i32 %div_tmp)
   %range_generator1 = alloca %"!range_gen"
   br label %for_loop_init2
 
 for_loop_exit:                                    ; preds = %for_loop_check
-  ret i32 0
+  %range_generator10 = alloca %"!range_gen"
+  br label %for_loop_init11
 
 for_loop_init2:                                   ; preds = %for_loop_stmts
   call void @"!range_gen_init"(%"!range_gen"* %range_generator1, i32 0, i32 6)
@@ -99,4 +104,31 @@ for_loop_stmts4:                                  ; preds = %for_loop_check3
 
 for_loop_exit5:                                   ; preds = %for_loop_check3
   br label %for_loop_check
+
+for_loop_init11:                                  ; preds = %for_loop_exit
+  call void @"!range_gen_init"(%"!range_gen"* %range_generator10, i32 1, i32 2)
+  br label %for_loop_check12
+
+for_loop_check12:                                 ; preds = %for_loop_stmts13, %for_loop_init11
+  %done15 = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator10)
+  %done_cmp16 = icmp eq i32 %done15, 0
+  br i1 %done_cmp16, label %for_loop_exit14, label %for_loop_stmts13
+
+for_loop_stmts13:                                 ; preds = %for_loop_check12
+  %ctx_ret17 = getelementptr inbounds %"!range_gen"* %range_generator10, i32 0, i32 3
+  %i18 = load i32* %ctx_ret17
+  %add_tmp19 = add i32 %i18, 0
+  call void @print_int(i32 %add_tmp19)
+  %sub_tmp20 = sub i32 3, %i18
+  call void @print_int(i32 %sub_tmp20)
+  %mul_tmp21 = mul i32 %i18, 3
+  call void @print_int(i32 %mul_tmp21)
+  %div_tmp22 = sdiv i32 4, %i18
+  call void @print_int(i32 %div_tmp22)
+  %mod_tmp = srem i32 %i18, 5
+  call void @print_int(i32 %mod_tmp)
+  br label %for_loop_check12
+
+for_loop_exit14:                                  ; preds = %for_loop_check12
+  ret i32 0
 }
