@@ -198,8 +198,9 @@ trait HydraBaseParser {
         }
     }
 
-    fn resolve_bin_exp(&mut self, expr1 : Box<Expr>) -> Box<Expr> {
+    fn resolve_bin_expr(&mut self, expr1 : Box<Expr>) -> Box<Expr> {
         let op1 = self.tok();
+        
         let expr2 = match self.basic_expr_opt(){
             Some(e) => e, 
             None => fail!(
@@ -209,6 +210,7 @@ trait HydraBaseParser {
                 op1.col
             )
         };
+
         let op2 = self.peek();
 
         match op2 {
@@ -226,38 +228,12 @@ trait HydraBaseParser {
 
         self.next();
 
-        let expr3 = match self.basic_expr_opt(){
-            Some(e) => e, 
-            None => fail!(
-                "Trailing {:?} at {}:{}",
-                op2.typ,
-                op2.line, 
-                op2.col
-            )
-        };
-
-        let expr : Box<Expr>;
-
         if presidence(op1.typ) >= presidence(op2.typ) {
             let expr_tmp = BinaryExpr::new(expr1, op1, expr2);
-            expr = BinaryExpr::new(expr_tmp, op2, expr3);
+            self.resolve_bin_expr(expr_tmp)
         } else {
-            let expr_tmp = BinaryExpr::new(expr2, op2, expr3);
-            expr = BinaryExpr::new(expr1, op1, expr_tmp);
-        }
-
-        match self.peek() {
-            Some(tok) => {
-                if self.is_binary_op(tok.typ) {
-                    self.next();
-                    self.resolve_bin_exp(expr)
-                } else {
-                    expr
-                }
-            },
-            None => {
-                expr
-            }
+            let expr_tmp = self.resolve_bin_expr(expr2);
+            BinaryExpr::new(expr1, op1, expr_tmp)
         }
     }
 
@@ -305,7 +281,7 @@ trait HydraBaseParser {
                     // 2 * 2 + 4 = 8 ------- 2 + 2 * 4 = 10
                     _ if self.is_binary_op(tok.typ) => {
                         self.next();
-                        Some(self.resolve_bin_exp(expr_opt.unwrap()))
+                        Some(self.resolve_bin_expr(expr_opt.unwrap()))
                     },
                     _ => expr_opt
                 }

@@ -1,5 +1,5 @@
 for i in 0 upto 11 do
-    print_int(i + 1 - 2 * 4 / 2)
+    print_int(i + 1 - 2 * 4 / 2 +)
     for i in 0 through 5 do
         print_int(i)
     end

@@ -101,9 +101,8 @@ Ltmp17:
 	.align	4, 0x90
 LBB3_2:                                 ## %for_loop_init2
                                         ##   in Loop: Header=BB3_1 Depth=1
-	movl	-24(%rbp), %eax
-	leal	-4(,%rax,4), %edi
-	sarl	%edi
+	movl	-24(%rbp), %edi
+	addl	$-3, %edi
 	callq	_print_int
 	movq	%rsp, %rbx
 	addq	$-32, %rbx

@@ -76,10 +76,8 @@ for_loop_stmts:                                   ; preds = %for_loop_check
   %ctx_ret = getelementptr inbounds %"!range_gen"* %range_generator, i32 0, i32 3
   %i = load i32* %ctx_ret
   %add_tmp = add i32 %i, 1
-  %sub_tmp = sub i32 %add_tmp, 2
-  %mul_tmp = mul i32 %sub_tmp, 4
-  %div_tmp = sdiv i32 %mul_tmp, 2
-  call void @print_int(i32 %div_tmp)
+  %sub_tmp = sub i32 %add_tmp, 4
+  call void @print_int(i32 %sub_tmp)
   %range_generator1 = alloca %"!range_gen"
   br label %for_loop_init2
 
@@ -121,10 +119,10 @@ for_loop_stmts13:                                 ; preds = %for_loop_check12
   call void @print_int(i32 %add_tmp19)
   %sub_tmp20 = sub i32 3, %i18
   call void @print_int(i32 %sub_tmp20)
-  %mul_tmp21 = mul i32 %i18, 3
-  call void @print_int(i32 %mul_tmp21)
-  %div_tmp22 = sdiv i32 4, %i18
-  call void @print_int(i32 %div_tmp22)
+  %mul_tmp = mul i32 %i18, 3
+  call void @print_int(i32 %mul_tmp)
+  %div_tmp = sdiv i32 4, %i18
+  call void @print_int(i32 %div_tmp)
   %mod_tmp = srem i32 %i18, 5
   call void @print_int(i32 %mod_tmp)
   br label %for_loop_check12
