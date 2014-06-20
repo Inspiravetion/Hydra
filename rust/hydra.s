@@ -126,6 +126,16 @@ Ltmp9:
 	ret
 	.cfi_endproc
 
+	.globl	_times
+	.align	4, 0x90
+_times:                                 ## @times
+	.cfi_startproc
+## BB#0:
+	imull	%esi, %edi
+	movl	%edi, %eax
+	ret
+	.cfi_endproc
+
 	.globl	_main
 	.align	4, 0x90
 _main:                                  ## @main
@@ -158,6 +168,9 @@ Ltmp18:
 	movl	$1, %esi
 	movl	%eax, %edi
 	callq	"_-"
+	movl	$2, %esi
+	movl	%eax, %edi
+	callq	_times
 	movl	$1, %edi
 	movl	%eax, %esi
 	callq	"_+"
@@ -166,10 +179,10 @@ Ltmp18:
 	movq	%r14, %rdi
 	movl	%eax, %edx
 	callq	"_!range_gen_init"
-	jmp	LBB8_1
+	jmp	LBB9_1
 	.align	4, 0x90
-LBB8_2:                                 ## %for_loop_init2
-                                        ##   in Loop: Header=BB8_1 Depth=1
+LBB9_2:                                 ## %for_loop_init2
+                                        ##   in Loop: Header=BB9_1 Depth=1
 	movl	-32(%rbp), %r15d
 	movl	%r15d, %edi
 	callq	_print_int
@@ -181,10 +194,10 @@ LBB8_2:                                 ## %for_loop_init2
 	movq	%rbx, %rdi
 	movl	%r15d, %edx
 	callq	"_!range_gen_init"
-	jmp	LBB8_3
+	jmp	LBB9_3
 	.align	4, 0x90
-LBB8_4:                                 ## %for_loop_stmts4
-                                        ##   in Loop: Header=BB8_3 Depth=2
+LBB9_4:                                 ## %for_loop_stmts4
+                                        ##   in Loop: Header=BB9_3 Depth=2
 	movl	16(%rbx), %edi
 	movl	$1, %esi
 	callq	"_+"
@@ -193,20 +206,20 @@ LBB8_4:                                 ## %for_loop_stmts4
 	callq	"_-"
 	movl	%eax, %edi
 	callq	_print_int
-LBB8_3:                                 ## %for_loop_check3
-                                        ##   Parent Loop BB8_1 Depth=1
+LBB9_3:                                 ## %for_loop_check3
+                                        ##   Parent Loop BB9_1 Depth=1
                                         ## =>  This Inner Loop Header: Depth=2
 	movq	%rbx, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
-	jne	LBB8_4
-LBB8_1:                                 ## %for_loop_check
+	jne	LBB9_4
+LBB9_1:                                 ## %for_loop_check
                                         ## =>This Loop Header: Depth=1
-                                        ##     Child Loop BB8_3 Depth 2
+                                        ##     Child Loop BB9_3 Depth 2
 	movq	%r14, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
-	jne	LBB8_2
+	jne	LBB9_2
 ## BB#5:                                ## %for_loop_exit
 	xorl	%eax, %eax
 	leaq	-24(%rbp), %rsp

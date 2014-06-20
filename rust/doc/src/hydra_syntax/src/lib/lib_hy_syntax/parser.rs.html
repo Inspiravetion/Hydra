@@ -522,6 +522,7 @@
 <span id='482'>482</span>
 <span id='483'>483</span>
 <span id='484'>484</span>
+<span id='485'>485</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -719,7 +720,8 @@
     <span class='kw'>fn</span> <span class='ident'>is_binary_op</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>typ</span> : <span class='ident'>TokenType</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='kw'>match</span> <span class='ident'>typ</span> {
             <span class='ident'>Add_Op</span> <span class='op'>|</span> <span class='ident'>Min_Op</span> <span class='op'>|</span> <span class='ident'>Mult_Op</span> <span class='op'>|</span> <span class='ident'>Div_Op</span> <span class='op'>|</span> <span class='ident'>Mod_Op</span> <span class='op'>|</span> <span class='ident'>Power_Op</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
-            _ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
+            <span class='ident'>Identifier</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,<span class='comment'> //binary operators that are words
+            </span>_ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
         }
     }
 
@@ -1000,11 +1002,11 @@
 
 <span class='kw'>fn</span> <span class='ident'>presidence</span>(<span class='ident'>typ</span> : <span class='ident'>TokenType</span>) <span class='op'>-&gt;</span> <span class='ident'>int</span> {
     <span class='kw'>match</span> <span class='ident'>typ</span> {
-        <span class='ident'>Mod_Op</span> <span class='op'>=&gt;</span> <span class='number'>0</span>,
-        <span class='ident'>Add_Op</span> <span class='op'>|</span> <span class='ident'>Min_Op</span> <span class='op'>=&gt;</span> <span class='number'>1</span>, 
-        <span class='ident'>Mult_Op</span> <span class='op'>|</span> <span class='ident'>Div_Op</span>  <span class='op'>=&gt;</span> <span class='number'>2</span>,
-        <span class='ident'>Power_Op</span> <span class='op'>=&gt;</span> <span class='number'>3</span>,
-        _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{:?} not a binary op&quot;</span>, <span class='ident'>typ</span>)
+        <span class='ident'>Mod_Op</span> <span class='op'>=&gt;</span> <span class='number'>1</span>,
+        <span class='ident'>Add_Op</span> <span class='op'>|</span> <span class='ident'>Min_Op</span> <span class='op'>=&gt;</span> <span class='number'>2</span>, 
+        <span class='ident'>Mult_Op</span> <span class='op'>|</span> <span class='ident'>Div_Op</span>  <span class='op'>=&gt;</span> <span class='number'>3</span>,
+        <span class='ident'>Power_Op</span> <span class='op'>=&gt;</span> <span class='number'>4</span>,
+        _ <span class='op'>=&gt;</span> <span class='number'>0</span>
     }
 }
 </pre>

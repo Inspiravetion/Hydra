@@ -84,11 +84,17 @@ define i32 @"%"(i32, i32) {
   ret i32 %tmp
 }
 
+define i32 @times(i32, i32) {
+  %tmp = mul i32 %0, %1
+  ret i32 %tmp
+}
+
 define i32 @main() {
   %"*_tmp" = call i32 @"*"(i32 2, i32 3)
   %"/_tmp" = call i32 @"/"(i32 %"*_tmp", i32 2)
   %-_tmp = call i32 @-(i32 %"/_tmp", i32 1)
-  %"+_tmp" = call i32 @"+"(i32 1, i32 %-_tmp)
+  %times_tmp = call i32 @times(i32 %-_tmp, i32 2)
+  %"+_tmp" = call i32 @"+"(i32 1, i32 %times_tmp)
   %range_generator = alloca %"!range_gen"
   br label %for_loop_init
 

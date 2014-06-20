@@ -91,6 +91,16 @@ fn main(){
         let tmp = fb.mod_op(left_val, right_val, "tmp");
         fb.ret(tmp);
     });
+
+    builder.create_function("times", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
+
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.mul_op(left_val, right_val, "tmp");
+        fb.ret(tmp);
+    });
     // builder.create_function("^", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
     //     fb.goto_first_block();
 

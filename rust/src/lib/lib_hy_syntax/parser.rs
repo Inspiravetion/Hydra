@@ -194,6 +194,7 @@ trait HydraBaseParser {
     fn is_binary_op(&mut self, typ : TokenType) -> bool {
         match typ {
             Add_Op | Min_Op | Mult_Op | Div_Op | Mod_Op | Power_Op => true,
+            Identifier => true, //binary operators that are words
             _ => false
         }
     }
@@ -475,10 +476,10 @@ impl HydraBaseParser for SyncParser {
 
 fn presidence(typ : TokenType) -> int {
     match typ {
-        Mod_Op => 0,
-        Add_Op | Min_Op => 1, 
-        Mult_Op | Div_Op  => 2,
-        Power_Op => 3,
-        _ => fail!("{:?} not a binary op", typ)
+        Mod_Op => 1,
+        Add_Op | Min_Op => 2, 
+        Mult_Op | Div_Op  => 3,
+        Power_Op => 4,
+        _ => 0
     }
 }
