@@ -279,11 +279,13 @@ trait HydraBaseParser {
                         Some(self.excl_range(expr_opt.unwrap()))
                     }, 
                     // 2 * 2 + 4 = 8 ------- 2 + 2 * 4 = 10
+                    // TODO:change this call to take a full token and tell you if it could be a binary op including identifiers
                     _ if self.is_binary_op(tok.typ) => {
                         self.next();
                         Some(self.resolve_bin_expr(expr_opt.unwrap()))
                     },
                     _ => expr_opt
+                    //TODO...if this is an identifier...try to make it a binary operator
                 }
             },
             None => None

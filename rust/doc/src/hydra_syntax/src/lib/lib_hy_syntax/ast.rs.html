@@ -457,9 +457,6 @@
 <span id='417'>417</span>
 <span id='418'>418</span>
 <span id='419'>419</span>
-<span id='420'>420</span>
-<span id='421'>421</span>
-<span id='422'>422</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>CodeGenerator</span>;
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::<span class='ident'>Builder</span>; 
@@ -471,7 +468,7 @@
 // use std::iter::FromIterator;
 // use std::strbuf::StrBuf;
 // use std::fmt::{Show, Formatter, Result};
-</span><span class='kw'>use</span> <span class='ident'>token</span>::{<span class='ident'>Token</span>, <span class='ident'>Add_Op</span>, <span class='ident'>Mod_Op</span>, <span class='ident'>Min_Op</span>, <span class='ident'>Mult_Op</span>, <span class='ident'>Div_Op</span>, <span class='ident'>Power_Op</span> };
+</span><span class='kw'>use</span> <span class='ident'>token</span>::<span class='ident'>Token</span>;
 
 <span class='doccomment'>///Identifier expressions, variable names etc.
 </span><span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Ident</span> <span class='op'>=</span> <span class='kw-2'>~</span><span class='ident'>str</span>;
@@ -687,15 +684,12 @@
         <span class='kw'>let</span> <span class='ident'>left_val</span>  <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>lhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
         <span class='kw'>let</span> <span class='ident'>right_val</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>rhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>op</span>.<span class='ident'>typ</span> {
-            <span class='ident'>Add_Op</span> <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>add_op</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>, <span class='string'>&quot;add_tmp&quot;</span>),
-            <span class='ident'>Mod_Op</span> <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>mod_op</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>, <span class='string'>&quot;mod_tmp&quot;</span>),
-            <span class='ident'>Min_Op</span> <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>sub_op</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>, <span class='string'>&quot;sub_tmp&quot;</span>), 
-            <span class='ident'>Mult_Op</span> <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>mul_op</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>, <span class='string'>&quot;mul_tmp&quot;</span>),
-            <span class='ident'>Div_Op</span> <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>div_op</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>, <span class='string'>&quot;div_tmp&quot;</span>),<span class='comment'>
-            // Power_Op =&gt; builder.mod_op(left_val, right_val, &quot;pwr_tmp&quot;),
-            </span>_ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;expression with {:?} cant be resolved to a value&quot;</span>, <span class='self'>self</span>.<span class='ident'>op</span>.<span class='ident'>typ</span>)
-        }
+        <span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>);
+        <span class='ident'>builder</span>.<span class='ident'>call</span>(
+            <span class='self'>self</span>.<span class='ident'>op</span>.<span class='ident'>text</span>, 
+            <span class='ident'>args</span>, 
+            <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='self'>self</span>.<span class='ident'>op</span>.<span class='ident'>text</span>)
+        )
     }
 }
 

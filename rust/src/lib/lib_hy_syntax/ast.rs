@@ -8,7 +8,7 @@ use std::owned::Box;
 // use std::iter::FromIterator;
 // use std::strbuf::StrBuf;
 // use std::fmt::{Show, Formatter, Result};
-use token::{Token, Add_Op, Mod_Op, Min_Op, Mult_Op, Div_Op, Power_Op };
+use token::Token;
 
 ///Identifier expressions, variable names etc.
 pub type Ident = ~str;
@@ -224,15 +224,12 @@ impl Expr for BinaryExpr {
         let left_val  = self.lhs.to_value(builder);
         let right_val = self.rhs.to_value(builder);
 
-        match self.op.typ {
-            Add_Op => builder.add_op(left_val, right_val, "add_tmp"),
-            Mod_Op => builder.mod_op(left_val, right_val, "mod_tmp"),
-            Min_Op => builder.sub_op(left_val, right_val, "sub_tmp"), 
-            Mult_Op => builder.mul_op(left_val, right_val, "mul_tmp"),
-            Div_Op => builder.div_op(left_val, right_val, "div_tmp"),
-            // Power_Op => builder.mod_op(left_val, right_val, "pwr_tmp"),
-            _ => fail!("expression with {:?} cant be resolved to a value", self.op.typ)
-        }
+        let args = vec!(left_val, right_val);
+        builder.call(
+            self.op.text, 
+            args, 
+            format!("{}_tmp", self.op.text)
+        )
     }
 }
 
