@@ -22,11 +22,6 @@ enum Scope {
     Inner(HashMap<~str, Value>, Box<Scope>)
 }
 
-// struct Scope {
-//     pub vars   : HashMap<~str, Value>,
-//     pub parent : Option<Box<Scope>>
-// }
-
 impl Scope {
     pub fn new_global() -> Box<Scope> {
        box Global(HashMap::new())
@@ -110,6 +105,11 @@ impl Builder {
 
     fn add_builtin_types(&mut self) {
         self.define_range_gen_builtin_type();
+    }
+
+    pub fn default_value(&mut self) -> Value {
+        //TODO this should return the undefined sentinal
+        self.int(-1)
     }
 
     pub fn define_range_gen_builtin_type(&mut self) {

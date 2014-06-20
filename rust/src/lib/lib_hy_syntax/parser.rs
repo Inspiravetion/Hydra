@@ -31,7 +31,7 @@ pub fn parse_str_sync(code : &str) -> Vec<Box<Stmt>> {
 pub struct AsyncParser {
     tokens   : Receiver<Token>,
     peek_tok : Option<Token>,
-    tok      : Token
+    tok      : Option<Token>
 }
 
 pub struct SyncParser {
@@ -96,23 +96,60 @@ trait HydraBaseParser {
 
     fn program_stmts(&mut self) -> Vec<Box<Stmt>> {
         let mut stmts = Vec::new();
-        let mut not_at_eof = true;
         loop {
-            if not_at_eof {
-                let stmt = match self.tok().typ {
-                    For => self.for_in_loop(),
-                    _   => fail!(
-                            "Statement at {}:{} not allowed at top level", 
-                            self.tok().line,
-                            self.tok().col
-                        )
-                };
-                stmts.push(stmt);
-            } else {
-                return stmts;
-            }
-            not_at_eof = self.next_opt();
+            match self.peek() {
+                Some(tok) => {
+                    let stmt = match tok.typ {
+                        For => {
+                            self.next();
+                            self.for_in_loop()
+                        },
+                        While => {
+                            self.next();
+                            self.while_loop()
+                        },
+                        Var => { 
+                            self.next();
+                            self.var_decl()
+                        },
+                        Identifier => {
+                            self.func_call_stmt()
+                        },
+                        _   => fail!(
+                                "Statement at {}:{} not allowed at top level", 
+                                self.tok().line,
+                                self.tok().col
+                            )
+                    };
+                    stmts.push(stmt);
+                },
+                None => {
+                    return stmts
+                }
+            };
         } 
+    }
+
+    fn var_decl(&mut self) -> Box<Stmt> {
+        let vars = self.idents();
+
+        if self.next_is(Assign) {
+            let vals = self.exprs();
+
+            self.expect(Semicolon);
+
+            VarAssign::new(vars, vals)
+        } else {
+            self.expect(Semicolon);
+            VarDecl::new(vars)
+        }
+    }
+
+    fn while_loop(&mut self) -> Box<Stmt> {
+        let cond = self.expr();
+        let stmts = self.do_block();
+
+        WhileLoop::new(cond, stmts)
     }
 
     fn for_in_loop(&mut self) -> Box<Stmt> {
@@ -153,19 +190,32 @@ trait HydraBaseParser {
         FuncCall::new(prop_path, params)
     }
 
+    fn func_call_stmt(&mut self) -> Box<Stmt> {
+        let expr = self.func_call();
+
+        self.expect(Semicolon);
+
+        ExprStmt::new(expr)
+    }
+
     fn stmt_opt(&mut self) -> Option<Box<Stmt>> {
         match self.peek() {
             Some(tok) => {
                 match tok.typ {
                     Identifier => {
-                        let expr = self.func_call();
-                        let stmt = ExprStmt::new(expr);
-                        Some(stmt)
+                        Some(self.func_call_stmt())
                     },
                     For => {
                         self.next();
-                        let stmt = self.for_in_loop();
-                        Some(stmt)
+                        Some(self.for_in_loop())
+                    },
+                    While => {
+                        self.next();
+                        Some(self.while_loop())
+                    },
+                    Var => { 
+                        self.next();
+                        Some(self.var_decl())
                     },
                     _ => None
                 }
@@ -387,19 +437,19 @@ trait HydraBaseParser {
 impl AsyncParser {
     pub fn new(toks : Receiver<Token>) -> AsyncParser {
         let first = match toks.recv_opt() {
-            Ok(t) => t,
+            Ok(t) => Some(t),
             Err(_)  => fail!("Created parser with empty input")
         };
 
-        let peek = match toks.recv_opt() {
-            Ok(t) => Some(t),
-            Err(_)  => None
-        };
+        // let peek = match toks.recv_opt() {
+        //     Ok(t) => Some(t),
+        //     Err(_)  => None
+        // };
 
         AsyncParser {
             tokens   : toks,
-            peek_tok : peek,
-            tok      : first
+            peek_tok : first,
+            tok      : None
         }
     }
 }
@@ -416,7 +466,7 @@ impl HydraBaseParser for AsyncParser {
                     Err(_)  => None
                 };
 
-                self.tok = tok;
+                self.tok = Some(tok);
                 true
             },
             None => false
@@ -428,7 +478,10 @@ impl HydraBaseParser for AsyncParser {
     }
 
     fn tok(&mut self) -> Token {
-        self.tok.clone()
+        match self.tok {
+            Some(ref t) => t.clone(),
+            None => fail!("Tried to get token before advancing")
+        }
     }
 }
 
@@ -440,7 +493,7 @@ impl SyncParser {
 
         SyncParser {
             tokens : toks,
-            tok_idx : 0
+            tok_idx : -1
         }
     }
 }
@@ -470,6 +523,11 @@ impl HydraBaseParser for SyncParser {
 
     fn tok(&mut self) -> Token {
         let idx = self.tok_idx;
+
+        if idx < 0 {
+            fail!("Tried to get token before advancing");
+        }
+
         self.tokens.get(idx).clone()
     }
 }

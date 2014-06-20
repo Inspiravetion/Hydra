@@ -116,7 +116,9 @@ for_loop_stmts:                                   ; preds = %for_loop_check
   br label %for_loop_init2
 
 for_loop_exit:                                    ; preds = %for_loop_check
-  ret i32 0
+  %"+_tmp13" = call i32 @"+"(i32 11, i32 12)
+  call void @print_int(i32 %"+_tmp13")
+  br label %while_loop_check
 
 for_loop_init2:                                   ; preds = %for_loop_stmts
   call void @"!range_gen_init"(%"!range_gen"* %range_generator1, i32 0, i32 %add_tmp)
@@ -132,9 +134,20 @@ for_loop_stmts4:                                  ; preds = %for_loop_check3
   %i9 = load i32* %ctx_ret8
   %"+_tmp10" = call i32 @"+"(i32 %i9, i32 1)
   %-_tmp11 = call i32 @-(i32 %"+_tmp10", i32 1)
-  call void @print_int(i32 %-_tmp11)
+  %"+_tmp12" = call i32 @"+"(i32 %-_tmp11, i32 10)
+  call void @print_int(i32 %"+_tmp12")
   br label %for_loop_check3
 
 for_loop_exit5:                                   ; preds = %for_loop_check3
   br label %for_loop_check
+
+while_loop_check:                                 ; preds = %while_loop_stmts, %for_loop_exit
+  br i1 true, label %while_loop_exit, label %while_loop_stmts
+
+while_loop_stmts:                                 ; preds = %while_loop_check
+  call void @print_int(i32 11)
+  br label %while_loop_check
+
+while_loop_exit:                                  ; preds = %while_loop_check
+  ret i32 0
 }

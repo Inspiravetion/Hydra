@@ -523,6 +523,64 @@
 <span id='483'>483</span>
 <span id='484'>484</span>
 <span id='485'>485</span>
+<span id='486'>486</span>
+<span id='487'>487</span>
+<span id='488'>488</span>
+<span id='489'>489</span>
+<span id='490'>490</span>
+<span id='491'>491</span>
+<span id='492'>492</span>
+<span id='493'>493</span>
+<span id='494'>494</span>
+<span id='495'>495</span>
+<span id='496'>496</span>
+<span id='497'>497</span>
+<span id='498'>498</span>
+<span id='499'>499</span>
+<span id='500'>500</span>
+<span id='501'>501</span>
+<span id='502'>502</span>
+<span id='503'>503</span>
+<span id='504'>504</span>
+<span id='505'>505</span>
+<span id='506'>506</span>
+<span id='507'>507</span>
+<span id='508'>508</span>
+<span id='509'>509</span>
+<span id='510'>510</span>
+<span id='511'>511</span>
+<span id='512'>512</span>
+<span id='513'>513</span>
+<span id='514'>514</span>
+<span id='515'>515</span>
+<span id='516'>516</span>
+<span id='517'>517</span>
+<span id='518'>518</span>
+<span id='519'>519</span>
+<span id='520'>520</span>
+<span id='521'>521</span>
+<span id='522'>522</span>
+<span id='523'>523</span>
+<span id='524'>524</span>
+<span id='525'>525</span>
+<span id='526'>526</span>
+<span id='527'>527</span>
+<span id='528'>528</span>
+<span id='529'>529</span>
+<span id='530'>530</span>
+<span id='531'>531</span>
+<span id='532'>532</span>
+<span id='533'>533</span>
+<span id='534'>534</span>
+<span id='535'>535</span>
+<span id='536'>536</span>
+<span id='537'>537</span>
+<span id='538'>538</span>
+<span id='539'>539</span>
+<span id='540'>540</span>
+<span id='541'>541</span>
+<span id='542'>542</span>
+<span id='543'>543</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -557,7 +615,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>AsyncParser</span> {
     <span class='ident'>tokens</span>   : <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>,
     <span class='ident'>peek_tok</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>,
-    <span class='ident'>tok</span>      : <span class='ident'>Token</span>
+    <span class='ident'>tok</span>      : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>
 }
 
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SyncParser</span> {
@@ -622,23 +680,60 @@
 
     <span class='kw'>fn</span> <span class='ident'>program_stmts</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stmts</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>not_at_eof</span> <span class='op'>=</span> <span class='boolval'>true</span>;
         <span class='kw'>loop</span> {
-            <span class='kw'>if</span> <span class='ident'>not_at_eof</span> {
-                <span class='kw'>let</span> <span class='ident'>stmt</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>typ</span> {
-                    <span class='ident'>For</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>for_in_loop</span>(),
-                    _   <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(
-                            <span class='string'>&quot;Statement at {}:{} not allowed at top level&quot;</span>, 
-                            <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>line</span>,
-                            <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>col</span>
-                        )
-                };
-                <span class='ident'>stmts</span>.<span class='ident'>push</span>(<span class='ident'>stmt</span>);
-            } <span class='kw'>else</span> {
-                <span class='kw'>return</span> <span class='ident'>stmts</span>;
-            }
-            <span class='ident'>not_at_eof</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>next_opt</span>();
+            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>peek</span>() {
+                <span class='prelude-val'>Some</span>(<span class='ident'>tok</span>) <span class='op'>=&gt;</span> {
+                    <span class='kw'>let</span> <span class='ident'>stmt</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>tok</span>.<span class='ident'>typ</span> {
+                        <span class='ident'>For</span> <span class='op'>=&gt;</span> {
+                            <span class='self'>self</span>.<span class='ident'>next</span>();
+                            <span class='self'>self</span>.<span class='ident'>for_in_loop</span>()
+                        },
+                        <span class='ident'>While</span> <span class='op'>=&gt;</span> {
+                            <span class='self'>self</span>.<span class='ident'>next</span>();
+                            <span class='self'>self</span>.<span class='ident'>while_loop</span>()
+                        },
+                        <span class='ident'>Var</span> <span class='op'>=&gt;</span> { 
+                            <span class='self'>self</span>.<span class='ident'>next</span>();
+                            <span class='self'>self</span>.<span class='ident'>var_decl</span>()
+                        },
+                        <span class='ident'>Identifier</span> <span class='op'>=&gt;</span> {
+                            <span class='self'>self</span>.<span class='ident'>func_call_stmt</span>()
+                        },
+                        _   <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(
+                                <span class='string'>&quot;Statement at {}:{} not allowed at top level&quot;</span>, 
+                                <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>line</span>,
+                                <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>col</span>
+                            )
+                    };
+                    <span class='ident'>stmts</span>.<span class='ident'>push</span>(<span class='ident'>stmt</span>);
+                },
+                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
+                    <span class='kw'>return</span> <span class='ident'>stmts</span>
+                }
+            };
         } 
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>var_decl</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>vars</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>idents</span>();
+
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_is</span>(<span class='ident'>Assign</span>) {
+            <span class='kw'>let</span> <span class='ident'>vals</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>exprs</span>();
+
+            <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Semicolon</span>);
+
+            <span class='ident'>VarAssign</span>::<span class='ident'>new</span>(<span class='ident'>vars</span>, <span class='ident'>vals</span>)
+        } <span class='kw'>else</span> {
+            <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Semicolon</span>);
+            <span class='ident'>VarDecl</span>::<span class='ident'>new</span>(<span class='ident'>vars</span>)
+        }
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>while_loop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>cond</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>expr</span>();
+        <span class='kw'>let</span> <span class='ident'>stmts</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>do_block</span>();
+
+        <span class='ident'>WhileLoop</span>::<span class='ident'>new</span>(<span class='ident'>cond</span>, <span class='ident'>stmts</span>)
     }
 
     <span class='kw'>fn</span> <span class='ident'>for_in_loop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
@@ -679,19 +774,32 @@
         <span class='ident'>FuncCall</span>::<span class='ident'>new</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>)
     }
 
+    <span class='kw'>fn</span> <span class='ident'>func_call_stmt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>expr</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>func_call</span>();
+
+        <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Semicolon</span>);
+
+        <span class='ident'>ExprStmt</span>::<span class='ident'>new</span>(<span class='ident'>expr</span>)
+    }
+
     <span class='kw'>fn</span> <span class='ident'>stmt_opt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>peek</span>() {
             <span class='prelude-val'>Some</span>(<span class='ident'>tok</span>) <span class='op'>=&gt;</span> {
                 <span class='kw'>match</span> <span class='ident'>tok</span>.<span class='ident'>typ</span> {
                     <span class='ident'>Identifier</span> <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>expr</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>func_call</span>();
-                        <span class='kw'>let</span> <span class='ident'>stmt</span> <span class='op'>=</span> <span class='ident'>ExprStmt</span>::<span class='ident'>new</span>(<span class='ident'>expr</span>);
-                        <span class='prelude-val'>Some</span>(<span class='ident'>stmt</span>)
+                        <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>func_call_stmt</span>())
                     },
                     <span class='ident'>For</span> <span class='op'>=&gt;</span> {
                         <span class='self'>self</span>.<span class='ident'>next</span>();
-                        <span class='kw'>let</span> <span class='ident'>stmt</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>for_in_loop</span>();
-                        <span class='prelude-val'>Some</span>(<span class='ident'>stmt</span>)
+                        <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>for_in_loop</span>())
+                    },
+                    <span class='ident'>While</span> <span class='op'>=&gt;</span> {
+                        <span class='self'>self</span>.<span class='ident'>next</span>();
+                        <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>while_loop</span>())
+                    },
+                    <span class='ident'>Var</span> <span class='op'>=&gt;</span> { 
+                        <span class='self'>self</span>.<span class='ident'>next</span>();
+                        <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>var_decl</span>())
                     },
                     _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
                 }
@@ -913,19 +1021,19 @@
 <span class='kw'>impl</span> <span class='ident'>AsyncParser</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>toks</span> : <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>AsyncParser</span> {
         <span class='kw'>let</span> <span class='ident'>first</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>toks</span>.<span class='ident'>recv_opt</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> <span class='ident'>t</span>,
-            <span class='prelude-val'>Err</span>(_)  <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Created parser with empty input&quot;</span>)
-        };
-
-        <span class='kw'>let</span> <span class='ident'>peek</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>toks</span>.<span class='ident'>recv_opt</span>() {
             <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>t</span>),
-            <span class='prelude-val'>Err</span>(_)  <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
-        };
+            <span class='prelude-val'>Err</span>(_)  <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Created parser with empty input&quot;</span>)
+        };<span class='comment'>
 
-        <span class='ident'>AsyncParser</span> {
+        // let peek = match toks.recv_opt() {
+        //     Ok(t) =&gt; Some(t),
+        //     Err(_)  =&gt; None
+        // };
+
+        </span><span class='ident'>AsyncParser</span> {
             <span class='ident'>tokens</span>   : <span class='ident'>toks</span>,
-            <span class='ident'>peek_tok</span> : <span class='ident'>peek</span>,
-            <span class='ident'>tok</span>      : <span class='ident'>first</span>
+            <span class='ident'>peek_tok</span> : <span class='ident'>first</span>,
+            <span class='ident'>tok</span>      : <span class='prelude-val'>None</span>
         }
     }
 }
@@ -942,7 +1050,7 @@
                     <span class='prelude-val'>Err</span>(_)  <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
                 };
 
-                <span class='self'>self</span>.<span class='ident'>tok</span> <span class='op'>=</span> <span class='ident'>tok</span>;
+                <span class='self'>self</span>.<span class='ident'>tok</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>tok</span>);
                 <span class='boolval'>true</span>
             },
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='boolval'>false</span>
@@ -954,7 +1062,10 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>tok</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Token</span> {
-        <span class='self'>self</span>.<span class='ident'>tok</span>.<span class='ident'>clone</span>()
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>tok</span> {
+            <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>t</span>) <span class='op'>=&gt;</span> <span class='ident'>t</span>.<span class='ident'>clone</span>(),
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Tried to get token before advancing&quot;</span>)
+        }
     }
 }
 
@@ -966,7 +1077,7 @@
 
         <span class='ident'>SyncParser</span> {
             <span class='ident'>tokens</span> : <span class='ident'>toks</span>,
-            <span class='ident'>tok_idx</span> : <span class='number'>0</span>
+            <span class='ident'>tok_idx</span> : <span class='op'>-</span><span class='number'>1</span>
         }
     }
 }
@@ -996,6 +1107,11 @@
 
     <span class='kw'>fn</span> <span class='ident'>tok</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Token</span> {
         <span class='kw'>let</span> <span class='ident'>idx</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>tok_idx</span>;
+
+        <span class='kw'>if</span> <span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='number'>0</span> {
+            <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Tried to get token before advancing&quot;</span>);
+        }
+
         <span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>get</span>(<span class='ident'>idx</span>).<span class='ident'>clone</span>()
     }
 }

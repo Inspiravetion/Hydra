@@ -224,6 +224,7 @@ impl Expr for BinaryExpr {
         let left_val  = self.lhs.to_value(builder);
         let right_val = self.rhs.to_value(builder);
 
+        //TODO: verify that the operator being used is visible in the current scope
         let args = vec!(left_val, right_val);
         builder.call(
             self.op.text, 
@@ -276,6 +277,84 @@ impl ExprStmt {
     pub fn new(expr : Box<Expr>) -> Box<Stmt> {
         box ExprStmt {
             expr : expr
+        } as Box<Stmt>
+    }
+}
+
+///////////////////////////////////////
+//         Var Declaration           //
+//ie.                                //
+//  var a                            //
+//  var a, b, c                      //
+///////////////////////////////////////
+
+/// variables to create in the current scope
+pub struct VarDecl {
+    vars : Vec<Ident>,
+}
+
+impl CodeGenerator for VarDecl {
+    fn gen_code(&mut self, builder : &mut Builder){
+        let val = builder.default_value();
+
+        for var in self.vars.iter() {
+            builder.set_var(var.as_slice(), val);
+        }
+    }
+}
+
+impl Node for VarDecl {}
+
+impl Stmt for VarDecl {}
+
+impl VarDecl {
+    pub fn new(vars : Vec<Ident>) -> Box<Stmt> {
+        box VarDecl {
+            vars : vars
+        } as Box<Stmt>
+    }
+}
+
+///////////////////////////////////////
+//         Var Assignment            //
+//ie.                                //
+//  var a = 1                        //
+//  var a, b, c = 1, 2, 3            //
+//  var a, b, c = 1, 2               //
+///////////////////////////////////////
+
+/// variables to create in the current scope
+pub struct VarAssign {
+    vars : Vec<Ident>,
+    vals : Vec<Box<Expr>>
+}
+
+impl CodeGenerator for VarAssign {
+    fn gen_code(&mut self, builder : &mut Builder){
+        let mut i = 0;
+
+        for var in self.vars.iter() {
+            let val = if i < self.vals.len() {
+                self.vals.get_mut(i).to_value(builder)
+            } else {
+                builder.default_value()
+            };
+
+            builder.set_var(var.as_slice(), val);
+            i += 1;
+        }
+    }
+}
+
+impl Node for VarAssign {}
+
+impl Stmt for VarAssign {}
+
+impl VarAssign {
+    pub fn new(vars : Vec<Ident>, vals : Vec<Box<Expr>>) -> Box<Stmt> {
+        box VarAssign {
+            vars : vars,
+            vals : vals
         } as Box<Stmt>
     }
 }
@@ -334,6 +413,7 @@ impl CodeGenerator for ForInLoop {
         let end_pos   = gen.var_count + gen.ret_count + 1;
         let mut vars  = self.vars.iter();
 
+        //bind variables
         for i in range(start_pos, end_pos) {
             let var_name = vars.next().unwrap().as_slice();
             let ret_val  = builder.get_obj_property(gen.gen, i as int, "ctx_ret");
@@ -368,34 +448,6 @@ impl ForInLoop {
     }
 }
 
-// impl Show for ForInLoop {
-//     fn fmt(&self, f: &mut Formatter) -> Result {
-//         let mut vars = StrBuf::new();
-//         vars.push_str("vars: ");
-//         for var in self.vars.iter() {
-//             vars.push_str(var.as_slice());
-//         }
-
-//         let mut gen = StrBuf::new();
-//         gen.push_str("gen: ");
-//         gen.push_str(format!("{:?}", self.gen));
-
-//         let mut stmts = StrBuf::new();
-//         stmts.push_str("stmts: ");
-//         for stmt in self.stmts.iter() {
-//             stmts.push_str(format!("{:?}", stmt));
-//         }
-
-//         let for_in_loop = format!(
-//             "ForInLoop \\{\n{}\n{}\n{}\n\\}", 
-//             vars.as_slice(),
-//             gen.as_slice(),
-//             stmts.as_slice()
-//         );
-//         write!(f, "{}", for_in_loop)
-//     }
-// }
-
 ///////////////////////////////////////
 //             While Loop            //
 ///////////////////////////////////////
@@ -407,7 +459,31 @@ pub struct WhileLoop {
 }
 
 impl CodeGenerator for WhileLoop {
-    fn gen_code(&mut self, builder : &mut Builder){}
+    fn gen_code(&mut self, builder : &mut Builder){
+        builder.open_scope();
+
+        let loop_check = builder.new_block("while_loop_check");
+        let loop_stmts = builder.new_block("while_loop_stmts");
+        let loop_exit  = builder.new_block("while_loop_exit");
+
+        builder.break_to(loop_check);
+
+        builder.goto_block(loop_check);
+        let cond = self.cond.to_value(builder);
+        let fals = builder.int(0);
+        let cmp = builder.cmp_eq(fals, cond, "while_cmp");
+        builder.conditional_break(cmp, loop_exit, loop_stmts);
+
+        builder.goto_block(loop_stmts);
+        for stmt in self.stmts.mut_iter(){
+            stmt.gen_code(builder);
+        }
+        builder.break_to(loop_check);
+
+        builder.goto_block(loop_exit);
+
+        builder.close_scope();
+    }
 }
 
 impl Node for WhileLoop {}
@@ -415,5 +491,10 @@ impl Node for WhileLoop {}
 impl Stmt for WhileLoop {}
 
 impl WhileLoop {
-    
+    pub fn new(cond : Box<Expr>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+        box WhileLoop {
+            cond  : cond, 
+            stmts : stmts
+        } as Box<Stmt>
+    }
 }

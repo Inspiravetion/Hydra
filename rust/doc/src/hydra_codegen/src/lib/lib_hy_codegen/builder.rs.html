@@ -619,14 +619,9 @@
 <span class='kw'>enum</span> <span class='ident'>Scope</span> {
     <span class='ident'>Global</span>(<span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='kw-2'>~</span><span class='ident'>str</span>, <span class='ident'>Value</span><span class='op'>&gt;</span>),
     <span class='ident'>Inner</span>(<span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='kw-2'>~</span><span class='ident'>str</span>, <span class='ident'>Value</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Scope</span><span class='op'>&gt;</span>)
-}<span class='comment'>
+}
 
-// struct Scope {
-//     pub vars   : HashMap&lt;~str, Value&gt;,
-//     pub parent : Option&lt;Box&lt;Scope&gt;&gt;
-// }
-
-</span><span class='kw'>impl</span> <span class='ident'>Scope</span> {
+<span class='kw'>impl</span> <span class='ident'>Scope</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_global</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Scope</span><span class='op'>&gt;</span> {
        <span class='kw'>box</span> <span class='ident'>Global</span>(<span class='ident'>HashMap</span>::<span class='ident'>new</span>())
     }
@@ -709,6 +704,11 @@
 
     <span class='kw'>fn</span> <span class='ident'>add_builtin_types</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
         <span class='self'>self</span>.<span class='ident'>define_range_gen_builtin_type</span>();
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>default_value</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {<span class='comment'>
+        //TODO this should return the undefined sentinal
+        </span><span class='self'>self</span>.<span class='ident'>int</span>(<span class='op'>-</span><span class='number'>1</span>)
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>define_range_gen_builtin_type</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {

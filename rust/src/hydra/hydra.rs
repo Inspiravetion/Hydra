@@ -92,6 +92,7 @@ fn main(){
         fb.ret(tmp);
     });
 
+    //this should be created by an operator where the following block is parsed like a function
     builder.create_function("times", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
         fb.goto_first_block();
 

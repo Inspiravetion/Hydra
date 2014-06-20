@@ -204,6 +204,9 @@ LBB9_4:                                 ## %for_loop_stmts4
 	movl	$1, %esi
 	movl	%eax, %edi
 	callq	"_-"
+	movl	$10, %esi
+	movl	%eax, %edi
+	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
 LBB9_3:                                 ## %for_loop_check3
@@ -220,7 +223,12 @@ LBB9_1:                                 ## %for_loop_check
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	jne	LBB9_2
-## BB#5:                                ## %for_loop_exit
+## BB#5:                                ## %while_loop_exit
+	movl	$11, %edi
+	movl	$12, %esi
+	callq	"_+"
+	movl	%eax, %edi
+	callq	_print_int
 	xorl	%eax, %eax
 	leaq	-24(%rbp), %rsp
 	popq	%rbx
