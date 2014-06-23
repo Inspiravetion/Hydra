@@ -100,52 +100,71 @@ define i32 @main() {
 
 for_loop_init:                                    ; preds = %0
   call void @"!range_gen_init"(%"!range_gen"* %range_generator, i32 0, i32 %"+_tmp")
+  %i = alloca i32
+  store i32 -1, i32* %i
   br label %for_loop_check
 
-for_loop_check:                                   ; preds = %for_loop_exit5, %for_loop_init
+for_loop_check:                                   ; preds = %for_loop_exit8, %for_loop_init
   %done = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator)
   %done_cmp = icmp eq i32 %done, 0
   br i1 %done_cmp, label %for_loop_exit, label %for_loop_stmts
 
 for_loop_stmts:                                   ; preds = %for_loop_check
   %ctx_ret = getelementptr inbounds %"!range_gen"* %range_generator, i32 0, i32 3
-  %i = load i32* %ctx_ret
-  call void @print_int(i32 %i)
-  %add_tmp = add i32 %i, 1
-  %range_generator1 = alloca %"!range_gen"
-  br label %for_loop_init2
+  %i1 = load i32* %ctx_ret
+  store i32 %i1, i32* %i
+  %padding = alloca i32
+  store i32 10, i32* %padding
+  %i2 = load i32* %i
+  call void @print_int(i32 %i2)
+  %i3 = load i32* %i
+  %add_tmp = add i32 %i3, 1
+  %range_generator4 = alloca %"!range_gen"
+  br label %for_loop_init5
 
 for_loop_exit:                                    ; preds = %for_loop_check
-  %"+_tmp13" = call i32 @"+"(i32 11, i32 12)
-  call void @print_int(i32 %"+_tmp13")
+  %i19 = alloca i32
+  store i32 11, i32* %i19
+  %j = alloca i32
+  store i32 12, i32* %j
+  %i20 = load i32* %i19
+  %j21 = load i32* %j
+  %"+_tmp22" = call i32 @"+"(i32 %i20, i32 %j21)
+  call void @print_int(i32 %"+_tmp22")
   br label %while_loop_check
 
-for_loop_init2:                                   ; preds = %for_loop_stmts
-  call void @"!range_gen_init"(%"!range_gen"* %range_generator1, i32 0, i32 %add_tmp)
-  br label %for_loop_check3
+for_loop_init5:                                   ; preds = %for_loop_stmts
+  call void @"!range_gen_init"(%"!range_gen"* %range_generator4, i32 0, i32 %add_tmp)
+  %i9 = alloca i32
+  store i32 -1, i32* %i9
+  br label %for_loop_check6
 
-for_loop_check3:                                  ; preds = %for_loop_stmts4, %for_loop_init2
-  %done6 = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator1)
-  %done_cmp7 = icmp eq i32 %done6, 0
-  br i1 %done_cmp7, label %for_loop_exit5, label %for_loop_stmts4
+for_loop_check6:                                  ; preds = %for_loop_stmts7, %for_loop_init5
+  %done10 = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator4)
+  %done_cmp11 = icmp eq i32 %done10, 0
+  br i1 %done_cmp11, label %for_loop_exit8, label %for_loop_stmts7
 
-for_loop_stmts4:                                  ; preds = %for_loop_check3
-  %ctx_ret8 = getelementptr inbounds %"!range_gen"* %range_generator1, i32 0, i32 3
-  %i9 = load i32* %ctx_ret8
-  %"+_tmp10" = call i32 @"+"(i32 %i9, i32 1)
-  %-_tmp11 = call i32 @-(i32 %"+_tmp10", i32 1)
-  %"+_tmp12" = call i32 @"+"(i32 %-_tmp11, i32 10)
-  call void @print_int(i32 %"+_tmp12")
-  br label %for_loop_check3
+for_loop_stmts7:                                  ; preds = %for_loop_check6
+  %ctx_ret12 = getelementptr inbounds %"!range_gen"* %range_generator4, i32 0, i32 3
+  %i13 = load i32* %ctx_ret12
+  store i32 %i13, i32* %i9
+  %i14 = load i32* %i9
+  %"+_tmp15" = call i32 @"+"(i32 %i14, i32 1)
+  %-_tmp16 = call i32 @-(i32 %"+_tmp15", i32 1)
+  %padding17 = load i32* %padding
+  %"+_tmp18" = call i32 @"+"(i32 %-_tmp16, i32 %padding17)
+  call void @print_int(i32 %"+_tmp18")
+  br label %for_loop_check6
 
-for_loop_exit5:                                   ; preds = %for_loop_check3
+for_loop_exit8:                                   ; preds = %for_loop_check6
   br label %for_loop_check
 
 while_loop_check:                                 ; preds = %while_loop_stmts, %for_loop_exit
   br i1 true, label %while_loop_exit, label %while_loop_stmts
 
 while_loop_stmts:                                 ; preds = %while_loop_check
-  call void @print_int(i32 11)
+  %i23 = load i32* %i19
+  call void @print_int(i32 %i23)
   br label %while_loop_check
 
 while_loop_exit:                                  ; preds = %while_loop_check

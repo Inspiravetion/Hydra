@@ -538,6 +538,24 @@
 <span id='498'>498</span>
 <span id='499'>499</span>
 <span id='500'>500</span>
+<span id='501'>501</span>
+<span id='502'>502</span>
+<span id='503'>503</span>
+<span id='504'>504</span>
+<span id='505'>505</span>
+<span id='506'>506</span>
+<span id='507'>507</span>
+<span id='508'>508</span>
+<span id='509'>509</span>
+<span id='510'>510</span>
+<span id='511'>511</span>
+<span id='512'>512</span>
+<span id='513'>513</span>
+<span id='514'>514</span>
+<span id='515'>515</span>
+<span id='516'>516</span>
+<span id='517'>517</span>
+<span id='518'>518</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>CodeGenerator</span>;
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::<span class='ident'>Builder</span>; 
@@ -728,8 +746,10 @@
 
 <span class='kw'>impl</span> <span class='ident'>Expr</span> <span class='kw'>for</span> <span class='ident'>IdentExpr</span> {
     <span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-        <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_var</span>(<span class='self'>self</span>.<span class='ident'>value</span>.<span class='ident'>as_slice</span>()) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>,
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>value</span>.<span class='ident'>as_slice</span>();
+
+        <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_var</span>(<span class='ident'>name</span>) {
+            <span class='prelude-val'>Some</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>val</span>, <span class='ident'>name</span>),
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;No {} in current scope&quot;</span>, <span class='self'>self</span>.<span class='ident'>value</span>)
         }
     }
@@ -836,10 +856,10 @@
 
 <span class='kw'>impl</span> <span class='ident'>CodeGenerator</span> <span class='kw'>for</span> <span class='ident'>VarDecl</span> {
     <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
-        <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>default_value</span>();
-
         <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>vars</span>.<span class='ident'>iter</span>() {
-            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>var</span>.<span class='ident'>as_slice</span>(), <span class='ident'>val</span>);
+            <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
+            <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_default_var</span>(<span class='ident'>name</span>);
+            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>name</span>, <span class='ident'>val</span>);
         }
     }
 }
@@ -881,7 +901,11 @@
                 <span class='ident'>builder</span>.<span class='ident'>default_value</span>()
             };
 
-            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>var</span>.<span class='ident'>as_slice</span>(), <span class='ident'>val</span>);
+            
+            <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
+            <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_var</span>(<span class='ident'>val</span>, <span class='ident'>name</span>);
+            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>name</span>, <span class='ident'>var_val</span>);
+
             <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
         }
     }
@@ -933,7 +957,15 @@
         </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_init</span>);
         <span class='kw'>let</span> <span class='ident'>init_fn</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>init_func</span>.<span class='ident'>clone</span>();
         <span class='kw'>let</span> <span class='ident'>init_args</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>init_args</span>.<span class='ident'>clone</span>();
-        <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>init_fn</span>, <span class='ident'>init_args</span>, <span class='string'>&quot;&quot;</span>);
+        <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>init_fn</span>, <span class='ident'>init_args</span>, <span class='string'>&quot;&quot;</span>);<span class='comment'>
+
+        //create variables 
+        </span><span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>vars</span>.<span class='ident'>iter</span>(){
+            <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
+            <span class='kw'>let</span> <span class='ident'>undefined</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_default_var</span>(<span class='ident'>var_name</span>);
+            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>var_name</span>, <span class='ident'>undefined</span>);
+        }
+
         <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_check</span>);<span class='comment'>
 
         //check to see if generator is done or not
@@ -954,12 +986,16 @@
         <span class='kw'>let</span> <span class='ident'>end_pos</span>   <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>var_count</span> <span class='op'>+</span> <span class='ident'>gen</span>.<span class='ident'>ret_count</span> <span class='op'>+</span> <span class='number'>1</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vars</span>  <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>vars</span>.<span class='ident'>iter</span>();<span class='comment'>
 
-        //bind variables
+        //bind variables from generator call
         </span><span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='ident'>start_pos</span>, <span class='ident'>end_pos</span>) {
-            <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>vars</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>();
-            <span class='kw'>let</span> <span class='ident'>ret_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen</span>.<span class='ident'>gen</span>, <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='string'>&quot;ctx_ret&quot;</span>);
-            <span class='kw'>let</span> <span class='ident'>var_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>ret_val</span>, <span class='ident'>var_name</span>);
-            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>var_name</span>, <span class='ident'>var_val</span>);
+            <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>vars</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>();<span class='comment'>
+
+            //get opaque return value from generator
+            </span><span class='kw'>let</span> <span class='ident'>ret_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen</span>.<span class='ident'>gen</span>, <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='string'>&quot;ctx_ret&quot;</span>);
+            <span class='kw'>let</span> <span class='ident'>var_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>ret_val</span>, <span class='ident'>var_name</span>);<span class='comment'>
+
+            //change the bound variable
+            </span><span class='ident'>builder</span>.<span class='ident'>assign_var</span>(<span class='ident'>var_val</span>, <span class='ident'>var_name</span>);
         }
 
         <span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>stmts</span>.<span class='ident'>mut_iter</span>(){

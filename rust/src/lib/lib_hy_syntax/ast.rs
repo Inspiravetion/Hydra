@@ -187,8 +187,10 @@ impl Node for IdentExpr {}
 
 impl Expr for IdentExpr {
     fn to_value(&mut self, builder : &mut Builder) -> Value {
-        match builder.get_var(self.value.as_slice()) {
-            Some(val) => val,
+        let name = self.value.as_slice();
+
+        match builder.get_var(name) {
+            Some(val) => builder.load(val, name),
             None => fail!("No {} in current scope", self.value)
         }
     }
@@ -295,10 +297,10 @@ pub struct VarDecl {
 
 impl CodeGenerator for VarDecl {
     fn gen_code(&mut self, builder : &mut Builder){
-        let val = builder.default_value();
-
         for var in self.vars.iter() {
-            builder.set_var(var.as_slice(), val);
+            let name = var.as_slice();
+            let val = builder.new_default_var(name);
+            builder.set_var(name, val);
         }
     }
 }
@@ -340,7 +342,11 @@ impl CodeGenerator for VarAssign {
                 builder.default_value()
             };
 
-            builder.set_var(var.as_slice(), val);
+            
+            let name = var.as_slice();
+            let var_val = builder.new_var(val, name);
+            builder.set_var(name, var_val);
+
             i += 1;
         }
     }
@@ -393,6 +399,14 @@ impl CodeGenerator for ForInLoop {
         let init_fn = gen.init_func.clone();
         let init_args = gen.init_args.clone();
         builder.call(init_fn, init_args, "");
+
+        //create variables 
+        for var in self.vars.iter(){
+            let var_name = var.as_slice();
+            let undefined = builder.new_default_var(var_name);
+            builder.set_var(var_name, undefined);
+        }
+
         builder.break_to(loop_check);
 
         //check to see if generator is done or not
@@ -413,12 +427,16 @@ impl CodeGenerator for ForInLoop {
         let end_pos   = gen.var_count + gen.ret_count + 1;
         let mut vars  = self.vars.iter();
 
-        //bind variables
+        //bind variables from generator call
         for i in range(start_pos, end_pos) {
             let var_name = vars.next().unwrap().as_slice();
+
+            //get opaque return value from generator
             let ret_val  = builder.get_obj_property(gen.gen, i as int, "ctx_ret");
             let var_val  = builder.load(ret_val, var_name);
-            builder.set_var(var_name, var_val);
+
+            //change the bound variable
+            builder.assign_var(var_val, var_name);
         }
 
         for stmt in self.stmts.mut_iter(){

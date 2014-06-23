@@ -103,6 +103,32 @@ impl Builder {
         self.curr_scope.put(name, val);
     }
 
+    pub fn assign_var(&mut self, var_val : Value, var_name : &str) {
+        let var_ptr = match self.get_var(var_name){
+            Some(ptr) => ptr,
+            None => fail!("No {} in scope.", var_name)
+        };
+
+        self.store(var_val, var_ptr);
+    }
+
+    pub fn new_default_var(&mut self, name : &str) -> Value {
+        let default = self.default_value();
+        self.alloca_and_store(default, name)
+    }
+
+    pub fn new_var(&mut self, val : Value, name : &str) -> Value {
+        self.alloca_and_store(val, name)
+    }
+
+    fn alloca_and_store(&mut self, val : Value, name : &str) -> Value {
+        let typ = self.int32_type();
+        let pointer = self.alloca(typ, name);
+
+        self.store(val, pointer);
+        pointer
+    }
+
     fn add_builtin_types(&mut self) {
         self.define_range_gen_builtin_type();
     }

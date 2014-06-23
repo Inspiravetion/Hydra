@@ -151,13 +151,16 @@ Ltmp15:
 	.cfi_def_cfa_register %rbp
 	pushq	%r15
 	pushq	%r14
+	pushq	%r12
 	pushq	%rbx
-	subq	$24, %rsp
+	subq	$32, %rsp
 Ltmp16:
-	.cfi_offset %rbx, -40
+	.cfi_offset %rbx, -48
 Ltmp17:
-	.cfi_offset %r14, -32
+	.cfi_offset %r12, -40
 Ltmp18:
+	.cfi_offset %r14, -32
+Ltmp19:
 	.cfi_offset %r15, -24
 	movl	$2, %edi
 	movl	$3, %esi
@@ -174,42 +177,53 @@ Ltmp18:
 	movl	$1, %edi
 	movl	%eax, %esi
 	callq	"_+"
-	leaq	-48(%rbp), %r14
+	leaq	-56(%rbp), %r14
 	xorl	%esi, %esi
 	movq	%r14, %rdi
 	movl	%eax, %edx
 	callq	"_!range_gen_init"
+	movl	$-1, -60(%rbp)
 	jmp	LBB9_1
 	.align	4, 0x90
-LBB9_2:                                 ## %for_loop_init2
+LBB9_2:                                 ## %for_loop_init5
                                         ##   in Loop: Header=BB9_1 Depth=1
-	movl	-32(%rbp), %r15d
-	movl	%r15d, %edi
+	movl	-40(%rbp), %eax
+	movl	%eax, -60(%rbp)
+	movq	%rsp, %rax
+	leaq	-16(%rax), %r15
+	movq	%r15, %rsp
+	movl	$10, -16(%rax)
+	movl	-60(%rbp), %edi
 	callq	_print_int
-	incl	%r15d
+	movl	-60(%rbp), %edx
+	incl	%edx
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
 	movq	%rbx, %rsp
 	xorl	%esi, %esi
 	movq	%rbx, %rdi
-	movl	%r15d, %edx
 	callq	"_!range_gen_init"
+	movq	%rsp, %rax
+	leaq	-16(%rax), %r12
+	movq	%r12, %rsp
+	movl	$-1, -16(%rax)
 	jmp	LBB9_3
 	.align	4, 0x90
-LBB9_4:                                 ## %for_loop_stmts4
+LBB9_4:                                 ## %for_loop_stmts7
                                         ##   in Loop: Header=BB9_3 Depth=2
 	movl	16(%rbx), %edi
+	movl	%edi, (%r12)
 	movl	$1, %esi
 	callq	"_+"
 	movl	$1, %esi
 	movl	%eax, %edi
 	callq	"_-"
-	movl	$10, %esi
+	movl	(%r15), %esi
 	movl	%eax, %edi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
-LBB9_3:                                 ## %for_loop_check3
+LBB9_3:                                 ## %for_loop_check6
                                         ##   Parent Loop BB9_1 Depth=1
                                         ## =>  This Inner Loop Header: Depth=2
 	movq	%rbx, %rdi
@@ -224,14 +238,22 @@ LBB9_1:                                 ## %for_loop_check
 	testl	%eax, %eax
 	jne	LBB9_2
 ## BB#5:                                ## %while_loop_exit
-	movl	$11, %edi
+	movq	%rsp, %rax
+	leaq	-16(%rax), %rcx
+	movq	%rcx, %rsp
+	movl	$11, -16(%rax)
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movl	$12, -16(%rcx)
+	movl	-16(%rax), %edi
 	movl	$12, %esi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
 	xorl	%eax, %eax
-	leaq	-24(%rbp), %rsp
+	leaq	-32(%rbp), %rsp
 	popq	%rbx
+	popq	%r12
 	popq	%r14
 	popq	%r15
 	popq	%rbp
