@@ -366,6 +366,43 @@ impl VarAssign {
 }
 
 ///////////////////////////////////////
+//             Assign Stmt           //
+//ie.                                //
+//  a = 1                            //
+//  a, b, c = 1, 2, 3                //
+///////////////////////////////////////
+
+/// variables to create in the current scope
+pub struct AssignStmt {
+    lhs : Vec<Ident>,
+    rhs : Vec<Box<Expr>>
+}
+
+impl CodeGenerator for AssignStmt {
+    fn gen_code(&mut self, builder : &mut Builder){
+        //TODO: make this work for a list of variables
+        let var_name = self.lhs.get(0).as_slice();
+        let var_val = self.rhs.get_mut(0).to_value(builder);
+
+        builder.assign_var(var_val, var_name);
+    }
+}
+
+impl Node for AssignStmt {}
+
+impl Stmt for AssignStmt {}
+
+impl AssignStmt {
+    pub fn new(lhs : Vec<Ident>, rhs : Vec<Box<Expr>>) -> Box<Stmt> {
+        box AssignStmt {
+            lhs : lhs,
+            rhs : rhs
+        } as Box<Stmt>
+    }
+}
+
+
+///////////////////////////////////////
 //            For In Loop            //
 ///////////////////////////////////////
 

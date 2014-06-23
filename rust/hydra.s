@@ -185,7 +185,19 @@ Ltmp19:
 	movl	$-1, -60(%rbp)
 	jmp	LBB9_1
 	.align	4, 0x90
-LBB9_2:                                 ## %for_loop_init5
+LBB9_5:                                 ## %for_loop_exit7
+                                        ##   in Loop: Header=BB9_1 Depth=1
+	movl	$100, -60(%rbp)
+	movl	$100, %edi
+	callq	_print_int
+LBB9_1:                                 ## %for_loop_check
+                                        ## =>This Loop Header: Depth=1
+                                        ##     Child Loop BB9_3 Depth 2
+	movq	%r14, %rdi
+	callq	"_!range_gen_next"
+	testl	%eax, %eax
+	je	LBB9_6
+## BB#2:                                ## %for_loop_init4
                                         ##   in Loop: Header=BB9_1 Depth=1
 	movl	-40(%rbp), %eax
 	movl	%eax, -60(%rbp)
@@ -193,8 +205,6 @@ LBB9_2:                                 ## %for_loop_init5
 	leaq	-16(%rax), %r15
 	movq	%r15, %rsp
 	movl	$10, -16(%rax)
-	movl	-60(%rbp), %edi
-	callq	_print_int
 	movl	-60(%rbp), %edx
 	incl	%edx
 	movq	%rsp, %rbx
@@ -209,7 +219,7 @@ LBB9_2:                                 ## %for_loop_init5
 	movl	$-1, -16(%rax)
 	jmp	LBB9_3
 	.align	4, 0x90
-LBB9_4:                                 ## %for_loop_stmts7
+LBB9_4:                                 ## %for_loop_stmts6
                                         ##   in Loop: Header=BB9_3 Depth=2
 	movl	16(%rbx), %edi
 	movl	%edi, (%r12)
@@ -223,30 +233,32 @@ LBB9_4:                                 ## %for_loop_stmts7
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
-LBB9_3:                                 ## %for_loop_check6
+LBB9_3:                                 ## %for_loop_check5
                                         ##   Parent Loop BB9_1 Depth=1
                                         ## =>  This Inner Loop Header: Depth=2
 	movq	%rbx, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	jne	LBB9_4
-LBB9_1:                                 ## %for_loop_check
-                                        ## =>This Loop Header: Depth=1
-                                        ##     Child Loop BB9_3 Depth 2
-	movq	%r14, %rdi
-	callq	"_!range_gen_next"
-	testl	%eax, %eax
-	jne	LBB9_2
-## BB#5:                                ## %while_loop_exit
-	movq	%rsp, %rax
-	leaq	-16(%rax), %rcx
-	movq	%rcx, %rsp
-	movl	$11, -16(%rax)
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movl	$12, -16(%rcx)
-	movl	-16(%rax), %edi
+	jmp	LBB9_5
+LBB9_6:                                 ## %while_loop_exit
+	movq	%rsp, %rbx
+	leaq	-16(%rbx), %rax
+	movq	%rax, %rsp
+	movl	$11, -16(%rbx)
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rax
+	movq	%rax, %rsp
+	movl	$12, -16(%r14)
+	movl	-16(%rbx), %edi
 	movl	$12, %esi
+	callq	"_+"
+	movl	%eax, %edi
+	callq	_print_int
+	movl	$21, -16(%rbx)
+	movl	$22, -16(%r14)
+	movl	-16(%rbx), %edi
+	movl	$22, %esi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int

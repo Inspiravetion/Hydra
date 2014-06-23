@@ -113,7 +113,7 @@ trait HydraBaseParser {
                             self.var_decl()
                         },
                         Identifier => {
-                            self.func_call_stmt()
+                            self.func_call_or_assignment()
                         },
                         _   => fail!(
                                 "Statement at {}:{} not allowed at top level", 
@@ -190,12 +190,44 @@ trait HydraBaseParser {
         FuncCall::new(prop_path, params)
     }
 
-    fn func_call_stmt(&mut self) -> Box<Stmt> {
-        let expr = self.func_call();
-
+    fn func_call_stmt(&mut self, prop_path : Vec<Ident>) -> Box<Stmt> {
+        self.expect(Lparen);
+        let params = self.exprs();
+        self.expect(Rparen);
         self.expect(Semicolon);
 
+        let expr = FuncCall::new(prop_path, params);
         ExprStmt::new(expr)
+    }
+
+    fn assignment_stmt(&mut self, prop_path : Vec<Ident>) -> Box<Stmt> {
+        self.expect(Assign);
+        let rhs = self.exprs();
+        self.expect(Semicolon);
+
+        AssignStmt::new(prop_path, rhs)
+    }
+
+    fn func_call_or_assignment(&mut self) -> Box<Stmt> {
+        let prop_path = self.property_path();
+
+        match self.peek() {
+            Some(tok) => {
+                match tok.typ {
+                    Assign => {
+                        self.assignment_stmt(prop_path)
+                    },
+                    Lparen => {
+                        self.func_call_stmt(prop_path)
+                    },
+                    _ => fail!("Useless stmt at {}:{}", tok.line, tok.col)
+                }
+            },
+            None => { 
+                let tok = self.tok();
+                fail!("Useless stmt at {}:{}", tok.line, tok.col)
+            }
+        }
     }
 
     fn stmt_opt(&mut self) -> Option<Box<Stmt>> {
@@ -203,7 +235,7 @@ trait HydraBaseParser {
             Some(tok) => {
                 match tok.typ {
                     Identifier => {
-                        Some(self.func_call_stmt())
+                        Some(self.func_call_or_assignment())
                     },
                     For => {
                         self.next();
