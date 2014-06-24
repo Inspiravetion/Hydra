@@ -204,7 +204,7 @@ for_loop_exit7:                                   ; preds = %for_loop_check5
   call void @print_int(i32 %i18)
   br label %for_loop_check
 
-while_loop_check:                                 ; preds = %while_loop_stmts, %for_loop_exit
+while_loop_check:                                 ; preds = %while_loop_stmts, %while_loop_stmts, %for_loop_exit
   %done27 = load i32* %done26
   %"<=_tmp" = call i32 @"<="(i32 %done27, i32 5)
   %while_cmp = icmp eq i32 0, %"<=_tmp"
@@ -212,6 +212,7 @@ while_loop_check:                                 ; preds = %while_loop_stmts, %
 
 while_loop_stmts:                                 ; preds = %while_loop_check
   call void @print_int(i32 1000000)
+  br label %while_loop_check
   %done28 = load i32* %done26
   %"+_tmp29" = call i32 @"+"(i32 %done28, i32 1)
   store i32 %"+_tmp29", i32* %done26

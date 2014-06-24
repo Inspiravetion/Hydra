@@ -13,33 +13,34 @@ pub struct Builder {
     pkgs       : HashMap<~str, Package>,
     curr_pkg   : Option<Package>,
     curr_func  : Option<Value>,
-    curr_scope : Box<Scope>
+    curr_scope : Box<Scope>,
+    loop_scope : Box<LoopScope>
 }
 
 #[deriving(Clone)]
 enum Scope {
-    Global(HashMap<~str, Value>),
-    Inner(HashMap<~str, Value>, Box<Scope>)
+    GlobalScope(HashMap<~str, Value>),
+    InnerScope(HashMap<~str, Value>, Box<Scope>)
 }
 
 impl Scope {
     pub fn new_global() -> Box<Scope> {
-       box Global(HashMap::new())
+       box GlobalScope(HashMap::new())
     }
 
     pub fn new_inner(parent: Box<Scope>) -> Box<Scope> {
-       box Inner(HashMap::new(), parent)
+       box InnerScope(HashMap::new(), parent)
     }
 
     pub fn get(&mut self, var_ident : &str) -> Option<Value> {
         match *self {
-            Global(ref mut vars) => {
+            GlobalScope(ref mut vars) => {
                 match vars.find(&var_ident.to_owned()) {
                     Some(val) => Some(*val),
                     None      => None
                 }
             },
-            Inner(ref mut vars, ref mut parent) => {
+            InnerScope(ref mut vars, ref mut parent) => {
                 match vars.find(&var_ident.to_owned()) {
                     Some(val) => Some(*val),
                     None      => parent.get(var_ident)
@@ -50,13 +51,43 @@ impl Scope {
 
     pub fn put(&mut self, var_ident : &str, val : Value) {
         match *self {
-            Global(ref mut vars) => {
+            GlobalScope(ref mut vars) => {
                 vars.insert(var_ident.to_owned(), val);
             },
-            Inner(ref mut vars, _) => {
+            InnerScope(ref mut vars, _) => {
                 vars.insert(var_ident.to_owned(), val);                
             }
         };
+    }
+}
+
+#[deriving(Clone)]
+enum LoopScope {
+    NotInLoop,
+    InLoop(Block, Block, Box<LoopScope>)
+}
+
+impl LoopScope {
+    fn new() -> Box<LoopScope> {
+        box NotInLoop
+    }
+
+    fn new_loop(continu : Block, brk : Block, parent : Box<LoopScope>) -> Box<LoopScope> {
+        box InLoop(continu, brk, parent)
+    }
+
+    fn continue_block(self) -> Option<Block> {
+        match self {
+            NotInLoop => None,
+            InLoop(continu, _, _) => Some(continu)
+        }
+    }
+
+    fn break_block(self) -> Option<Block> {
+        match self {
+            NotInLoop => None,
+            InLoop(_, brk, _) => Some(brk)
+        }
     }
 }
 
@@ -72,13 +103,42 @@ impl Builder {
             pkgs       : HashMap::new() , 
             curr_pkg   : None,
             curr_func  : None,
-            curr_scope : Scope::new_global()
+            curr_scope : Scope::new_global(),
+            loop_scope : LoopScope::new()
         };
 
         b.create_package("hydra");
         b.add_builtin_types();
 
         b
+    }
+
+    pub fn open_loop_scope(&mut self, continu : Block, brk : Block) {
+        let inner_scope = LoopScope::new_loop(continu, brk, self.loop_scope.clone());
+        self.loop_scope = inner_scope;
+    }
+
+    pub fn close_loop_scope(&mut self) {
+        let p = match *self.loop_scope {
+            InLoop(_,_,ref parent) => parent.clone(),
+            NotInLoop => fail!("tried to close loop scope when you werent in a loop")
+        };
+
+        self.loop_scope = p;
+    }
+
+    pub fn get_continue_block(&mut self) -> Option<Block> {
+        match *self.loop_scope {
+            NotInLoop => None,
+            InLoop(continu, _, _) => Some(continu)
+        }
+    }
+
+    pub fn get_break_block(&mut self) -> Option<Block> {
+        match *self.loop_scope {
+            NotInLoop => None,
+            InLoop(_, brk, _) => Some(brk)
+        }
     }
 
     pub fn open_scope(&mut self) {
@@ -88,8 +148,8 @@ impl Builder {
 
     pub fn close_scope(&mut self) {
         let p = match *self.curr_scope {
-            Inner(_,ref parent) => parent.clone(),
-            Global(_) => fail!("tried to close global scope")
+            InnerScope(_,ref parent) => parent.clone(),
+            GlobalScope(_) => fail!("tried to close global scope")
         };
 
         self.curr_scope = p;

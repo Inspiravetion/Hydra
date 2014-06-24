@@ -8,7 +8,7 @@ use std::owned::Box;
 // use std::iter::FromIterator;
 // use std::strbuf::StrBuf;
 // use std::fmt::{Show, Formatter, Result};
-use token::Token;
+use token::*;
 
 ///Identifier expressions, variable names etc.
 pub type Ident = ~str;
@@ -408,6 +408,49 @@ impl AssignStmt {
     }
 }
 
+///////////////////////////////////////
+//         Loop Control Stmt         //
+//ie.                                //
+//  break                            //
+//  continue                         //
+///////////////////////////////////////
+
+/// A loop statement that controls how the loop works
+pub struct LoopControlStmt {
+    typ : TokenType
+}
+
+impl CodeGenerator for LoopControlStmt {
+    fn gen_code(&mut self, builder : &mut Builder){
+          match self.typ {
+            Break => {
+                match builder.get_break_block() {
+                    Some(block) => builder.break_to(block),
+                    None => {}
+                };
+            },
+            Continue => {
+                match builder.get_continue_block() {
+                    Some(block) => builder.break_to(block),
+                    None => {}
+                };
+            },
+            _ => fail!("Created a LoopControlStmt with an incompatibly keyword {:?}", self.typ)
+          }
+    }
+}
+
+impl Node for LoopControlStmt {}
+
+impl Stmt for LoopControlStmt {}
+
+impl LoopControlStmt {
+    pub fn new(typ : TokenType) -> Box<Stmt> {
+        box LoopControlStmt {
+            typ : typ
+        } as Box<Stmt>
+    }
+}
 
 ///////////////////////////////////////
 //            For In Loop            //
@@ -434,6 +477,9 @@ impl CodeGenerator for ForInLoop {
         let loop_stmts = builder.new_block("for_loop_stmts");
         //jump out of the loop to the next stmt
         let loop_exit  = builder.new_block("for_loop_exit");
+
+        //setup loop scope for break and continue
+        builder.open_loop_scope(loop_check, loop_exit);
 
         //make sure previous block runs loop code after it
         builder.break_to(loop_init);
@@ -488,6 +534,7 @@ impl CodeGenerator for ForInLoop {
         }
         builder.break_to(loop_check);
 
+        builder.close_loop_scope();
         builder.close_scope();
 
         //make sure following stmts start from the loop exit block
@@ -528,6 +575,8 @@ impl CodeGenerator for WhileLoop {
         let loop_stmts = builder.new_block("while_loop_stmts");
         let loop_exit  = builder.new_block("while_loop_exit");
 
+        builder.open_loop_scope(loop_check, loop_exit);
+
         builder.break_to(loop_check);
 
         builder.goto_block(loop_check);
@@ -544,6 +593,7 @@ impl CodeGenerator for WhileLoop {
 
         builder.goto_block(loop_exit);
 
+        builder.close_loop_scope();
         builder.close_scope();
     }
 }

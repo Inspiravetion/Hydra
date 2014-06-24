@@ -290,6 +290,20 @@ trait HydraBaseParser {
                         self.next();
                         Some(self.var_decl())
                     },
+                    Break => {
+                        self.next();
+                        let stmt = LoopControlStmt::new(Break);
+                        self.expect(Semicolon);
+
+                        Some(stmt)
+                    },
+                    Continue => {
+                        self.next();
+                        let stmt = LoopControlStmt::new(Continue);
+                        self.expect(Semicolon);
+
+                        Some(stmt)
+                    }
                     _ => None
                 }
             },

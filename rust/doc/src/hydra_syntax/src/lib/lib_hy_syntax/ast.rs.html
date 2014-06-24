@@ -600,6 +600,56 @@
 <span id='560'>560</span>
 <span id='561'>561</span>
 <span id='562'>562</span>
+<span id='563'>563</span>
+<span id='564'>564</span>
+<span id='565'>565</span>
+<span id='566'>566</span>
+<span id='567'>567</span>
+<span id='568'>568</span>
+<span id='569'>569</span>
+<span id='570'>570</span>
+<span id='571'>571</span>
+<span id='572'>572</span>
+<span id='573'>573</span>
+<span id='574'>574</span>
+<span id='575'>575</span>
+<span id='576'>576</span>
+<span id='577'>577</span>
+<span id='578'>578</span>
+<span id='579'>579</span>
+<span id='580'>580</span>
+<span id='581'>581</span>
+<span id='582'>582</span>
+<span id='583'>583</span>
+<span id='584'>584</span>
+<span id='585'>585</span>
+<span id='586'>586</span>
+<span id='587'>587</span>
+<span id='588'>588</span>
+<span id='589'>589</span>
+<span id='590'>590</span>
+<span id='591'>591</span>
+<span id='592'>592</span>
+<span id='593'>593</span>
+<span id='594'>594</span>
+<span id='595'>595</span>
+<span id='596'>596</span>
+<span id='597'>597</span>
+<span id='598'>598</span>
+<span id='599'>599</span>
+<span id='600'>600</span>
+<span id='601'>601</span>
+<span id='602'>602</span>
+<span id='603'>603</span>
+<span id='604'>604</span>
+<span id='605'>605</span>
+<span id='606'>606</span>
+<span id='607'>607</span>
+<span id='608'>608</span>
+<span id='609'>609</span>
+<span id='610'>610</span>
+<span id='611'>611</span>
+<span id='612'>612</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>CodeGenerator</span>;
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::<span class='ident'>Builder</span>; 
@@ -611,7 +661,7 @@
 // use std::iter::FromIterator;
 // use std::strbuf::StrBuf;
 // use std::fmt::{Show, Formatter, Result};
-</span><span class='kw'>use</span> <span class='ident'>token</span>::<span class='ident'>Token</span>;
+</span><span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
 
 <span class='doccomment'>///Identifier expressions, variable names etc.
 </span><span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Ident</span> <span class='op'>=</span> <span class='kw-2'>~</span><span class='ident'>str</span>;
@@ -1011,6 +1061,49 @@
     }
 }<span class='comment'>
 
+///////////////////////////////////////
+//         Loop Control Stmt         //
+//ie.                                //
+//  break                            //
+//  continue                         //
+///////////////////////////////////////
+
+</span><span class='doccomment'>/// A loop statement that controls how the loop works
+</span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>LoopControlStmt</span> {
+    <span class='ident'>typ</span> : <span class='ident'>TokenType</span>
+}
+
+<span class='kw'>impl</span> <span class='ident'>CodeGenerator</span> <span class='kw'>for</span> <span class='ident'>LoopControlStmt</span> {
+    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+          <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>typ</span> {
+            <span class='ident'>Break</span> <span class='op'>=&gt;</span> {
+                <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_break_block</span>() {
+                    <span class='prelude-val'>Some</span>(<span class='ident'>block</span>) <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>block</span>),
+                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {}
+                };
+            },
+            <span class='ident'>Continue</span> <span class='op'>=&gt;</span> {
+                <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_continue_block</span>() {
+                    <span class='prelude-val'>Some</span>(<span class='ident'>block</span>) <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>block</span>),
+                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {}
+                };
+            },
+            _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Created a LoopControlStmt with an incompatibly keyword {:?}&quot;</span>, <span class='self'>self</span>.<span class='ident'>typ</span>)
+          }
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>LoopControlStmt</span> {}
+
+<span class='kw'>impl</span> <span class='ident'>Stmt</span> <span class='kw'>for</span> <span class='ident'>LoopControlStmt</span> {}
+
+<span class='kw'>impl</span> <span class='ident'>LoopControlStmt</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>typ</span> : <span class='ident'>TokenType</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+        <span class='kw'>box</span> <span class='ident'>LoopControlStmt</span> {
+            <span class='ident'>typ</span> : <span class='ident'>typ</span>
+        } <span class='kw'>as</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span>
+    }
+}<span class='comment'>
 
 ///////////////////////////////////////
 //            For In Loop            //
@@ -1037,6 +1130,9 @@
         </span><span class='kw'>let</span> <span class='ident'>loop_stmts</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_stmts&quot;</span>);<span class='comment'>
         //jump out of the loop to the next stmt
         </span><span class='kw'>let</span> <span class='ident'>loop_exit</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_exit&quot;</span>);<span class='comment'>
+
+        //setup loop scope for break and continue
+        </span><span class='ident'>builder</span>.<span class='ident'>open_loop_scope</span>(<span class='ident'>loop_check</span>, <span class='ident'>loop_exit</span>);<span class='comment'>
 
         //make sure previous block runs loop code after it
         </span><span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_init</span>);<span class='comment'>
@@ -1091,6 +1187,7 @@
         }
         <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_check</span>);
 
+        <span class='ident'>builder</span>.<span class='ident'>close_loop_scope</span>();
         <span class='ident'>builder</span>.<span class='ident'>close_scope</span>();<span class='comment'>
 
         //make sure following stmts start from the loop exit block
@@ -1131,6 +1228,8 @@
         <span class='kw'>let</span> <span class='ident'>loop_stmts</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;while_loop_stmts&quot;</span>);
         <span class='kw'>let</span> <span class='ident'>loop_exit</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;while_loop_exit&quot;</span>);
 
+        <span class='ident'>builder</span>.<span class='ident'>open_loop_scope</span>(<span class='ident'>loop_check</span>, <span class='ident'>loop_exit</span>);
+
         <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_check</span>);
 
         <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_check</span>);
@@ -1147,6 +1246,7 @@
 
         <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_exit</span>);
 
+        <span class='ident'>builder</span>.<span class='ident'>close_loop_scope</span>();
         <span class='ident'>builder</span>.<span class='ident'>close_scope</span>();
     }
 }
