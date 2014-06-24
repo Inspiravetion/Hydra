@@ -91,8 +91,78 @@ fn main(){
         let tmp = fb.mod_op(left_val, right_val, "tmp");
         fb.ret(tmp);
     });
+    builder.create_function("<", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
 
-    //this should be created by an operator where the following block is parsed like a function
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.cmp_less_than(left_val, right_val, "tmp");
+        let int32_tmp = fb.zext(tmp, int_type, "cast_tmp");
+
+        fb.ret(int32_tmp);
+    });
+    builder.create_function(">", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
+
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.cmp_greater_than(left_val, right_val, "tmp");
+        let int32_tmp = fb.zext(tmp, int_type, "cast_tmp");
+
+        fb.ret(int32_tmp);
+    });
+    builder.create_function("<=", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
+
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.cmp_less_than_eq(left_val, right_val, "tmp");
+        let int32_tmp = fb.zext(tmp, int_type, "cast_tmp");
+
+        fb.ret(int32_tmp);
+    });
+    builder.create_function(">=", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
+
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.cmp_greater_than_eq(left_val, right_val, "tmp");
+        let int32_tmp = fb.zext(tmp, int_type, "cast_tmp");
+
+        fb.ret(int32_tmp);
+    });
+    builder.create_function("==", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
+
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.cmp_eq(left_val, right_val, "tmp");
+        let int32_tmp = fb.zext(tmp, int_type, "cast_tmp");
+
+        fb.ret(int32_tmp);
+    });
+    builder.create_function("!=", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
+        fb.goto_first_block();
+
+        let left_val = fb.get_param(0);
+        let right_val = fb.get_param(1);
+
+        let tmp = fb.cmp_not_eq(left_val, right_val, "tmp");
+        let int32_tmp = fb.zext(tmp, int_type, "cast_tmp");
+
+        fb.ret(int32_tmp);
+    });
+
+
+
+
+
+    //this should be created by an operator definition where the following block is parsed like a function
     builder.create_function("times", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
         fb.goto_first_block();
 

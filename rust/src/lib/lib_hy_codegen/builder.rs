@@ -532,6 +532,10 @@ impl Builder {
          u!(llvm::LLVMInt8TypeInContext(self.ctx))
     }
 
+    pub fn int1_type(&mut self) -> Type {
+        u!(llvm::LLVMInt1TypeInContext(self.ctx))
+    }
+
     pub fn int32_type(&mut self) -> Type {
         u!(llvm::LLVMInt32TypeInContext(self.ctx))
     }
@@ -575,6 +579,24 @@ impl Builder {
             v.as_ptr(),
             v.len() as c_uint,
             chars(variable_name)
+        ))
+    }
+
+    pub fn bitcast(&mut self, val : Value, to :Type, name : &str) -> Value {
+        u!(llvm::LLVMBuildBitCast(
+            self.builder,
+            val,
+            to,
+            chars(name)
+        ))
+    }
+
+    pub fn zext(&mut self, val : Value, to :Type, name : &str) -> Value {
+        u!(llvm::LLVMBuildZExt(
+            self.builder,
+            val,
+            to,
+            chars(name)
         ))
     }
 }

@@ -622,6 +622,28 @@
 <span id='582'>582</span>
 <span id='583'>583</span>
 <span id='584'>584</span>
+<span id='585'>585</span>
+<span id='586'>586</span>
+<span id='587'>587</span>
+<span id='588'>588</span>
+<span id='589'>589</span>
+<span id='590'>590</span>
+<span id='591'>591</span>
+<span id='592'>592</span>
+<span id='593'>593</span>
+<span id='594'>594</span>
+<span id='595'>595</span>
+<span id='596'>596</span>
+<span id='597'>597</span>
+<span id='598'>598</span>
+<span id='599'>599</span>
+<span id='600'>600</span>
+<span id='601'>601</span>
+<span id='602'>602</span>
+<span id='603'>603</span>
+<span id='604'>604</span>
+<span id='605'>605</span>
+<span id='606'>606</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>rustc</span>::<span class='ident'>lib</span>::<span class='ident'>llvm</span>::{<span class='ident'>llvm</span>, <span class='ident'>Bool</span>, <span class='ident'>False</span>, <span class='ident'>True</span>, <span class='ident'>IntEQ</span>, <span class='ident'>IntNE</span>, <span class='ident'>IntSGT</span>, <span class='ident'>IntSGE</span>, <span class='ident'>IntSLT</span>, <span class='ident'>IntSLE</span>};
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>hashmap</span>::<span class='ident'>HashMap</span>;
@@ -1157,6 +1179,10 @@
          <span class='macro'>u</span><span class='macro'>!</span>(<span class='ident'>llvm</span>::<span class='ident'>LLVMInt8TypeInContext</span>(<span class='self'>self</span>.<span class='ident'>ctx</span>))
     }
 
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>int1_type</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
+        <span class='macro'>u</span><span class='macro'>!</span>(<span class='ident'>llvm</span>::<span class='ident'>LLVMInt1TypeInContext</span>(<span class='self'>self</span>.<span class='ident'>ctx</span>))
+    }
+
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>int32_type</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
         <span class='macro'>u</span><span class='macro'>!</span>(<span class='ident'>llvm</span>::<span class='ident'>LLVMInt32TypeInContext</span>(<span class='self'>self</span>.<span class='ident'>ctx</span>))
     }
@@ -1200,6 +1226,24 @@
             <span class='ident'>v</span>.<span class='ident'>as_ptr</span>(),
             <span class='ident'>v</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>,
             <span class='ident'>chars</span>(<span class='ident'>variable_name</span>)
+        ))
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>bitcast</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>val</span> : <span class='ident'>Value</span>, <span class='ident'>to</span> :<span class='ident'>Type</span>, <span class='ident'>name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+        <span class='macro'>u</span><span class='macro'>!</span>(<span class='ident'>llvm</span>::<span class='ident'>LLVMBuildBitCast</span>(
+            <span class='self'>self</span>.<span class='ident'>builder</span>,
+            <span class='ident'>val</span>,
+            <span class='ident'>to</span>,
+            <span class='ident'>chars</span>(<span class='ident'>name</span>)
+        ))
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>zext</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>val</span> : <span class='ident'>Value</span>, <span class='ident'>to</span> :<span class='ident'>Type</span>, <span class='ident'>name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+        <span class='macro'>u</span><span class='macro'>!</span>(<span class='ident'>llvm</span>::<span class='ident'>LLVMBuildZExt</span>(
+            <span class='self'>self</span>.<span class='ident'>builder</span>,
+            <span class='ident'>val</span>,
+            <span class='ident'>to</span>,
+            <span class='ident'>chars</span>(<span class='ident'>name</span>)
         ))
     }
 }

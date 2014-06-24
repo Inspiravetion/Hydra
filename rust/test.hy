@@ -15,6 +15,8 @@ print_int(i + j);
 i, j = 21, 22;
 print_int(i + j);
 
-while 0 do
-    print_int(i);
+var done = 0;
+while done <= 5 do
+    print_int(1000000);
+    done = done + 1;
 end

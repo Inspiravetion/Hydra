@@ -316,7 +316,8 @@ trait HydraBaseParser {
 
     fn is_binary_op(&mut self, typ : TokenType) -> bool {
         match typ {
-            Add_Op | Min_Op | Mult_Op | Div_Op | Mod_Op | Power_Op => true,
+            Add_Op | Min_Op | Mult_Op | Div_Op | Mod_Op | Power_Op | 
+            Less_Than | Greater_Than | Less_Than_Eq | Greater_Than_Eq | Equal | Bang_Eq => true,
             Identifier => true, //binary operators that are words
             _ => false
         }

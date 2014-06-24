@@ -654,6 +654,7 @@
 <span id='614'>614</span>
 <span id='615'>615</span>
 <span id='616'>616</span>
+<span id='617'>617</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -973,7 +974,8 @@
 
     <span class='kw'>fn</span> <span class='ident'>is_binary_op</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>typ</span> : <span class='ident'>TokenType</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='kw'>match</span> <span class='ident'>typ</span> {
-            <span class='ident'>Add_Op</span> <span class='op'>|</span> <span class='ident'>Min_Op</span> <span class='op'>|</span> <span class='ident'>Mult_Op</span> <span class='op'>|</span> <span class='ident'>Div_Op</span> <span class='op'>|</span> <span class='ident'>Mod_Op</span> <span class='op'>|</span> <span class='ident'>Power_Op</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+            <span class='ident'>Add_Op</span> <span class='op'>|</span> <span class='ident'>Min_Op</span> <span class='op'>|</span> <span class='ident'>Mult_Op</span> <span class='op'>|</span> <span class='ident'>Div_Op</span> <span class='op'>|</span> <span class='ident'>Mod_Op</span> <span class='op'>|</span> <span class='ident'>Power_Op</span> <span class='op'>|</span> 
+            <span class='ident'>Less_Than</span> <span class='op'>|</span> <span class='ident'>Greater_Than</span> <span class='op'>|</span> <span class='ident'>Less_Than_Eq</span> <span class='op'>|</span> <span class='ident'>Greater_Than_Eq</span> <span class='op'>|</span> <span class='ident'>Equal</span> <span class='op'>|</span> <span class='ident'>Bang_Eq</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
             <span class='ident'>Identifier</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,<span class='comment'> //binary operators that are words
             </span>_ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
         }

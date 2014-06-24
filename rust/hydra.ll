@@ -84,6 +84,42 @@ define i32 @"%"(i32, i32) {
   ret i32 %tmp
 }
 
+define i32 @"<"(i32, i32) {
+  %tmp = icmp slt i32 %0, %1
+  %cast_tmp = zext i1 %tmp to i32
+  ret i32 %cast_tmp
+}
+
+define i32 @">"(i32, i32) {
+  %tmp = icmp sgt i32 %0, %1
+  %cast_tmp = zext i1 %tmp to i32
+  ret i32 %cast_tmp
+}
+
+define i32 @"<="(i32, i32) {
+  %tmp = icmp sle i32 %0, %1
+  %cast_tmp = zext i1 %tmp to i32
+  ret i32 %cast_tmp
+}
+
+define i32 @">="(i32, i32) {
+  %tmp = icmp sge i32 %0, %1
+  %cast_tmp = zext i1 %tmp to i32
+  ret i32 %cast_tmp
+}
+
+define i32 @"=="(i32, i32) {
+  %tmp = icmp eq i32 %0, %1
+  %cast_tmp = zext i1 %tmp to i32
+  ret i32 %cast_tmp
+}
+
+define i32 @"!="(i32, i32) {
+  %tmp = icmp ne i32 %0, %1
+  %cast_tmp = zext i1 %tmp to i32
+  ret i32 %cast_tmp
+}
+
 define i32 @times(i32, i32) {
   %tmp = mul i32 %0, %1
   ret i32 %tmp
@@ -135,6 +171,8 @@ for_loop_exit:                                    ; preds = %for_loop_check
   %j24 = load i32* %j
   %"+_tmp25" = call i32 @"+"(i32 %i23, i32 %j24)
   call void @print_int(i32 %"+_tmp25")
+  %done26 = alloca i32
+  store i32 0, i32* %done26
   br label %while_loop_check
 
 for_loop_init4:                                   ; preds = %for_loop_stmts
@@ -167,11 +205,16 @@ for_loop_exit7:                                   ; preds = %for_loop_check5
   br label %for_loop_check
 
 while_loop_check:                                 ; preds = %while_loop_stmts, %for_loop_exit
-  br i1 true, label %while_loop_exit, label %while_loop_stmts
+  %done27 = load i32* %done26
+  %"<=_tmp" = call i32 @"<="(i32 %done27, i32 5)
+  %while_cmp = icmp eq i32 0, %"<=_tmp"
+  br i1 %while_cmp, label %while_loop_exit, label %while_loop_stmts
 
 while_loop_stmts:                                 ; preds = %while_loop_check
-  %i26 = load i32* %i19
-  call void @print_int(i32 %i26)
+  call void @print_int(i32 1000000)
+  %done28 = load i32* %done26
+  %"+_tmp29" = call i32 @"+"(i32 %done28, i32 1)
+  store i32 %"+_tmp29", i32* %done26
   br label %while_loop_check
 
 while_loop_exit:                                  ; preds = %while_loop_check

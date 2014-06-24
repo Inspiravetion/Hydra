@@ -126,6 +126,72 @@ Ltmp9:
 	ret
 	.cfi_endproc
 
+	.globl	"_<"
+	.align	4, 0x90
+"_<":                                   ## @"<"
+	.cfi_startproc
+## BB#0:
+	cmpl	%esi, %edi
+	setl	%al
+	movzbl	%al, %eax
+	ret
+	.cfi_endproc
+
+	.globl	"_>"
+	.align	4, 0x90
+"_>":                                   ## @">"
+	.cfi_startproc
+## BB#0:
+	cmpl	%esi, %edi
+	setg	%al
+	movzbl	%al, %eax
+	ret
+	.cfi_endproc
+
+	.globl	"_<="
+	.align	4, 0x90
+"_<=":                                  ## @"<="
+	.cfi_startproc
+## BB#0:
+	cmpl	%esi, %edi
+	setle	%al
+	movzbl	%al, %eax
+	ret
+	.cfi_endproc
+
+	.globl	"_>="
+	.align	4, 0x90
+"_>=":                                  ## @">="
+	.cfi_startproc
+## BB#0:
+	cmpl	%esi, %edi
+	setge	%al
+	movzbl	%al, %eax
+	ret
+	.cfi_endproc
+
+	.globl	"_=="
+	.align	4, 0x90
+"_==":                                  ## @"=="
+	.cfi_startproc
+## BB#0:
+	cmpl	%esi, %edi
+	sete	%al
+	movzbl	%al, %eax
+	ret
+	.cfi_endproc
+
+	.globl	"_!="
+	.align	4, 0x90
+"_!=":                                  ## @"!="
+	.cfi_startproc
+## BB#0:
+	cmpl	%esi, %edi
+	setne	%al
+	movzbl	%al, %eax
+	ret
+	.cfi_endproc
+
 	.globl	_times
 	.align	4, 0x90
 _times:                                 ## @times
@@ -140,7 +206,7 @@ _times:                                 ## @times
 	.align	4, 0x90
 _main:                                  ## @main
 	.cfi_startproc
-## BB#0:                                ## %for_loop_init
+## BB#0:
 	pushq	%rbp
 Ltmp13:
 	.cfi_def_cfa_offset 16
@@ -151,16 +217,19 @@ Ltmp15:
 	.cfi_def_cfa_register %rbp
 	pushq	%r15
 	pushq	%r14
+	pushq	%r13
 	pushq	%r12
 	pushq	%rbx
-	subq	$32, %rsp
+	subq	$24, %rsp
 Ltmp16:
-	.cfi_offset %rbx, -48
+	.cfi_offset %rbx, -56
 Ltmp17:
-	.cfi_offset %r12, -40
+	.cfi_offset %r12, -48
 Ltmp18:
-	.cfi_offset %r14, -32
+	.cfi_offset %r13, -40
 Ltmp19:
+	.cfi_offset %r14, -32
+Ltmp20:
 	.cfi_offset %r15, -24
 	movl	$2, %edi
 	movl	$3, %esi
@@ -177,35 +246,38 @@ Ltmp19:
 	movl	$1, %edi
 	movl	%eax, %esi
 	callq	"_+"
-	leaq	-56(%rbp), %r14
+	leaq	-64(%rbp), %r14
 	xorl	%esi, %esi
 	movq	%r14, %rdi
 	movl	%eax, %edx
 	callq	"_!range_gen_init"
-	movl	$-1, -60(%rbp)
-	jmp	LBB9_1
-	.align	4, 0x90
-LBB9_5:                                 ## %for_loop_exit7
-                                        ##   in Loop: Header=BB9_1 Depth=1
-	movl	$100, -60(%rbp)
-	movl	$100, %edi
-	callq	_print_int
-LBB9_1:                                 ## %for_loop_check
-                                        ## =>This Loop Header: Depth=1
-                                        ##     Child Loop BB9_3 Depth 2
-	movq	%r14, %rdi
-	callq	"_!range_gen_next"
-	testl	%eax, %eax
-	je	LBB9_6
-## BB#2:                                ## %for_loop_init4
-                                        ##   in Loop: Header=BB9_1 Depth=1
-	movl	-40(%rbp), %eax
-	movl	%eax, -60(%rbp)
 	movq	%rsp, %rax
 	leaq	-16(%rax), %r15
 	movq	%r15, %rsp
+	movl	$-1, -16(%rax)
+	jmp	LBB15_1
+	.align	4, 0x90
+LBB15_5:                                ## %for_loop_exit7
+                                        ##   in Loop: Header=BB15_1 Depth=1
+	movl	$100, (%r15)
+	movl	$100, %edi
+	callq	_print_int
+LBB15_1:                                ## %for_loop_check
+                                        ## =>This Loop Header: Depth=1
+                                        ##     Child Loop BB15_3 Depth 2
+	movq	%r14, %rdi
+	callq	"_!range_gen_next"
+	testl	%eax, %eax
+	je	LBB15_6
+## BB#2:                                ## %for_loop_stmts
+                                        ##   in Loop: Header=BB15_1 Depth=1
+	movl	-48(%rbp), %eax
+	movl	%eax, (%r15)
+	movq	%rsp, %rax
+	leaq	-16(%rax), %r12
+	movq	%r12, %rsp
 	movl	$10, -16(%rax)
-	movl	-60(%rbp), %edx
+	movl	(%r15), %edx
 	incl	%edx
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
@@ -214,34 +286,34 @@ LBB9_1:                                 ## %for_loop_check
 	movq	%rbx, %rdi
 	callq	"_!range_gen_init"
 	movq	%rsp, %rax
-	leaq	-16(%rax), %r12
-	movq	%r12, %rsp
+	leaq	-16(%rax), %r13
+	movq	%r13, %rsp
 	movl	$-1, -16(%rax)
-	jmp	LBB9_3
+	jmp	LBB15_3
 	.align	4, 0x90
-LBB9_4:                                 ## %for_loop_stmts6
-                                        ##   in Loop: Header=BB9_3 Depth=2
+LBB15_4:                                ## %for_loop_stmts6
+                                        ##   in Loop: Header=BB15_3 Depth=2
 	movl	16(%rbx), %edi
-	movl	%edi, (%r12)
+	movl	%edi, (%r13)
 	movl	$1, %esi
 	callq	"_+"
 	movl	$1, %esi
 	movl	%eax, %edi
 	callq	"_-"
-	movl	(%r15), %esi
+	movl	(%r12), %esi
 	movl	%eax, %edi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
-LBB9_3:                                 ## %for_loop_check5
-                                        ##   Parent Loop BB9_1 Depth=1
+LBB15_3:                                ## %for_loop_check5
+                                        ##   Parent Loop BB15_1 Depth=1
                                         ## =>  This Inner Loop Header: Depth=2
 	movq	%rbx, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
-	jne	LBB9_4
-	jmp	LBB9_5
-LBB9_6:                                 ## %while_loop_exit
+	jne	LBB15_4
+	jmp	LBB15_5
+LBB15_6:                                ## %for_loop_exit
 	movq	%rsp, %rbx
 	leaq	-16(%rbx), %rax
 	movq	%rax, %rsp
@@ -262,10 +334,33 @@ LBB9_6:                                 ## %while_loop_exit
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
+	movq	%rsp, %rax
+	leaq	-16(%rax), %rbx
+	movq	%rbx, %rsp
+	movl	$0, -16(%rax)
+	jmp	LBB15_7
+	.align	4, 0x90
+LBB15_8:                                ## %while_loop_stmts
+                                        ##   in Loop: Header=BB15_7 Depth=1
+	movl	$1000000, %edi          ## imm = 0xF4240
+	callq	_print_int
+	movl	(%rbx), %edi
+	movl	$1, %esi
+	callq	"_+"
+	movl	%eax, (%rbx)
+LBB15_7:                                ## %while_loop_check
+                                        ## =>This Inner Loop Header: Depth=1
+	movl	(%rbx), %edi
+	movl	$5, %esi
+	callq	"_<="
+	testl	%eax, %eax
+	jne	LBB15_8
+## BB#9:                                ## %while_loop_exit
 	xorl	%eax, %eax
-	leaq	-32(%rbp), %rsp
+	leaq	-40(%rbp), %rsp
 	popq	%rbx
 	popq	%r12
+	popq	%r13
 	popq	%r14
 	popq	%r15
 	popq	%rbp
