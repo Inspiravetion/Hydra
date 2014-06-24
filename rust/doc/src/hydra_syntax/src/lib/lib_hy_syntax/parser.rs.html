@@ -613,6 +613,47 @@
 <span id='573'>573</span>
 <span id='574'>574</span>
 <span id='575'>575</span>
+<span id='576'>576</span>
+<span id='577'>577</span>
+<span id='578'>578</span>
+<span id='579'>579</span>
+<span id='580'>580</span>
+<span id='581'>581</span>
+<span id='582'>582</span>
+<span id='583'>583</span>
+<span id='584'>584</span>
+<span id='585'>585</span>
+<span id='586'>586</span>
+<span id='587'>587</span>
+<span id='588'>588</span>
+<span id='589'>589</span>
+<span id='590'>590</span>
+<span id='591'>591</span>
+<span id='592'>592</span>
+<span id='593'>593</span>
+<span id='594'>594</span>
+<span id='595'>595</span>
+<span id='596'>596</span>
+<span id='597'>597</span>
+<span id='598'>598</span>
+<span id='599'>599</span>
+<span id='600'>600</span>
+<span id='601'>601</span>
+<span id='602'>602</span>
+<span id='603'>603</span>
+<span id='604'>604</span>
+<span id='605'>605</span>
+<span id='606'>606</span>
+<span id='607'>607</span>
+<span id='608'>608</span>
+<span id='609'>609</span>
+<span id='610'>610</span>
+<span id='611'>611</span>
+<span id='612'>612</span>
+<span id='613'>613</span>
+<span id='614'>614</span>
+<span id='615'>615</span>
+<span id='616'>616</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -659,6 +700,11 @@
     <span class='kw'>fn</span> <span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>program_stmts</span>()
     }  
+}
+
+<span class='kw'>enum</span> <span class='ident'>PropertyPath</span> {
+    <span class='ident'>SinglePath</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>),
+    <span class='ident'>MultiplePaths</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>)
 }
 
 <span class='kw'>trait</span> <span class='ident'>HydraBaseParser</span> {
@@ -794,7 +840,29 @@
             <span class='ident'>idents</span>.<span class='ident'>push</span>(<span class='self'>self</span>.<span class='ident'>ident</span>());
         }
 
-        <span class='kw'>return</span> <span class='ident'>idents</span>
+        <span class='ident'>idents</span>
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>property_paths</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>PropertyPath</span> {
+        <span class='kw'>let</span> <span class='ident'>first</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>property_path</span>();
+
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_is</span>(<span class='ident'>Comma</span>) {
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>prop_paths</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+            <span class='ident'>prop_paths</span>.<span class='ident'>push</span>(<span class='ident'>first</span>);
+            <span class='ident'>prop_paths</span>.<span class='ident'>push</span>(<span class='self'>self</span>.<span class='ident'>property_path</span>());
+
+            <span class='kw'>loop</span> {
+                <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>next_is</span>(<span class='ident'>Comma</span>) {
+                    <span class='kw'>break</span>;
+                }
+                
+                <span class='ident'>prop_paths</span>.<span class='ident'>push</span>(<span class='self'>self</span>.<span class='ident'>property_path</span>());
+            }
+
+            <span class='ident'>MultiplePaths</span>(<span class='ident'>prop_paths</span>)
+        } <span class='kw'>else</span> {
+            <span class='ident'>SinglePath</span>(<span class='ident'>first</span>)
+        }
     }
 
     <span class='kw'>fn</span> <span class='ident'>func_call</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span> {
@@ -806,35 +874,49 @@
         <span class='ident'>FuncCall</span>::<span class='ident'>new</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>func_call_stmt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>prop_path</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>func_call_stmt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>prop_paths</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Lparen</span>);
         <span class='kw'>let</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>exprs</span>();
         <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Rparen</span>);
         <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Semicolon</span>);
 
-        <span class='kw'>let</span> <span class='ident'>expr</span> <span class='op'>=</span> <span class='ident'>FuncCall</span>::<span class='ident'>new</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>);
+        <span class='kw'>let</span> <span class='ident'>expr</span> <span class='op'>=</span> <span class='ident'>FuncCall</span>::<span class='ident'>new</span>(<span class='ident'>prop_paths</span>, <span class='ident'>params</span>);
         <span class='ident'>ExprStmt</span>::<span class='ident'>new</span>(<span class='ident'>expr</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>assignment_stmt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>prop_path</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>assignment_stmt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>prop_paths</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Assign</span>);
         <span class='kw'>let</span> <span class='ident'>rhs</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>exprs</span>();
         <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Semicolon</span>);
 
-        <span class='ident'>AssignStmt</span>::<span class='ident'>new</span>(<span class='ident'>prop_path</span>, <span class='ident'>rhs</span>)
+        <span class='ident'>AssignStmt</span>::<span class='ident'>new</span>(<span class='ident'>prop_paths</span>, <span class='ident'>rhs</span>)
     }
 
     <span class='kw'>fn</span> <span class='ident'>func_call_or_assignment</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>prop_path</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>property_path</span>();
+        <span class='kw'>let</span> <span class='ident'>prop_paths</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>property_paths</span>();
 
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>peek</span>() {
             <span class='prelude-val'>Some</span>(<span class='ident'>tok</span>) <span class='op'>=&gt;</span> {
                 <span class='kw'>match</span> <span class='ident'>tok</span>.<span class='ident'>typ</span> {
                     <span class='ident'>Assign</span> <span class='op'>=&gt;</span> {
-                        <span class='self'>self</span>.<span class='ident'>assignment_stmt</span>(<span class='ident'>prop_path</span>)
+                        <span class='kw'>match</span> <span class='ident'>prop_paths</span> {
+                            <span class='ident'>SinglePath</span>(<span class='ident'>path</span>) <span class='op'>=&gt;</span> {
+                                <span class='self'>self</span>.<span class='ident'>assignment_stmt</span>(<span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>path</span>))
+                            },
+                            <span class='ident'>MultiplePaths</span>(<span class='ident'>paths</span>) <span class='op'>=&gt;</span> {
+                                <span class='self'>self</span>.<span class='ident'>assignment_stmt</span>(<span class='ident'>paths</span>)
+                            }
+                        }
                     },
                     <span class='ident'>Lparen</span> <span class='op'>=&gt;</span> {
-                        <span class='self'>self</span>.<span class='ident'>func_call_stmt</span>(<span class='ident'>prop_path</span>)
+                        <span class='kw'>match</span> <span class='ident'>prop_paths</span> {
+                            <span class='ident'>SinglePath</span>(<span class='ident'>path</span>) <span class='op'>=&gt;</span> {
+                                <span class='self'>self</span>.<span class='ident'>func_call_stmt</span>(<span class='ident'>path</span>)
+                            },
+                            <span class='ident'>MultiplePaths</span>(<span class='ident'>paths</span>) <span class='op'>=&gt;</span> {
+                                <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Function calls need to be their own statement&quot;</span>)
+                            }
+                        }
                     },
                     _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Useless stmt at {}:{}&quot;</span>, <span class='ident'>tok</span>.<span class='ident'>line</span>, <span class='ident'>tok</span>.<span class='ident'>col</span>)
                 }

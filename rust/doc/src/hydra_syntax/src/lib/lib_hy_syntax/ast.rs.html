@@ -593,6 +593,13 @@
 <span id='553'>553</span>
 <span id='554'>554</span>
 <span id='555'>555</span>
+<span id='556'>556</span>
+<span id='557'>557</span>
+<span id='558'>558</span>
+<span id='559'>559</span>
+<span id='560'>560</span>
+<span id='561'>561</span>
+<span id='562'>562</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>CodeGenerator</span>;
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::<span class='ident'>Builder</span>; 
@@ -970,17 +977,24 @@
 
 </span><span class='doccomment'>/// variables to create in the current scope
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>AssignStmt</span> {
-    <span class='ident'>lhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>,
+    <span class='ident'>lhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>,
     <span class='ident'>rhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>
 }
 
 <span class='kw'>impl</span> <span class='ident'>CodeGenerator</span> <span class='kw'>for</span> <span class='ident'>AssignStmt</span> {
-    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){<span class='comment'>
-        //TODO: make this work for a list of variables
-        </span><span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>lhs</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>as_slice</span>();
-        <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>rhs</span>.<span class='ident'>get_mut</span>(<span class='number'>0</span>).<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
+    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>lhs</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='self'>self</span>.<span class='ident'>rhs</span>.<span class='ident'>len</span>() {
+            <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;left hand and right hand sides of assignment stmt arent compatible&quot;</span>);
+        }
 
-        <span class='ident'>builder</span>.<span class='ident'>assign_var</span>(<span class='ident'>var_val</span>, <span class='ident'>var_name</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
+
+        <span class='kw'>for</span> <span class='ident'>prop_path</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>lhs</span>.<span class='ident'>iter</span>() {
+            <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>as_slice</span>();
+            <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>rhs</span>.<span class='ident'>get_mut</span>(<span class='ident'>i</span>).<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
+            <span class='ident'>builder</span>.<span class='ident'>assign_var</span>(<span class='ident'>var_val</span>, <span class='ident'>var_name</span>);
+            <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
+        }        
     }
 }
 
@@ -989,7 +1003,7 @@
 <span class='kw'>impl</span> <span class='ident'>Stmt</span> <span class='kw'>for</span> <span class='ident'>AssignStmt</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>AssignStmt</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>lhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>rhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>lhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>, <span class='ident'>rhs</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
         <span class='kw'>box</span> <span class='ident'>AssignStmt</span> {
             <span class='ident'>lhs</span> : <span class='ident'>lhs</span>,
             <span class='ident'>rhs</span> : <span class='ident'>rhs</span>

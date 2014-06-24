@@ -45,6 +45,11 @@ pub trait HydraParser : HydraBaseParser {
     }  
 }
 
+enum PropertyPath {
+    SinglePath(Vec<Ident>),
+    MultiplePaths(Vec<Vec<Ident>>)
+}
+
 trait HydraBaseParser {
     
     ///Returns the current token
@@ -178,7 +183,29 @@ trait HydraBaseParser {
             idents.push(self.ident());
         }
 
-        return idents
+        idents
+    }
+
+    fn property_paths(&mut self) -> PropertyPath {
+        let first = self.property_path();
+
+        if self.next_is(Comma) {
+            let mut prop_paths = Vec::new();
+            prop_paths.push(first);
+            prop_paths.push(self.property_path());
+
+            loop {
+                if !self.next_is(Comma) {
+                    break;
+                }
+                
+                prop_paths.push(self.property_path());
+            }
+
+            MultiplePaths(prop_paths)
+        } else {
+            SinglePath(first)
+        }
     }
 
     fn func_call(&mut self) -> Box<Expr> {
@@ -190,35 +217,49 @@ trait HydraBaseParser {
         FuncCall::new(prop_path, params)
     }
 
-    fn func_call_stmt(&mut self, prop_path : Vec<Ident>) -> Box<Stmt> {
+    fn func_call_stmt(&mut self, prop_paths : Vec<Ident>) -> Box<Stmt> {
         self.expect(Lparen);
         let params = self.exprs();
         self.expect(Rparen);
         self.expect(Semicolon);
 
-        let expr = FuncCall::new(prop_path, params);
+        let expr = FuncCall::new(prop_paths, params);
         ExprStmt::new(expr)
     }
 
-    fn assignment_stmt(&mut self, prop_path : Vec<Ident>) -> Box<Stmt> {
+    fn assignment_stmt(&mut self, prop_paths : Vec<Vec<Ident>>) -> Box<Stmt> {
         self.expect(Assign);
         let rhs = self.exprs();
         self.expect(Semicolon);
 
-        AssignStmt::new(prop_path, rhs)
+        AssignStmt::new(prop_paths, rhs)
     }
 
     fn func_call_or_assignment(&mut self) -> Box<Stmt> {
-        let prop_path = self.property_path();
+        let prop_paths = self.property_paths();
 
         match self.peek() {
             Some(tok) => {
                 match tok.typ {
                     Assign => {
-                        self.assignment_stmt(prop_path)
+                        match prop_paths {
+                            SinglePath(path) => {
+                                self.assignment_stmt(vec!(path))
+                            },
+                            MultiplePaths(paths) => {
+                                self.assignment_stmt(paths)
+                            }
+                        }
                     },
                     Lparen => {
-                        self.func_call_stmt(prop_path)
+                        match prop_paths {
+                            SinglePath(path) => {
+                                self.func_call_stmt(path)
+                            },
+                            MultiplePaths(paths) => {
+                                fail!("Function calls need to be their own statement")
+                            }
+                        }
                     },
                     _ => fail!("Useless stmt at {}:{}", tok.line, tok.col)
                 }

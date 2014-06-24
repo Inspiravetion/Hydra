@@ -12,8 +12,7 @@ end
 var i, j = 11, 12;
 print_int(i + j);
 
-i = 21;
-j = 22;
+i, j = 21, 22;
 print_int(i + j);
 
 while 0 do
