@@ -669,6 +669,41 @@
 <span id='629'>629</span>
 <span id='630'>630</span>
 <span id='631'>631</span>
+<span id='632'>632</span>
+<span id='633'>633</span>
+<span id='634'>634</span>
+<span id='635'>635</span>
+<span id='636'>636</span>
+<span id='637'>637</span>
+<span id='638'>638</span>
+<span id='639'>639</span>
+<span id='640'>640</span>
+<span id='641'>641</span>
+<span id='642'>642</span>
+<span id='643'>643</span>
+<span id='644'>644</span>
+<span id='645'>645</span>
+<span id='646'>646</span>
+<span id='647'>647</span>
+<span id='648'>648</span>
+<span id='649'>649</span>
+<span id='650'>650</span>
+<span id='651'>651</span>
+<span id='652'>652</span>
+<span id='653'>653</span>
+<span id='654'>654</span>
+<span id='655'>655</span>
+<span id='656'>656</span>
+<span id='657'>657</span>
+<span id='658'>658</span>
+<span id='659'>659</span>
+<span id='660'>660</span>
+<span id='661'>661</span>
+<span id='662'>662</span>
+<span id='663'>663</span>
+<span id='664'>664</span>
+<span id='665'>665</span>
+<span id='666'>666</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -792,6 +827,10 @@
                         <span class='ident'>Identifier</span> <span class='op'>=&gt;</span> {
                             <span class='self'>self</span>.<span class='ident'>func_call_or_assignment</span>()
                         },
+                        <span class='ident'>If</span> <span class='op'>=&gt;</span> {
+                            <span class='self'>self</span>.<span class='ident'>next</span>();
+                            <span class='self'>self</span>.<span class='ident'>if_else_stmt</span>()
+                        },
                         _   <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(
                                 <span class='string'>&quot;Statement at {}:{} not allowed at top level&quot;</span>, 
                                 <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>line</span>,
@@ -839,6 +878,37 @@
         <span class='kw'>let</span> <span class='ident'>stmts</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>do_block</span>();
 
         <span class='ident'>ForInLoop</span>::<span class='ident'>new</span>(<span class='ident'>bound_vars</span>, <span class='ident'>generator</span>, <span class='ident'>stmts</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>if_else_stmt</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>branches</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+
+        <span class='kw'>let</span> <span class='ident'>if_cond</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>expr</span>();
+        <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Then</span>);
+        <span class='kw'>let</span> <span class='ident'>if_stmts</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>stmts</span>();
+
+        <span class='ident'>branches</span>.<span class='ident'>push</span>(<span class='ident'>IfElseBranch</span>::<span class='ident'>new</span>(<span class='prelude-val'>Some</span>(<span class='ident'>if_cond</span>), <span class='ident'>if_stmts</span>));
+
+        <span class='kw'>loop</span> {
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_is</span>(<span class='ident'>End</span>){
+                <span class='kw'>break</span>;
+            }
+
+            <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Else</span>);
+
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_is</span>(<span class='ident'>If</span>) {
+                <span class='kw'>let</span> <span class='ident'>else_if_cond</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>expr</span>();
+                <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Then</span>);
+                <span class='kw'>let</span> <span class='ident'>else_if_stmts</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>stmts</span>();
+
+                <span class='ident'>branches</span>.<span class='ident'>push</span>(<span class='ident'>IfElseBranch</span>::<span class='ident'>new</span>(<span class='prelude-val'>Some</span>(<span class='ident'>else_if_cond</span>), <span class='ident'>else_if_stmts</span>));
+            } <span class='kw'>else</span> {
+                <span class='kw'>let</span> <span class='ident'>else_stmts</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>stmts</span>();
+                <span class='ident'>branches</span>.<span class='ident'>push</span>(<span class='ident'>IfElseBranch</span>::<span class='ident'>new</span>(<span class='prelude-val'>None</span>, <span class='ident'>else_stmts</span>));
+            }
+        }
+
+        <span class='ident'>IfElseStmt</span>::<span class='ident'>new</span>(<span class='ident'>branches</span>)
     }
 
     <span class='kw'>fn</span> <span class='ident'>property_path</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span> {

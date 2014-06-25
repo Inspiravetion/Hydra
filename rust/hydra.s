@@ -251,19 +251,27 @@ Ltmp19:
 	movl	$-1, -60(%rbp)
 	jmp	LBB15_1
 	.align	4, 0x90
-LBB15_8:                                ## %for_loop_exit7
+LBB15_6:                                ## %for_loop_stmts6
                                         ##   in Loop: Header=BB15_1 Depth=1
-	movl	$100, -60(%rbp)
-	movl	$100, %edi
+	movl	16(%rbx), %edi
+	movl	%edi, (%r12)
+	movl	$1, %esi
+	callq	"_+"
+	movl	$1, %esi
+	movl	%eax, %edi
+	callq	"_-"
+	movl	(%r15), %esi
+	movl	%eax, %edi
+	callq	"_+"
+	movl	%eax, %edi
 	callq	_print_int
 LBB15_1:                                ## %for_loop_check
-                                        ## =>This Loop Header: Depth=1
-                                        ##     Child Loop BB15_6 Depth 2
+                                        ## =>This Inner Loop Header: Depth=1
 	movq	%r14, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	je	LBB15_2
-## BB#5:                                ## %for_loop_init4
+## BB#5:                                ## %for_loop_check5
                                         ##   in Loop: Header=BB15_1 Depth=1
 	movl	-40(%rbp), %eax
 	movl	%eax, -60(%rbp)
@@ -283,46 +291,27 @@ LBB15_1:                                ## %for_loop_check
 	leaq	-16(%rax), %r12
 	movq	%r12, %rsp
 	movl	$-1, -16(%rax)
-	jmp	LBB15_6
-	.align	4, 0x90
-LBB15_7:                                ## %for_loop_stmts6
-                                        ##   in Loop: Header=BB15_6 Depth=2
-	movl	16(%rbx), %edi
-	movl	%edi, (%r12)
-	movl	$1, %esi
-	callq	"_+"
-	movl	$1, %esi
-	movl	%eax, %edi
-	callq	"_-"
-	movl	(%r15), %esi
-	movl	%eax, %edi
-	callq	"_+"
-	movl	%eax, %edi
-	callq	_print_int
-LBB15_6:                                ## %for_loop_check5
-                                        ##   Parent Loop BB15_1 Depth=1
-                                        ## =>  This Inner Loop Header: Depth=2
 	movq	%rbx, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
-	jne	LBB15_7
-	jmp	LBB15_8
+	je	LBB15_1
+	jmp	LBB15_6
 LBB15_2:                                ## %for_loop_exit
 	movq	%rsp, %rbx
-	leaq	-16(%rbx), %rax
-	movq	%rax, %rsp
+	leaq	-16(%rbx), %r14
+	movq	%r14, %rsp
 	movl	$11, -16(%rbx)
-	movq	%rsp, %r14
-	leaq	-16(%r14), %rax
+	movq	%rsp, %r15
+	leaq	-16(%r15), %rax
 	movq	%rax, %rsp
-	movl	$12, -16(%r14)
+	movl	$12, -16(%r15)
 	movl	-16(%rbx), %edi
 	movl	$12, %esi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
 	movl	$21, -16(%rbx)
-	movl	$22, -16(%r14)
+	movl	$22, -16(%r15)
 	movl	-16(%rbx), %edi
 	movl	$22, %esi
 	callq	"_+"
@@ -338,6 +327,10 @@ LBB15_4:                                ## %while_loop_stmts
                                         ##   in Loop: Header=BB15_3 Depth=1
 	movl	$1000000, %edi          ## imm = 0xF4240
 	callq	_print_int
+	movl	(%rbx), %edi
+	movl	$1, %esi
+	callq	"_+"
+	movl	%eax, (%rbx)
 LBB15_3:                                ## %while_loop_check
                                         ## =>This Inner Loop Header: Depth=1
 	movl	(%rbx), %edi
@@ -345,7 +338,36 @@ LBB15_3:                                ## %while_loop_check
 	callq	"_<="
 	testl	%eax, %eax
 	jne	LBB15_4
-## BB#9:                                ## %while_loop_exit
+## BB#7:                                ## %if_cond
+	movq	%rsp, %rax
+	leaq	-16(%rax), %rbx
+	movq	%rbx, %rsp
+	movl	$-1, -16(%rax)
+	movl	(%r14), %edi
+	movl	$1000, %esi             ## imm = 0x3E8
+	callq	"_>"
+	testl	%eax, %eax
+	je	LBB15_8
+## BB#10:                               ## %if_else_stmts
+	movl	$1, (%rbx)
+	movl	(%r14), %edi
+	jmp	LBB15_11
+LBB15_8:                                ## %if_else_cond
+	movl	$1, %edi
+	movl	$100, %esi
+	callq	"_<"
+	testl	%eax, %eax
+	je	LBB15_9
+## BB#12:                               ## %if_else_stmts34
+	movl	$2, (%rbx)
+	movl	$100, %edi
+	jmp	LBB15_11
+LBB15_9:                                ## %if_else_cond33
+	movl	$1000, %edi             ## imm = 0x3E8
+LBB15_11:                               ## %if_else_exit
+	callq	_print_int
+	movl	(%rbx), %edi
+	callq	_print_int
 	xorl	%eax, %eax
 	leaq	-32(%rbp), %rsp
 	popq	%rbx

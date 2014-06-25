@@ -453,6 +453,91 @@ impl LoopControlStmt {
 }
 
 ///////////////////////////////////////
+//            If Else Stmt           //
+//ie.                                //
+///////////////////////////////////////
+
+pub struct IfElseBranch {
+    cond  : Option<Box<Expr>>,
+    stmts : Vec<Box<Stmt>>
+}
+
+impl IfElseBranch {
+    pub fn new(cond  : Option<Box<Expr>>, stmts : Vec<Box<Stmt>>) -> IfElseBranch {
+        IfElseBranch {
+            cond  : cond,
+            stmts : stmts
+        }
+    }
+}
+
+/// a statement that runs different code based on conditions
+pub struct IfElseStmt {
+    branches : Vec<IfElseBranch>
+}
+
+impl CodeGenerator for IfElseStmt {
+    fn gen_code(&mut self, builder : &mut Builder){
+        let mut next_cond = builder.new_block("if_cond");
+        let if_else_exit = builder.new_block("if_else_exit");
+
+        builder.break_to(next_cond);
+
+        for branch in self.branches.mut_iter() {
+            match branch.cond {
+              Some(ref mut expr) => {
+                builder.goto_block(next_cond);
+
+                let cond = expr.to_value(builder);
+                let false_value = builder.int(0);
+                let cmp = builder.cmp_eq(cond, false_value, "if_cmp");
+
+                next_cond = builder.new_block("if_else_cond");
+                let stmts_block = builder.new_block("if_else_stmts");
+                builder.conditional_break(cmp, next_cond, stmts_block);
+
+                builder.goto_block(stmts_block);
+                builder.open_scope();
+
+                for stmt in branch.stmts.mut_iter() {
+                    stmt.gen_code(builder);
+                }
+
+                builder.close_scope();
+                builder.break_to(if_else_exit);
+              },
+              None => {
+                builder.goto_block(next_cond);
+                builder.open_scope();
+
+                for stmt in branch.stmts.mut_iter() {
+                    stmt.gen_code(builder);
+                }
+
+                builder.close_scope();
+                builder.break_to(if_else_exit);
+              }  
+            };
+        }
+
+        builder.goto_block(if_else_exit);
+    }
+}
+
+impl Node for IfElseStmt {}
+
+impl Stmt for IfElseStmt {}
+
+impl IfElseStmt {
+    pub fn new(branches : Vec<IfElseBranch>) -> Box<Stmt> {
+        box IfElseStmt {
+            branches : branches
+        } as Box<Stmt>
+    }
+}
+
+
+///////////////////////////////////////
 //            For In Loop            //
 ///////////////////////////////////////
 

@@ -140,7 +140,7 @@ for_loop_init:                                    ; preds = %0
   store i32 -1, i32* %i
   br label %for_loop_check
 
-for_loop_check:                                   ; preds = %for_loop_exit7, %for_loop_init
+for_loop_check:                                   ; preds = %for_loop_exit7, %for_loop_exit7, %for_loop_init
   %done = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator)
   %done_cmp = icmp eq i32 %done, 0
   br i1 %done_cmp, label %for_loop_exit, label %for_loop_stmts
@@ -196,15 +196,17 @@ for_loop_stmts6:                                  ; preds = %for_loop_check5
   %padding16 = load i32* %padding
   %"+_tmp17" = call i32 @"+"(i32 %-_tmp15, i32 %padding16)
   call void @print_int(i32 %"+_tmp17")
+  br label %for_loop_exit7
   br label %for_loop_check5
 
-for_loop_exit7:                                   ; preds = %for_loop_check5
+for_loop_exit7:                                   ; preds = %for_loop_stmts6, %for_loop_check5
+  br label %for_loop_check
   store i32 100, i32* %i
   %i18 = load i32* %i
   call void @print_int(i32 %i18)
   br label %for_loop_check
 
-while_loop_check:                                 ; preds = %while_loop_stmts, %while_loop_stmts, %for_loop_exit
+while_loop_check:                                 ; preds = %while_loop_stmts, %for_loop_exit
   %done27 = load i32* %done26
   %"<=_tmp" = call i32 @"<="(i32 %done27, i32 5)
   %while_cmp = icmp eq i32 0, %"<=_tmp"
@@ -212,12 +214,44 @@ while_loop_check:                                 ; preds = %while_loop_stmts, %
 
 while_loop_stmts:                                 ; preds = %while_loop_check
   call void @print_int(i32 1000000)
-  br label %while_loop_check
   %done28 = load i32* %done26
   %"+_tmp29" = call i32 @"+"(i32 %done28, i32 1)
   store i32 %"+_tmp29", i32* %done26
   br label %while_loop_check
 
 while_loop_exit:                                  ; preds = %while_loop_check
+  %abc = alloca i32
+  store i32 -1, i32* %abc
+  br label %if_cond
+
+if_cond:                                          ; preds = %while_loop_exit
+  %i30 = load i32* %i19
+  %">_tmp" = call i32 @">"(i32 %i30, i32 1000)
+  %if_cmp = icmp eq i32 %">_tmp", 0
+  br i1 %if_cmp, label %if_else_cond, label %if_else_stmts
+
+if_else_exit:                                     ; preds = %if_else_cond33, %if_else_stmts34, %if_else_stmts
+  %abc35 = load i32* %abc
+  call void @print_int(i32 %abc35)
   ret i32 0
+
+if_else_cond:                                     ; preds = %if_cond
+  %"<_tmp" = call i32 @"<"(i32 1, i32 100)
+  %if_cmp32 = icmp eq i32 %"<_tmp", 0
+  br i1 %if_cmp32, label %if_else_cond33, label %if_else_stmts34
+
+if_else_stmts:                                    ; preds = %if_cond
+  store i32 1, i32* %abc
+  %i31 = load i32* %i19
+  call void @print_int(i32 %i31)
+  br label %if_else_exit
+
+if_else_cond33:                                   ; preds = %if_else_cond
+  call void @print_int(i32 1000)
+  br label %if_else_exit
+
+if_else_stmts34:                                  ; preds = %if_else_cond
+  store i32 2, i32* %abc
+  call void @print_int(i32 100)
+  br label %if_else_exit
 }

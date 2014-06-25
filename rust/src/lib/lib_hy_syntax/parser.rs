@@ -120,6 +120,10 @@ trait HydraBaseParser {
                         Identifier => {
                             self.func_call_or_assignment()
                         },
+                        If => {
+                            self.next();
+                            self.if_else_stmt()
+                        },
                         _   => fail!(
                                 "Statement at {}:{} not allowed at top level", 
                                 self.tok().line,
@@ -167,6 +171,37 @@ trait HydraBaseParser {
         let stmts = self.do_block();
 
         ForInLoop::new(bound_vars, generator, stmts)
+    }
+
+    fn if_else_stmt(&mut self) -> Box<Stmt> {
+        let mut branches = Vec::new();
+
+        let if_cond = self.expr();
+        self.expect(Then);
+        let if_stmts = self.stmts();
+
+        branches.push(IfElseBranch::new(Some(if_cond), if_stmts));
+
+        loop {
+            if self.next_is(End){
+                break;
+            }
+
+            self.expect(Else);
+
+            if self.next_is(If) {
+                let else_if_cond = self.expr();
+                self.expect(Then);
+                let else_if_stmts = self.stmts();
+
+                branches.push(IfElseBranch::new(Some(else_if_cond), else_if_stmts));
+            } else {
+                let else_stmts = self.stmts();
+                branches.push(IfElseBranch::new(None, else_stmts));
+            }
+        }
+
+        IfElseStmt::new(branches)
     }
 
     fn property_path(&mut self) -> Vec<Ident> {

@@ -28,3 +28,10 @@ llvm: build
 	llvm-as-mp-3.4 hydra.ll
 	llc-mp-3.4 hydra.bc
 	clang -o hydra-llvm hydra.s
+
+run:
+	./hydra
+	llvm-as-mp-3.4 hydra.ll
+	llc-mp-3.4 hydra.bc
+	clang -o hydra-llvm hydra.s
+	./hydra-llvm	
