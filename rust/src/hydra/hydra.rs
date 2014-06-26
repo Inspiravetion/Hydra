@@ -31,7 +31,7 @@ fn main(){
     builder.declare_variadic_function(
         "sprintf", vec!(string_type, string_type), int_type
     );
-    builder.create_function("print_int", vec!(int_type), void_type, |fb : &mut Builder|{
+    builder.create_function("print_int", vec!(int_type), int_type, |fb : &mut Builder|{
         fb.goto_first_block();
 
         let char_type = fb.char_type();
@@ -44,7 +44,8 @@ fn main(){
         let p_args = vec!(buf);
         fb.call("puts", p_args, "putsres");
 
-        fb.ret_void();
+        let ret = fb.int(0);
+        fb.ret(ret);
     });
     builder.create_function("+", vec!(int_type, int_type), int_type, |fb : &mut Builder|{
         fb.goto_first_block();

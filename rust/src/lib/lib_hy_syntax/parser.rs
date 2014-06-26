@@ -118,11 +118,15 @@ trait HydraBaseParser {
                             self.var_decl()
                         },
                         Identifier => {
-                            self.func_call_or_assignment()
+                            self.func_call_or_assignment_stmt()
                         },
                         If => {
                             self.next();
                             self.if_else_stmt()
+                        },
+                        Function => {
+                            self.next();
+                            self.function_def()
                         },
                         _   => fail!(
                                 "Statement at {}:{} not allowed at top level", 
@@ -137,6 +141,19 @@ trait HydraBaseParser {
                 }
             };
         } 
+    }
+
+    fn function_def(&mut self) -> Box<Stmt> {
+        self.expect(Identifier);
+        let func_name = self.tok().text.to_owned();
+
+        self.expect(Lparen);
+        let params = self.idents();
+        self.expect(Rparen);
+
+        let stmts = self.block();
+
+        FunctionDef::new(func_name, params, stmts)
     }
 
     fn var_decl(&mut self) -> Box<Stmt> {
@@ -243,8 +260,7 @@ trait HydraBaseParser {
         }
     }
 
-    fn func_call(&mut self) -> Box<Expr> {
-        let prop_path = self.property_path();
+    fn func_call(&mut self, prop_path : Vec<Ident>) -> Box<Expr> {
         self.expect(Lparen);
         let params = self.exprs();
         self.expect(Rparen);
@@ -270,7 +286,7 @@ trait HydraBaseParser {
         AssignStmt::new(prop_paths, rhs)
     }
 
-    fn func_call_or_assignment(&mut self) -> Box<Stmt> {
+    fn func_call_or_assignment_stmt(&mut self) -> Box<Stmt> {
         let prop_paths = self.property_paths();
 
         match self.peek() {
@@ -311,7 +327,7 @@ trait HydraBaseParser {
             Some(tok) => {
                 match tok.typ {
                     Identifier => {
-                        Some(self.func_call_or_assignment())
+                        Some(self.func_call_or_assignment_stmt())
                     },
                     For => {
                         self.next();
@@ -338,7 +354,16 @@ trait HydraBaseParser {
                         self.expect(Semicolon);
 
                         Some(stmt)
-                    }
+                    },
+                    If => {
+                        self.next();
+                        Some(self.if_else_stmt())
+                    },
+                    Return => {
+                        self.next();
+                        let ret_val = self.expr();
+                        Some(ReturnStmt::new(ret_val))
+                    },
                     _ => None
                 }
             },
@@ -421,13 +446,38 @@ trait HydraBaseParser {
                         Some(Int::new(num))
                     },
                     Identifier => {
-                        self.next();
-                        Some(IdentExpr::new(tok.text))
+                        Some(self.ident_or_func_call())
                     }
                     _ => None
                 }
             },
             None => None
+        }
+    }
+
+    fn ident_or_func_call(&mut self) -> Box<Expr> {
+        let prop_paths = self.property_paths();
+
+        match prop_paths {
+            SinglePath(path) => {
+                match self.peek() {
+                    Some(tok) => {
+                        if tok.typ == Lparen {
+                            self.func_call(path)
+                        } else {
+                            IdentExpr::new(path.get(0).to_owned())
+                        }
+                    },
+                    None => {
+                        let tok = self.tok();
+                        fail!("Expected Expression at {}:{}", tok.line, tok.col);
+                    }
+                }
+            },
+            MultiplePaths(paths) => {
+                //this is a tuple
+                fail!("Tuples are supported yet");
+            }
         }
     }
 

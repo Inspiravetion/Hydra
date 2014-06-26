@@ -141,6 +141,13 @@ impl Builder {
         }
     }
 
+    pub fn with_fresh_scope(&mut self, cb :|&mut Builder|) {
+        let saved_scope = self.curr_scope.clone();
+        self.curr_scope = Scope::new_global();
+        cb(self);
+        self.curr_scope = saved_scope;
+    }
+
     pub fn open_scope(&mut self) {
         let inner_scope = Scope::new_inner(self.curr_scope.clone());
         self.curr_scope = inner_scope;
@@ -327,10 +334,11 @@ impl Builder {
 
     pub fn create_function(&mut self, name : &str, args : Vec<Type>, ret : Type, cb : |&mut Builder|) {
         let typ = self.func_type(args, ret, False);
+        let saved_func = self.curr_func.clone();
         self.curr_func = Some(u!(llvm::LLVMAddFunction(self.curr_pkg.unwrap(), chars(name), typ)));
         self.new_block("");
         cb(self);
-        self.curr_func = None;
+        self.curr_func = saved_func;
     }
 
     pub fn create_variadic_function(&mut self, name : &str, args : Vec<Type>, ret : Type, cb : |&mut Builder|) {
@@ -522,6 +530,10 @@ impl Builder {
 
     pub fn get_first_block(&mut self, func : Value) -> Block {
         u!(llvm::LLVMGetFirstBasicBlock(func))
+    }
+
+    pub fn get_last_block(&mut self) -> Block {
+        u!(llvm::LLVMGetLastBasicBlock(self.curr_func.unwrap()))
     }
 
 

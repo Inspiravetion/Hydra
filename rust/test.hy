@@ -1,3 +1,14 @@
+function plus(a, b){
+    return a + b
+}
+
+function minus(a, b){
+    return a - b
+}
+
+var added = plus(1200, 34);
+print_int(added);
+
 for i in 0 upto 1 + 2 * 3 / 2 - 1 times 2 do
     var padding = 10;
 
@@ -35,3 +46,5 @@ else
 end
 
 print_int(abc);
+
+print_int(minus(10, 100));

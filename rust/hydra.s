@@ -66,6 +66,7 @@ Ltmp9:
 	callq	_sprintf
 	movq	%rbx, %rdi
 	callq	_puts
+	xorl	%eax, %eax
 	addq	$8, %rsp
 	popq	%rbx
 	popq	%rbp
@@ -219,7 +220,7 @@ Ltmp15:
 	pushq	%r14
 	pushq	%r12
 	pushq	%rbx
-	subq	$32, %rsp
+	subq	$48, %rsp
 Ltmp16:
 	.cfi_offset %rbx, -48
 Ltmp17:
@@ -228,6 +229,12 @@ Ltmp18:
 	.cfi_offset %r14, -32
 Ltmp19:
 	.cfi_offset %r15, -24
+	movl	$1200, %edi             ## imm = 0x4B0
+	movl	$34, %esi
+	callq	_plus
+	movl	%eax, -36(%rbp)
+	movl	%eax, %edi
+	callq	_print_int
 	movl	$2, %edi
 	movl	$3, %esi
 	callq	"_*"
@@ -243,15 +250,15 @@ Ltmp19:
 	movl	$1, %edi
 	movl	%eax, %esi
 	callq	"_+"
-	leaq	-56(%rbp), %r14
+	leaq	-64(%rbp), %r14
 	xorl	%esi, %esi
 	movq	%r14, %rdi
 	movl	%eax, %edx
 	callq	"_!range_gen_init"
-	movl	$-1, -60(%rbp)
+	movl	$-1, -68(%rbp)
 	jmp	LBB15_1
 	.align	4, 0x90
-LBB15_6:                                ## %for_loop_stmts6
+LBB15_6:                                ## %for_loop_stmts7
                                         ##   in Loop: Header=BB15_1 Depth=1
 	movl	16(%rbx), %edi
 	movl	%edi, (%r12)
@@ -271,15 +278,15 @@ LBB15_1:                                ## %for_loop_check
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	je	LBB15_2
-## BB#5:                                ## %for_loop_check5
+## BB#5:                                ## %for_loop_check6
                                         ##   in Loop: Header=BB15_1 Depth=1
-	movl	-40(%rbp), %eax
-	movl	%eax, -60(%rbp)
+	movl	-48(%rbp), %eax
+	movl	%eax, -68(%rbp)
 	movq	%rsp, %rax
 	leaq	-16(%rax), %r15
 	movq	%r15, %rsp
 	movl	$10, -16(%rax)
-	movl	-60(%rbp), %edx
+	movl	-68(%rbp), %edx
 	incl	%edx
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
@@ -349,7 +356,6 @@ LBB15_3:                                ## %while_loop_check
 	testl	%eax, %eax
 	je	LBB15_8
 ## BB#10:                               ## %if_else_stmts
-	movl	$1, (%rbx)
 	movl	(%r14), %edi
 	jmp	LBB15_11
 LBB15_8:                                ## %if_else_cond
@@ -358,15 +364,20 @@ LBB15_8:                                ## %if_else_cond
 	callq	"_<"
 	testl	%eax, %eax
 	je	LBB15_9
-## BB#12:                               ## %if_else_stmts34
+## BB#12:                               ## %if_else_stmts41
 	movl	$2, (%rbx)
 	movl	$100, %edi
 	jmp	LBB15_11
-LBB15_9:                                ## %if_else_cond33
+LBB15_9:                                ## %if_else_cond40
 	movl	$1000, %edi             ## imm = 0x3E8
 LBB15_11:                               ## %if_else_exit
 	callq	_print_int
 	movl	(%rbx), %edi
+	callq	_print_int
+	movl	$10, %edi
+	movl	$100, %esi
+	callq	_minus
+	movl	%eax, %edi
 	callq	_print_int
 	xorl	%eax, %eax
 	leaq	-32(%rbp), %rsp
@@ -375,6 +386,38 @@ LBB15_11:                               ## %if_else_exit
 	popq	%r14
 	popq	%r15
 	popq	%rbp
+	ret
+	.cfi_endproc
+
+	.globl	_plus
+	.align	4, 0x90
+_plus:                                  ## @plus
+	.cfi_startproc
+## BB#0:
+	pushq	%rax
+Ltmp21:
+	.cfi_def_cfa_offset 16
+	movl	%edi, 4(%rsp)
+	movl	%esi, (%rsp)
+	movl	4(%rsp), %edi
+	callq	"_+"
+	popq	%rdx
+	ret
+	.cfi_endproc
+
+	.globl	_minus
+	.align	4, 0x90
+_minus:                                 ## @minus
+	.cfi_startproc
+## BB#0:
+	pushq	%rax
+Ltmp23:
+	.cfi_def_cfa_offset 16
+	movl	%edi, 4(%rsp)
+	movl	%esi, (%rsp)
+	movl	4(%rsp), %edi
+	callq	"_-"
+	popq	%rdx
 	ret
 	.cfi_endproc
 

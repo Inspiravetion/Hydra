@@ -47,6 +47,14 @@ pub struct FuncCall {
 
 impl CodeGenerator for FuncCall {
     fn gen_code(&mut self, builder : &mut Builder){
+        self.to_value(builder);
+    }
+}
+
+impl Node for FuncCall {}
+
+impl Expr for FuncCall {
+    fn to_value(&mut self, builder : &mut Builder) -> Value {
         let mut params = Vec::new();
         for param in self.params.mut_iter() {
             params.push(param.to_value(builder));
@@ -54,13 +62,9 @@ impl CodeGenerator for FuncCall {
 
         //getting the function name will change later
         let func_name = self.prop_path.get(0).as_slice();
-        builder.call(func_name, params, "");   
+        builder.call(func_name, params, format!("{}_tmp", func_name))
     }
 }
-
-impl Node for FuncCall {}
-
-impl Expr for FuncCall {}
 
 impl FuncCall {
     pub fn new(prop_path : Vec<Ident>, params : Vec<Box<Expr>>) -> Box<Expr> {
@@ -692,6 +696,95 @@ impl WhileLoop {
         box WhileLoop {
             cond  : cond, 
             stmts : stmts
+        } as Box<Stmt>
+    }
+}
+
+///////////////////////////////////////
+//         Function Definition       //
+///////////////////////////////////////
+
+///Function definition
+pub struct FunctionDef {
+    name   : Ident,
+    params : Vec<Ident>, 
+    stmts  : Vec<Box<Stmt>>
+}
+
+impl CodeGenerator for FunctionDef {
+    fn gen_code(&mut self, builder : &mut Builder){
+        let saved_block = builder.get_last_block();
+
+        builder.with_fresh_scope(|fb : &mut Builder|{
+            //This will end up being some general HyObj type or sumthn
+            let int_type = fb.int32_type();
+
+            let name = self.name.as_slice();
+            let param_types = Vec::from_elem(self.params.len(), int_type);
+
+            fb.create_function(name, param_types, int_type,|fb : &mut Builder|{
+                fb.goto_first_block();
+                
+                //bind params to local vars
+                let mut i = 0;
+                for param in self.params.iter() {
+                    //right now this is pass by value...not by ref
+                    let name = param.as_slice();
+                    let param_val = fb.get_param(i);
+                    let var_val = fb.new_var(param_val, name);
+                    fb.set_var(name, var_val);
+
+                    i += 1;
+                }
+
+                for stmt in self.stmts.mut_iter() {
+                    stmt.gen_code(fb);
+                }
+
+                fb.goto_block(saved_block);
+            });
+        });
+    }
+}
+
+impl Node for FunctionDef {}
+
+impl Stmt for FunctionDef {}
+
+impl FunctionDef {
+    pub fn new(name : Ident, params : Vec<Ident>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+        box FunctionDef {
+            name   : name,
+            params : params, 
+            stmts  : stmts
+        } as Box<Stmt>
+    }
+}
+
+///////////////////////////////////////
+//             Return Stmt           //
+///////////////////////////////////////
+
+/// A return statement
+pub struct ReturnStmt {
+    ret_expr : Box<Expr>
+}
+
+impl CodeGenerator for ReturnStmt {
+    fn gen_code(&mut self, builder : &mut Builder){
+        let val = self.ret_expr.to_value(builder);
+        builder.ret(val);
+    }
+}
+
+impl Node for ReturnStmt {}
+
+impl Stmt for ReturnStmt {}
+
+impl ReturnStmt {
+    pub fn new(ret_expr : Box<Expr>) -> Box<Stmt> {
+        box ReturnStmt {
+            ret_expr : ret_expr
         } as Box<Stmt>
     }
 }
