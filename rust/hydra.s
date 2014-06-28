@@ -220,7 +220,7 @@ Ltmp15:
 	pushq	%r14
 	pushq	%r12
 	pushq	%rbx
-	subq	$48, %rsp
+	subq	$32, %rsp
 Ltmp16:
 	.cfi_offset %rbx, -48
 Ltmp17:
@@ -229,36 +229,31 @@ Ltmp18:
 	.cfi_offset %r14, -32
 Ltmp19:
 	.cfi_offset %r15, -24
-	movl	$1200, %edi             ## imm = 0x4B0
-	movl	$34, %esi
-	callq	_plus
-	movl	%eax, -36(%rbp)
-	movl	%eax, %edi
-	callq	_print_int
 	movl	$2, %edi
 	movl	$3, %esi
 	callq	"_*"
 	movl	$2, %esi
 	movl	%eax, %edi
 	callq	"_/"
-	movl	$1, %esi
-	movl	%eax, %edi
-	callq	"_-"
-	movl	$2, %esi
-	movl	%eax, %edi
+	movl	%eax, %ebx
+	movl	$1, %edi
+	movl	$10, %esi
 	callq	_times
+	movl	%ebx, %edi
+	movl	%eax, %esi
+	callq	"_-"
 	movl	$1, %edi
 	movl	%eax, %esi
 	callq	"_+"
-	leaq	-64(%rbp), %r14
+	leaq	-56(%rbp), %r14
 	xorl	%esi, %esi
 	movq	%r14, %rdi
 	movl	%eax, %edx
 	callq	"_!range_gen_init"
-	movl	$-1, -68(%rbp)
+	movl	$-1, -60(%rbp)
 	jmp	LBB15_1
 	.align	4, 0x90
-LBB15_6:                                ## %for_loop_stmts7
+LBB15_3:                                ## %for_loop_stmts7
                                         ##   in Loop: Header=BB15_1 Depth=1
 	movl	16(%rbx), %edi
 	movl	%edi, (%r12)
@@ -277,16 +272,16 @@ LBB15_1:                                ## %for_loop_check
 	movq	%r14, %rdi
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
-	je	LBB15_2
-## BB#5:                                ## %for_loop_check6
+	je	LBB15_4
+## BB#2:                                ## %for_loop_check6
                                         ##   in Loop: Header=BB15_1 Depth=1
-	movl	-48(%rbp), %eax
-	movl	%eax, -68(%rbp)
+	movl	-40(%rbp), %eax
+	movl	%eax, -60(%rbp)
 	movq	%rsp, %rax
 	leaq	-16(%rax), %r15
 	movq	%r15, %rsp
 	movl	$10, -16(%rax)
-	movl	-68(%rbp), %edx
+	movl	-60(%rbp), %edx
 	incl	%edx
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
@@ -302,8 +297,17 @@ LBB15_1:                                ## %for_loop_check
 	callq	"_!range_gen_next"
 	testl	%eax, %eax
 	je	LBB15_1
-	jmp	LBB15_6
-LBB15_2:                                ## %for_loop_exit
+	jmp	LBB15_3
+LBB15_4:                                ## %function_def_bridge21
+	movl	$1200, %edi             ## imm = 0x4B0
+	movl	$34, %esi
+	callq	_plus
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movl	%eax, -16(%rcx)
+	movl	%eax, %edi
+	callq	_print_int
 	movq	%rsp, %rbx
 	leaq	-16(%rbx), %r14
 	movq	%r14, %rsp
@@ -328,23 +332,23 @@ LBB15_2:                                ## %for_loop_exit
 	leaq	-16(%rax), %rbx
 	movq	%rbx, %rsp
 	movl	$0, -16(%rax)
-	jmp	LBB15_3
+	jmp	LBB15_5
 	.align	4, 0x90
-LBB15_4:                                ## %while_loop_stmts
-                                        ##   in Loop: Header=BB15_3 Depth=1
+LBB15_6:                                ## %while_loop_stmts
+                                        ##   in Loop: Header=BB15_5 Depth=1
 	movl	$1000000, %edi          ## imm = 0xF4240
 	callq	_print_int
 	movl	(%rbx), %edi
 	movl	$1, %esi
 	callq	"_+"
 	movl	%eax, (%rbx)
-LBB15_3:                                ## %while_loop_check
+LBB15_5:                                ## %while_loop_check
                                         ## =>This Inner Loop Header: Depth=1
 	movl	(%rbx), %edi
 	movl	$5, %esi
 	callq	"_<="
 	testl	%eax, %eax
-	jne	LBB15_4
+	jne	LBB15_6
 ## BB#7:                                ## %if_cond
 	movq	%rsp, %rax
 	leaq	-16(%rax), %rbx
@@ -364,11 +368,11 @@ LBB15_8:                                ## %if_else_cond
 	callq	"_<"
 	testl	%eax, %eax
 	je	LBB15_9
-## BB#12:                               ## %if_else_stmts41
+## BB#12:                               ## %if_else_stmts43
 	movl	$2, (%rbx)
 	movl	$100, %edi
 	jmp	LBB15_11
-LBB15_9:                                ## %if_else_cond40
+LBB15_9:                                ## %if_else_cond42
 	movl	$1000, %edi             ## imm = 0x3E8
 LBB15_11:                               ## %if_else_exit
 	callq	_print_int
@@ -389,9 +393,9 @@ LBB15_11:                               ## %if_else_exit
 	ret
 	.cfi_endproc
 
-	.globl	_plus
+	.globl	_minus
 	.align	4, 0x90
-_plus:                                  ## @plus
+_minus:                                 ## @minus
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
@@ -400,14 +404,14 @@ Ltmp21:
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
 	movl	4(%rsp), %edi
-	callq	"_+"
+	callq	"_-"
 	popq	%rdx
 	ret
 	.cfi_endproc
 
-	.globl	_minus
+	.globl	_times1
 	.align	4, 0x90
-_minus:                                 ## @minus
+_times1:                                ## @times1
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
@@ -416,7 +420,23 @@ Ltmp23:
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
 	movl	4(%rsp), %edi
-	callq	"_-"
+	callq	"_*"
+	popq	%rdx
+	ret
+	.cfi_endproc
+
+	.globl	_plus
+	.align	4, 0x90
+_plus:                                  ## @plus
+	.cfi_startproc
+## BB#0:
+	pushq	%rax
+Ltmp25:
+	.cfi_def_cfa_offset 16
+	movl	%edi, 4(%rsp)
+	movl	%esi, (%rsp)
+	movl	4(%rsp), %edi
+	callq	"_+"
 	popq	%rdx
 	ret
 	.cfi_endproc

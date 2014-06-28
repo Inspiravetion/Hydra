@@ -536,6 +536,10 @@ impl Builder {
         u!(llvm::LLVMGetLastBasicBlock(self.curr_func.unwrap()))
     }
 
+    pub fn goto_last_instr(&mut self, block : Block) {
+        let instr = u!(llvm::LLVMGetLastInstruction(block));
+        u!(llvm::LLVMPositionBuilder(self.builder, block, instr));
+    } 
 
     /*
         User Created Types

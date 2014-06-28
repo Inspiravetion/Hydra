@@ -3,6 +3,8 @@ use token::*;
 use ast::*;
 use std::from_str::from_str;
 use scanner;
+use collections::hashmap::HashMap;
+
 
 ///Scan and Parse a file in parallel
 pub fn parse_file_async(path : &str) -> Vec<Box<Stmt>> {
@@ -29,14 +31,16 @@ pub fn parse_str_sync(code : &str) -> Vec<Box<Stmt>> {
 }
 
 pub struct AsyncParser {
-    tokens   : Receiver<Token>,
-    peek_tok : Option<Token>,
-    tok      : Option<Token>
+    tokens      : Receiver<Token>,
+    presidences : HashMap<Ident, int>,
+    peek_tok    : Option<Token>,
+    tok         : Option<Token>
 }
 
 pub struct SyncParser {
-    tokens : Vec<Token>,
-    tok_idx : uint
+    tokens      : Vec<Token>,
+    presidences : HashMap<Ident, int>,
+    tok_idx     : uint
 }
 
 pub trait HydraParser : HydraBaseParser {
@@ -61,6 +65,12 @@ trait HydraBaseParser {
     ///Consumes the next token and returns true if
     ///possible, otherwise returns false if at EOF
     fn next_opt(&mut self) -> bool;
+
+    ///Returns a tokens presidence
+    fn get_presidence(&mut self, &Token) -> int;
+
+    ///Sets the presidence for a token
+    fn set_presidence(&mut self, &Token, int);
 
     ///Advance to next token or fail! if at EOF
     fn next(&mut self) {
@@ -126,6 +136,31 @@ trait HydraBaseParser {
                         },
                         Function => {
                             self.next();
+                            self.function_def()
+                        },
+                        Operator => {
+                            self.next();
+                            self.expect(Lbracket);
+
+                            if !self.next_is(Int_Literal) {
+                                fail!("Expected Int for operator presidence");
+                            }
+
+                            let pres = from_str::<int>(self.tok().text).unwrap();
+
+                            self.expect(Rbracket);
+
+                            match self.peek() {
+                                Some(tok) => {
+                                    if tok.typ != Identifier {
+                                        fail!("Expected Identifier at {}:{}", tok.line, tok.col);
+                                    }
+
+                                    self.set_presidence(&tok, pres);
+                                },
+                                None => fail!("Unexpected end of input")
+                            };
+
                             self.function_def()
                         },
                         _   => fail!(
@@ -427,7 +462,10 @@ trait HydraBaseParser {
 
         self.next();
 
-        if presidence(op1.typ) >= presidence(op2.typ) {
+        let op1_pres = self.get_presidence(&op1);
+        let op2_pres = self.get_presidence(&op2);
+
+        if op1_pres >= op2_pres {
             let expr_tmp = BinaryExpr::new(expr1, op1, expr2);
             self.resolve_bin_expr(expr_tmp)
         } else {
@@ -614,15 +652,11 @@ impl AsyncParser {
             Err(_)  => fail!("Created parser with empty input")
         };
 
-        // let peek = match toks.recv_opt() {
-        //     Ok(t) => Some(t),
-        //     Err(_)  => None
-        // };
-
         AsyncParser {
-            tokens   : toks,
-            peek_tok : first,
-            tok      : None
+            tokens      : toks,
+            presidences : new_presidence_map(),
+            peek_tok    : first,
+            tok         : None
         }
     }
 }
@@ -656,6 +690,17 @@ impl HydraBaseParser for AsyncParser {
             None => fail!("Tried to get token before advancing")
         }
     }
+
+    fn get_presidence(&mut self, tok : &Token) -> int {
+        match self.presidences.find(&tok.text) {
+            Some(pres) => *pres,
+            None => fail!("Must define {} operator before it can be used", tok.text)
+        }
+    }
+
+    fn set_presidence(&mut self, tok : &Token, pres : int) {
+        self.presidences.insert(tok.text.to_owned(), pres);
+    }
 }
 
 impl SyncParser {
@@ -665,8 +710,9 @@ impl SyncParser {
         }
 
         SyncParser {
-            tokens : toks,
-            tok_idx : -1
+            tokens      : toks,
+            presidences : new_presidence_map(),
+            tok_idx     : -1
         }
     }
 }
@@ -703,14 +749,31 @@ impl HydraBaseParser for SyncParser {
 
         self.tokens.get(idx).clone()
     }
+
+    fn get_presidence(&mut self, tok : &Token) -> int {
+        match self.presidences.find(&tok.text) {
+            Some(pres) => *pres,
+            None => fail!("Must define {} operator before it can be used", tok.text)
+        }
+    }
+
+    fn set_presidence(&mut self, tok : &Token, pres : int) {
+        self.presidences.insert(tok.text.to_owned(), pres);
+    }
 }
 
-fn presidence(typ : TokenType) -> int {
-    match typ {
-        Mod_Op => 1,
-        Add_Op | Min_Op => 2, 
-        Mult_Op | Div_Op  => 3,
-        Power_Op => 4,
-        _ => 0
-    }
+fn new_presidence_map() -> HashMap<Ident, int> {
+    let mut map = HashMap::new();
+
+    map.insert("%".to_owned(), 1);
+
+    map.insert("+".to_owned(), 2);
+    map.insert("-".to_owned(), 2);
+    
+    map.insert("*".to_owned(), 3);
+    map.insert("/".to_owned(), 3);
+    
+    map.insert("^".to_owned(), 4);
+
+    map
 }

@@ -713,7 +713,8 @@ pub struct FunctionDef {
 
 impl CodeGenerator for FunctionDef {
     fn gen_code(&mut self, builder : &mut Builder){
-        let saved_block = builder.get_last_block();
+        let saved_block = builder.new_block("function_def_bridge");
+        builder.break_to(saved_block);
 
         builder.with_fresh_scope(|fb : &mut Builder|{
             //This will end up being some general HyObj type or sumthn

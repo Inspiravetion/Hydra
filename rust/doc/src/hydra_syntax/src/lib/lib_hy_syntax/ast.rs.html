@@ -828,6 +828,7 @@
 <span id='788'>788</span>
 <span id='789'>789</span>
 <span id='790'>790</span>
+<span id='791'>791</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>CodeGenerator</span>;
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::<span class='ident'>Builder</span>; 
@@ -1544,7 +1545,8 @@
 
 <span class='kw'>impl</span> <span class='ident'>CodeGenerator</span> <span class='kw'>for</span> <span class='ident'>FunctionDef</span> {
     <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
-        <span class='kw'>let</span> <span class='ident'>saved_block</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_last_block</span>();
+        <span class='kw'>let</span> <span class='ident'>saved_block</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;function_def_bridge&quot;</span>);
+        <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>saved_block</span>);
 
         <span class='ident'>builder</span>.<span class='ident'>with_fresh_scope</span>(<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{<span class='comment'>
             //This will end up being some general HyObj type or sumthn

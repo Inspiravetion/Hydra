@@ -1,15 +1,12 @@
-function plus(a, b){
-    return a + b
-}
-
 function minus(a, b){
     return a - b
 }
 
-var added = plus(1200, 34);
-print_int(added);
+operator[0] times(a, b){
+    return a * b
+}
 
-for i in 0 upto 1 + 2 * 3 / 2 - 1 times 2 do
+for i in 0 upto 1 + 2 * 3 / 2 - 1 times 10 do
     var padding = 10;
 
     for i in 0 through i do
@@ -21,6 +18,13 @@ for i in 0 upto 1 + 2 * 3 / 2 - 1 times 2 do
     i = 100;
     print_int(i);
 end
+
+function plus(a, b){
+    return a + b
+}
+
+var added = plus(1200, 34);
+print_int(added);
 
 var i, j = 11, 12;
 print_int(i + j);

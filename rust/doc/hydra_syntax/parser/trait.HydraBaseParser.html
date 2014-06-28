@@ -39,11 +39,13 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>parser</a>::<a class='trait' href=''>HydraBaseParser</a><a class='source' href='../../src/hydra_syntax/src/lib/lib_hy_syntax/parser.rs.html#53-608'>[src]</a></h1>
+<h1 class='fqn'>Trait <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>parser</a>::<a class='trait' href=''>HydraBaseParser</a><a class='source' href='../../src/hydra_syntax/src/lib/lib_hy_syntax/parser.rs.html#57-646'>[src]</a></h1>
 <pre class='rust trait'>trait HydraBaseParser {
     fn <a href='#tymethod.tok' class='fnname'>tok</a>(&amp;mut self) -&gt; <a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>;
     fn <a href='#tymethod.peek' class='fnname'>peek</a>(&amp;mut self) -&gt; <a class='type' href='http://static.rust-lang.org/doc/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>&gt;;
     fn <a href='#tymethod.next_opt' class='fnname'>next_opt</a>(&amp;mut self) -&gt; bool;
+    fn <a href='#tymethod.get_presidence' class='fnname'>get_presidence</a>(&amp;mut self, &amp;<a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>) -&gt; int;
+    fn <a href='#tymethod.set_presidence' class='fnname'>set_presidence</a>(&amp;mut self, &amp;<a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>, int);
 
     fn <a href='#method.next' class='fnname'>next</a>(&amp;mut self) { ... }
     fn <a href='#method.next_is' class='fnname'>next_is</a>(&amp;mut self, typ: <a class='type' href='../../hydra_syntax/token/type.TokenType.html' title='hydra_syntax::token::TokenType'>TokenType</a>) -&gt; bool { ... }
@@ -84,6 +86,8 @@
 </div><h3 id='tymethod.peek' class='method'><code>fn <a href='#tymethod.peek' class='fnname'>peek</a>(&amp;mut self) -&gt; <a class='type' href='http://static.rust-lang.org/doc/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>&gt;</code></h3><div class='docblock'><p>Returns the next token or None if at EOF</p>
 </div><h3 id='tymethod.next_opt' class='method'><code>fn <a href='#tymethod.next_opt' class='fnname'>next_opt</a>(&amp;mut self) -&gt; bool</code></h3><div class='docblock'><p>Consumes the next token and returns true if
 possible, otherwise returns false if at EOF</p>
+</div><h3 id='tymethod.get_presidence' class='method'><code>fn <a href='#tymethod.get_presidence' class='fnname'>get_presidence</a>(&amp;mut self, &amp;<a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>) -&gt; int</code></h3><div class='docblock'><p>Returns a tokens presidence</p>
+</div><h3 id='tymethod.set_presidence' class='method'><code>fn <a href='#tymethod.set_presidence' class='fnname'>set_presidence</a>(&amp;mut self, &amp;<a class='struct' href='../../hydra_syntax/token/struct.Token.html' title='hydra_syntax::token::Token'>Token</a>, int)</code></h3><div class='docblock'><p>Sets the presidence for a token</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
