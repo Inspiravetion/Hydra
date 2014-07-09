@@ -49,9 +49,13 @@ pub trait HydraParser : HydraBaseParser {
     }  
 }
 
-enum PropertyPath {
-    SinglePath(Vec<Ident>),
-    MultiplePaths(Vec<Vec<Ident>>)
+///abc or abc.def or a.b.c, d.e.f
+///TODO: merge prop_path and prop_paths to return one of these so 
+///prefix...and eventually postfix...unary operators can be parsed
+enum IdentPrefix {
+    SingleIdent(Ident),
+    SingleIdentList(Vec<Ident>),
+    MultiIdentList(Vec<Vec<Ident>>)
 }
 
 trait HydraBaseParser {
@@ -136,33 +140,17 @@ trait HydraBaseParser {
                         },
                         Function => {
                             self.next();
-                            self.function_def()
+                            self.function_def(false)
                         },
                         Operator => {
                             self.next();
-                            self.expect(Lbracket);
-
-                            if !self.next_is(Int_Literal) {
-                                fail!("Expected Int for operator presidence");
-                            }
-
-                            let pres = from_str::<int>(self.tok().text).unwrap();
-
-                            self.expect(Rbracket);
-
-                            match self.peek() {
-                                Some(tok) => {
-                                    if tok.typ != Identifier {
-                                        fail!("Expected Identifier at {}:{}", tok.line, tok.col);
-                                    }
-
-                                    self.set_presidence(&tok, pres);
-                                },
-                                None => fail!("Unexpected end of input")
-                            };
-
-                            self.function_def()
+                            self.operator_def()
                         },
+                        Generator => {
+                            self.next();
+                            self.expect(Function);
+                            self.function_def(true)
+                        }
                         _   => fail!(
                                 "Statement at {}:{} not allowed at top level", 
                                 self.tok().line,
@@ -178,17 +166,47 @@ trait HydraBaseParser {
         } 
     }
 
-    fn function_def(&mut self) -> Box<Stmt> {
+    fn function_def(&mut self, generator : bool) -> Box<Stmt> {
         self.expect(Identifier);
         let func_name = self.tok().text.to_owned();
 
         self.expect(Lparen);
+        //TODO: this should be opt_idents();
         let params = self.idents();
         self.expect(Rparen);
 
-        let stmts = self.block();
+        let stmts = self.block(); //TODO: this should also be optional
 
-        FunctionDef::new(func_name, params, stmts)
+        if generator {
+            GeneratorDef::new(func_name, params, stmts)
+        } else {
+            FunctionDef::new(func_name, params, stmts)
+        }
+    }
+
+    fn operator_def(&mut self) -> Box<Stmt> {
+        self.expect(Lbracket);
+        
+        if !self.next_is(Int_Literal) {
+            fail!("Expected Int for operator presidence");
+        }
+
+        let pres = from_str::<int>(self.tok().text).unwrap();
+
+        self.expect(Rbracket);
+
+        match self.peek() {
+            Some(tok) => {
+                if tok.typ != Identifier {
+                    fail!("Expected Identifier at {}:{}", tok.line, tok.col);
+                }
+
+                self.set_presidence(&tok, pres);
+            },
+            None => fail!("Unexpected end of input")
+        };
+
+        self.function_def(false)
     }
 
     fn var_decl(&mut self) -> Box<Stmt> {
@@ -256,7 +274,7 @@ trait HydraBaseParser {
         IfElseStmt::new(branches)
     }
 
-    fn property_path(&mut self) -> Vec<Ident> {
+    fn ident_prefix(&mut self) -> Vec<Ident> {
         let mut idents = Vec::new();
 
         idents.push(self.ident());
@@ -273,25 +291,29 @@ trait HydraBaseParser {
         idents
     }
 
-    fn property_paths(&mut self) -> PropertyPath {
-        let first = self.property_path();
+    fn ident_prefixs(&mut self) -> IdentPrefix {
+        let first = self.ident_prefix();
 
         if self.next_is(Comma) {
             let mut prop_paths = Vec::new();
             prop_paths.push(first);
-            prop_paths.push(self.property_path());
+            prop_paths.push(self.ident_prefix());
 
             loop {
                 if !self.next_is(Comma) {
                     break;
                 }
                 
-                prop_paths.push(self.property_path());
+                prop_paths.push(self.ident_prefix());
             }
 
-            MultiplePaths(prop_paths)
+            MultiIdentList(prop_paths)
         } else {
-            SinglePath(first)
+            if first.len() == 1 {
+                SingleIdent(first.get(0).to_owned())
+            } else {
+                SingleIdentList(first)
+            }
         }
     }
 
@@ -322,28 +344,34 @@ trait HydraBaseParser {
     }
 
     fn func_call_or_assignment_stmt(&mut self) -> Box<Stmt> {
-        let prop_paths = self.property_paths();
+        let prop_paths = self.ident_prefixs();
 
         match self.peek() {
             Some(tok) => {
                 match tok.typ {
                     Assign => {
                         match prop_paths {
-                            SinglePath(path) => {
+                            SingleIdentList(path) => {
                                 self.assignment_stmt(vec!(path))
                             },
-                            MultiplePaths(paths) => {
+                            MultiIdentList(paths) => {
                                 self.assignment_stmt(paths)
+                            },
+                            SingleIdent(prefix) => {
+                                self.assignment_stmt(vec!(vec!(prefix)))
                             }
                         }
                     },
                     Lparen => {
                         match prop_paths {
-                            SinglePath(path) => {
+                            SingleIdentList(path) => {
                                 self.func_call_stmt(path)
                             },
-                            MultiplePaths(paths) => {
+                            MultiIdentList(paths) => {
                                 fail!("Function calls need to be their own statement")
+                            },
+                            SingleIdent(prefix) => {
+                                self.func_call_stmt(vec!(prefix))
                             }
                         }
                     },
@@ -494,15 +522,18 @@ trait HydraBaseParser {
     }
 
     fn ident_or_func_call(&mut self) -> Box<Expr> {
-        let prop_paths = self.property_paths();
+        let prop_paths = self.ident_prefixs();
 
         match prop_paths {
-            SinglePath(path) => {
+            SingleIdentList(path) => {
                 match self.peek() {
                     Some(tok) => {
                         if tok.typ == Lparen {
                             self.func_call(path)
                         } else {
+                            //TODO this will change when objects get support
+                            //this will actually never get called until i have things like
+                            //myobj.prop.name as valid expressions
                             IdentExpr::new(path.get(0).to_owned())
                         }
                     },
@@ -512,9 +543,29 @@ trait HydraBaseParser {
                     }
                 }
             },
-            MultiplePaths(paths) => {
+            SingleIdent(ident) => {
+                match self.peek() {
+                    Some(tok) => {
+                        if tok.typ == Lparen {
+                            self.func_call(vec!(ident))
+                        } else {
+                            match self.expr_opt() {
+                                Some(expr) => {
+                                    PrefixUnaryExpr::new(ident, expr)
+                                },
+                                None => IdentExpr::new(ident)
+                            }
+                        }
+                    },
+                    None => {
+                        let tok = self.tok();
+                        fail!("Expected Expression at {}:{}", tok.line, tok.col);
+                    }
+                }
+            },
+            MultiIdentList(paths) => {
                 //this is a tuple
-                fail!("Tuples are supported yet");
+                fail!("Tuples are supported yet!");
             }
         }
     }

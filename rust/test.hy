@@ -1,5 +1,17 @@
+function double(a){
+    return a * 2
+}
+
+var a = double 2 + 2;
+
+print_int(a);
+
 function minus(a, b){
     return a - b
+}
+
+gen function squares(n){
+    var b = 1;
 }
 
 operator[0] times(a, b){

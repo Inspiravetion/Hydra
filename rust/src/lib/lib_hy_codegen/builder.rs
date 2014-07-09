@@ -1,6 +1,6 @@
 use rustc::lib::llvm::{llvm, Bool, False, True, IntEQ, IntNE, IntSGT, IntSGE, IntSLT, IntSLE};
 use collections::hashmap::HashMap;
-use libc::{c_uint, c_ulonglong};
+use libc::{c_uint, c_ulonglong, puts};
 use generator::{Generator, RANGE_GEN_ID, RANGE_GEN_INIT, RANGE_GEN_NEXT};
 use generator;
 use lltype::*;
@@ -514,6 +514,14 @@ impl Builder {
         u!(llvm::LLVMBlockAddress(func, block))
     }
 
+    pub fn value_to_block(&mut self, val : Value) -> Block {
+        u!(llvm::LLVMValueAsBasicBlock(val))
+    }
+
+    pub fn block_to_value(&mut self, block : Block) -> Value {
+        u!(llvm::LLVMBasicBlockAsValue(block))
+    }
+
     pub fn indirect_break(&mut self, addr : Value, blocks : Vec<Block>) {
         let ibreak = u!(llvm::LLVMBuildIndirectBr(self.builder, addr, blocks.len() as c_uint));
         for block in blocks.iter() {
@@ -631,6 +639,15 @@ impl Builder {
 
     pub fn to_ptr_type(&mut self, typ : Type) -> Type {
         u!(llvm::LLVMPointerType(typ, 0))
+    }
+
+    pub fn type_of(&mut self, val : Value) -> Type {
+        u!(llvm::LLVMTypeOf(val))
+    }
+
+    pub fn type_to_str(&mut self, typ : Type) {
+        let type_str = u!(llvm::LLVMTypeToString(typ)); 
+        u!(puts(type_str));
     }
 
     /*

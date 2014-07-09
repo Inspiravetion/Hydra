@@ -1,7 +1,7 @@
 use codegen::CodeGenerator;
 use codegen::builder::Builder; 
 use codegen::generator::Generator; 
-use codegen::lltype::Value;
+use codegen::lltype::{Value, Block, Type};
 // use collections::hashmap::HashMap;
 use std::vec::Vec;
 use std::owned::Box;
@@ -10,11 +10,29 @@ use std::owned::Box;
 // use std::fmt::{Show, Formatter, Result};
 use token::*;
 
+
 ///Identifier expressions, variable names etc.
 pub type Ident = ~str;
 
 pub trait Node : CodeGenerator {
     // fn span() -> Span
+}
+
+pub trait GenGenerator {
+    ///Add declared variable types to vec so that a generator state object can 
+    ///be created
+    fn register_state_vars(&mut self, Vec<Type>){
+
+    }
+
+    ///Generate your regular code but also break to the end of the save and restore
+    ///blocks provided to save and restore state variables 
+    fn gen_gen_code(&mut self, Block, Block, &mut Vec<Block>, &mut Builder){
+        fail!("This type cannot build code for a generator");
+    }
+
+    //TODO: Remember to return a 0 as the last statement to let the caller know it is done
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,6 +264,45 @@ impl BinaryExpr {
             lhs : lhs,
             op  : op,
             rhs : rhs
+        } as Box<Expr>
+    }
+}
+
+///////////////////////////////////////
+//       Unary Prefix Expression     //
+///////////////////////////////////////
+
+///A unary prefix expression
+pub struct PrefixUnaryExpr {
+    op   : Ident, 
+    expr : Box<Expr>
+}
+
+impl CodeGenerator for PrefixUnaryExpr {
+    fn gen_code(&mut self, builder : &mut Builder){}
+}
+
+impl Node for PrefixUnaryExpr {}
+
+impl Expr for PrefixUnaryExpr {
+    fn to_value(&mut self, builder : &mut Builder) -> Value {
+        let expr_val = self.expr.to_value(builder);
+
+        //TODO: verify that the operator being used is visible in the current scope
+        let args = vec!(expr_val);
+        builder.call(
+            self.op, 
+            args, 
+            format!("{}_tmp", self.op)
+        )
+    }
+}
+
+impl PrefixUnaryExpr {
+    pub fn new(op : Ident, expr : Box<Expr>) -> Box<Expr> {
+        box PrefixUnaryExpr {
+            op   : op,
+            expr : expr
         } as Box<Expr>
     }
 }
@@ -786,6 +843,148 @@ impl ReturnStmt {
     pub fn new(ret_expr : Box<Expr>) -> Box<Stmt> {
         box ReturnStmt {
             ret_expr : ret_expr
+        } as Box<Stmt>
+    }
+}
+
+///////////////////////////////////////
+//       Generator Definition        //
+///////////////////////////////////////
+
+///A generator definition
+pub struct GeneratorDef {
+    name   : Ident,
+    params : Vec<Ident>,
+    stmts  : Vec<Box<Stmt>>
+}
+
+impl CodeGenerator for GeneratorDef {
+    fn gen_code(&mut self, builder : &mut Builder){
+         let saved_block = builder.new_block("gen_def_bridge");
+        builder.break_to(saved_block);
+
+        builder.with_fresh_scope(|fb : &mut Builder|{
+            
+            let name = self.name.as_slice();
+            //This will end up being some general HyObj type or sumthn
+            let int_type = fb.int32_type();
+            let void_type = fb.void_type();
+
+            //Create Type with fields for all state variables and next block to run
+            let mut state_types = vec!(fb.string_type());
+            //Add space for params
+            for param in self.params.iter() {
+                state_types.push(int_type);
+            }
+            //Add Space for stmts state
+            for stmt in self.stmts.mut_iter() {
+                // stmt.register_state_vars(&mut state_types);
+            }
+
+            //Create gen type
+            let concrete_gen_type = fb.create_type(state_types, name);
+            let gen_type = fb.to_ptr_type(concrete_gen_type);
+
+            //Create generator next function
+            let next_name = format!("!{}_next", name);
+            let next_params = vec!(gen_type);
+            let mut entry_block_holder = Vec::new();
+
+            fb.create_function(next_name, next_params, int_type,|fb : &mut Builder|{
+                fb.goto_first_block();
+                
+                //have stmts build their restoration code in this block
+                let state_restore = fb.new_block("gen_state_restore");
+                //have stmts build their state saving code in this block
+                let state_save = fb.new_block("gen_state_save");
+                //init should set the first block to start at as this entry block
+                let entry = fb.new_block("gen_state_entry");
+                //early returns should break here and this should return 0 to indicate
+                //the generator is done
+                let exit = fb.new_block("gen_exit");
+                entry_block_holder.push(entry);
+
+                let mut possible_labels = vec!(state_save, entry, exit);
+
+                fb.goto_block(entry);
+                fb.break_to(exit);
+                // for stmt in self.stmts.mut_iter() {
+                //     //pass in gen_ctx here?
+                //     // stmt.gen_gen_code(
+                //           state_save, 
+                //           state_restore, 
+                //           &mut possible_labels,
+                //           fb
+                //        );
+                // }
+
+                // //check which block to resume on
+                fb.goto_block(state_restore);
+                let gen_ctx = fb.get_param(0);
+                let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
+                let label = fb.load(ctx_state, "dest");
+                fb.indirect_break(label, possible_labels);
+
+                fb.goto_block(state_save);
+                let continue_val = fb.int(1);
+                fb.ret(continue_val);
+
+                fb.goto_block(exit);
+                let done_val = fb.int(0);
+                fb.ret(done_val);
+            });
+
+
+            let init_name = format!("!{}_init", name);
+            let init_param_types = Vec::from_elem(self.params.len(), int_type);
+            let mut init_params = vec!(gen_type);
+            init_params.push_all(init_param_types.as_slice());
+
+
+            //Create generator init function...bind parameters and set first block to 
+            //entry block
+            fb.create_function(init_name, init_params, void_type,|fb : &mut Builder|{
+                fb.goto_first_block();
+                
+                let gen_ctx = fb.get_param(0);
+                let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
+
+                //setup entry block
+                let next_func = fb.get_function(next_name);
+                let entry_block = fb.block_address(next_func , entry_block_holder.as_slice()[0]);
+
+                fb.store(entry_block, ctx_state);
+
+                //bind params to local vars
+                let mut i = 0;
+                for param in self.params.iter() {
+                    //right now this is pass by value...not by ref
+                    let param_val = fb.get_param(i + 1);
+                    let state_var_slot = fb.get_obj_property(gen_ctx, i + 1, format!("param{}", i));
+                    fb.store(param_val, state_var_slot);
+
+                    i += 1;
+                }
+
+                fb.ret_void();
+
+                fb.goto_block(saved_block);
+            });
+        });
+
+    }
+}
+
+impl Node for GeneratorDef {}
+
+impl Stmt for GeneratorDef {}
+
+impl GeneratorDef {
+    pub fn new(name : Ident, params : Vec<Ident>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+        box GeneratorDef {
+            name   : name,
+            params : params, 
+            stmts  : stmts
         } as Box<Stmt>
     }
 }
