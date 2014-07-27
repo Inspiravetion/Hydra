@@ -421,9 +421,9 @@ Ltmp23:
 	ret
 	.cfi_endproc
 
-	.globl	"_!squares_next"
+	.globl	"_!squares_gen_next"
 	.align	4, 0x90
-"_!squares_next":                       ## @"!squares_next"
+"_!squares_gen_next":                   ## @"!squares_gen_next"
 	.cfi_startproc
 ## BB#0:                                ## %gen_state_restore
 	jmpq	*(%rdi)
@@ -431,14 +431,15 @@ LBB17_1:                                ## %gen_state_save
 	movl	$1, %eax
 	ret
 Ltmp24:                                 ## Block address taken
-LBB17_2:                                ## %gen_exit
+LBB17_2:                                ## %gen_state_entry
+LBB17_3:                                ## %gen_exit
 	xorl	%eax, %eax
 	ret
 	.cfi_endproc
 
-	.globl	"_!squares_init"
+	.globl	"_!squares_gen_init"
 	.align	4, 0x90
-"_!squares_init":                       ## @"!squares_init"
+"_!squares_gen_init":                   ## @"!squares_gen_init"
 	.cfi_startproc
 ## BB#0:
 	leaq	Ltmp24(%rip), %rax

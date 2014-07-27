@@ -1,7 +1,7 @@
 ; ModuleID = 'hydra'
 
 %"!range_gen" = type { i8*, i32, i32, i32 }
-%squares = type { i8*, i32 }
+%squares = type { i8*, i32, i32, i32, i32 }
 
 @global_gen_fmt = private unnamed_addr constant [3 x i8] c"%d\00"
 
@@ -298,7 +298,7 @@ define i32 @minus(i32, i32) {
   ret i32 %-_tmp
 }
 
-define i32 @"!squares_next"(%squares*) {
+define i32 @"!squares_gen_next"(%squares*) {
 
 gen_state_restore:                                ; No predecessors!
   %ctx_state = getelementptr inbounds %squares* %0, i32 0, i32 0
@@ -309,15 +309,18 @@ gen_state_save:                                   ; preds = %gen_state_restore
   ret i32 1
 
 gen_state_entry:                                  ; preds = %gen_state_restore
+  %_a = getelementptr inbounds %squares* %0, i32 0, i32 2
+  %_b = getelementptr inbounds %squares* %0, i32 0, i32 3
+  %_c = getelementptr inbounds %squares* %0, i32 0, i32 4
   br label %gen_exit
 
 gen_exit:                                         ; preds = %gen_state_restore, %gen_state_entry
   ret i32 0
 }
 
-define void @"!squares_init"(%squares*, i32) {
+define void @"!squares_gen_init"(%squares*, i32) {
   %ctx_state = getelementptr inbounds %squares* %0, i32 0, i32 0
-  store i8* blockaddress(@"!squares_next", %gen_state_entry), i8** %ctx_state
+  store i8* blockaddress(@"!squares_gen_next", %gen_state_entry), i8** %ctx_state
   %param0 = getelementptr inbounds %squares* %0, i32 0, i32 1
   store i32 %1, i32* %param0
   ret void

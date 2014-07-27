@@ -1007,30 +1007,9 @@
 <span id='967'>967</span>
 <span id='968'>968</span>
 <span id='969'>969</span>
-<span id='970'>970</span>
-<span id='971'>971</span>
-<span id='972'>972</span>
-<span id='973'>973</span>
-<span id='974'>974</span>
-<span id='975'>975</span>
-<span id='976'>976</span>
-<span id='977'>977</span>
-<span id='978'>978</span>
-<span id='979'>979</span>
-<span id='980'>980</span>
-<span id='981'>981</span>
-<span id='982'>982</span>
-<span id='983'>983</span>
-<span id='984'>984</span>
-<span id='985'>985</span>
-<span id='986'>986</span>
-<span id='987'>987</span>
-<span id='988'>988</span>
-<span id='989'>989</span>
-<span id='990'>990</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>CodeGenerator</span>;
-<span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::<span class='ident'>Builder</span>; 
+<span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>builder</span>::{<span class='ident'>Builder</span>, <span class='ident'>GenBuilder</span>, <span class='ident'>GenGenState</span>}; 
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>generator</span>::<span class='ident'>Generator</span>; 
 <span class='kw'>use</span> <span class='ident'>codegen</span>::<span class='ident'>lltype</span>::{<span class='ident'>Value</span>, <span class='ident'>Block</span>, <span class='ident'>Type</span>};<span class='comment'>
 // use collections::hashmap::HashMap;
@@ -1049,22 +1028,26 @@
     // fn span() -&gt; Span
 </span>}
 
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>GenGenerator</span> {
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>GenGenerator</span> : <span class='ident'>Node</span> {
     <span class='doccomment'>///Add declared variable types to vec so that a generator state object can 
-</span>    <span class='doccomment'>///be created
-</span>    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span>){
-
+</span>    <span class='doccomment'>///be created...push the number of vars u need in so that you know where to start from on your save restore
+</span>    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>){
+        <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;this type does not have an implementation for register_state_vars&quot;</span>);
     }
 
     <span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
 </span>    <span class='doccomment'>///blocks provided to save and restore state variables 
-</span>    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>Block</span>, <span class='ident'>Block</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Block</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+</span>    <span class='doccomment'>///
+</span>    <span class='doccomment'>/// - Block : save block should be where all the state saving code should go
+</span>    <span class='doccomment'>/// - Block : restore block should be where all the state restoring code should go
+</span>    <span class='doccomment'>/// - Vec&lt;Block&gt; : a vector that holds all the possible blocks that may be resumed
+</span>    <span class='doccomment'>/// - Vec&lt;uint&gt; : a vector that holds the offsets of the state variables for each statement
+</span>    <span class='doccomment'>///
+</span>    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;This type cannot build code for a generator&quot;</span>);
-    }<span class='comment'>
+    }
 
-    //TODO: Remember to return a 0 as the last statement to let the caller know it is done
-
-</span>}<span class='comment'>
+}<span class='comment'>
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -1344,7 +1327,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Stmt</span> : <span class='ident'>Node</span> {
+</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Stmt</span> : <span class='ident'>GenGenerator</span> {
     
 }<span class='comment'>
 
@@ -1362,6 +1345,8 @@
         <span class='self'>self</span>.<span class='ident'>expr</span>.<span class='ident'>gen_code</span>(<span class='ident'>builder</span>);
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>ExprStmt</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>ExprStmt</span> {}
 
@@ -1396,6 +1381,8 @@
         }
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>VarDecl</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>VarDecl</span> {}
 
@@ -1437,6 +1424,49 @@
             
             <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
             <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_var</span>(<span class='ident'>val</span>, <span class='ident'>name</span>);
+            <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>name</span>, <span class='ident'>var_val</span>);
+
+            <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
+        }
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>VarAssign</span> {
+    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>gb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>){
+        <span class='ident'>gb</span>.<span class='ident'>register_n_variables</span>(<span class='self'>self</span>.<span class='ident'>vars</span>.<span class='ident'>len</span>());
+    }
+
+    <span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
+</span>    <span class='doccomment'>///blocks provided to save and restore state variables 
+</span>    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class='kw'>let</span> <span class='ident'>base_state_index</span> <span class='op'>=</span> <span class='ident'>ggs</span>.<span class='ident'>state_index</span>();
+
+        <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>vars</span>.<span class='ident'>iter</span>() {<span class='comment'>
+
+            //save block
+            //store current values in ctxt slots here...actually...may not have to save
+            //if we store on assignment
+            </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>save_blk</span>);<span class='comment'>
+
+            //restore block
+            //may not have to do shit here either if we set vars as the pointer slots
+            </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>restore_blk</span>);<span class='comment'>
+            
+            //actual code
+            </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>stmts_blk</span>);
+
+            <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>vals</span>.<span class='ident'>len</span>() {
+                <span class='self'>self</span>.<span class='ident'>vals</span>.<span class='ident'>get_mut</span>(<span class='ident'>i</span>).<span class='ident'>to_value</span>(<span class='ident'>builder</span>)
+            } <span class='kw'>else</span> {
+                <span class='ident'>builder</span>.<span class='ident'>default_value</span>()
+            };
+
+            
+            <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();<span class='comment'>
+            //load val into state slot and then set the var to the state slot
+            </span><span class='kw'>let</span> <span class='ident'>var_index</span> <span class='op'>=</span> <span class='ident'>base_state_index</span> <span class='op'>+</span> <span class='ident'>i</span>;
+            <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;_{}&quot;</span>, <span class='ident'>name</span>));
             <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>name</span>, <span class='ident'>var_val</span>);
 
             <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
@@ -1487,6 +1517,8 @@
     }
 }
 
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>AssignStmt</span> {}
+
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>AssignStmt</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Stmt</span> <span class='kw'>for</span> <span class='ident'>AssignStmt</span> {}
@@ -1531,6 +1563,8 @@
           }
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>LoopControlStmt</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>LoopControlStmt</span> {}
 
@@ -1615,6 +1649,8 @@
         <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>if_else_exit</span>);
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>IfElseStmt</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>IfElseStmt</span> {}
 
@@ -1720,6 +1756,8 @@
     }
 }
 
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>ForInLoop</span> {}
+
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>ForInLoop</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Stmt</span> <span class='kw'>for</span> <span class='ident'>ForInLoop</span> {}
@@ -1774,6 +1812,8 @@
         <span class='ident'>builder</span>.<span class='ident'>close_scope</span>();
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>WhileLoop</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>WhileLoop</span> {}
 
@@ -1836,6 +1876,8 @@
     }
 }
 
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>FunctionDef</span> {}
+
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>FunctionDef</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Stmt</span> <span class='kw'>for</span> <span class='ident'>FunctionDef</span> {}
@@ -1865,6 +1907,8 @@
         <span class='ident'>builder</span>.<span class='ident'>ret</span>(<span class='ident'>val</span>);
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>ReturnStmt</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>ReturnStmt</span> {}
 
@@ -1896,115 +1940,29 @@
 
         <span class='ident'>builder</span>.<span class='ident'>with_fresh_scope</span>(<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
             
-            <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>name</span>.<span class='ident'>as_slice</span>();<span class='comment'>
-            //This will end up being some general HyObj type or sumthn
-            </span><span class='kw'>let</span> <span class='ident'>int_type</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int32_type</span>();
-            <span class='kw'>let</span> <span class='ident'>void_type</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>void_type</span>();<span class='comment'>
+            <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>name</span>.<span class='ident'>as_slice</span>();
 
-            //Create Type with fields for all state variables and next block to run
-            </span><span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state_types</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>fb</span>.<span class='ident'>string_type</span>());<span class='comment'>
-            //Add space for params
-            </span><span class='kw'>for</span> <span class='ident'>param</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>params</span>.<span class='ident'>iter</span>() {
-                <span class='ident'>state_types</span>.<span class='ident'>push</span>(<span class='ident'>int_type</span>);
-            }<span class='comment'>
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gen_builder</span> <span class='op'>=</span> <span class='ident'>GenBuilder</span>::<span class='ident'>new</span>(<span class='ident'>name</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>params</span>, <span class='ident'>fb</span>.<span class='ident'>int32_type</span>(), <span class='ident'>fb</span>.<span class='ident'>string_type</span>());<span class='comment'>            
+
             //Add Space for stmts state
-            </span><span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>stmts</span>.<span class='ident'>mut_iter</span>() {<span class='comment'>
-                // stmt.register_state_vars(&amp;mut state_types);
-            </span>}<span class='comment'>
+            </span><span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>stmts</span>.<span class='ident'>mut_iter</span>() {
+                <span class='ident'>stmt</span>.<span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>gen_builder</span>);
+            }
 
-            //Create gen type
-            </span><span class='kw'>let</span> <span class='ident'>concrete_gen_type</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>create_type</span>(<span class='ident'>state_types</span>, <span class='ident'>name</span>);
-            <span class='kw'>let</span> <span class='ident'>gen_type</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>to_ptr_type</span>(<span class='ident'>concrete_gen_type</span>);<span class='comment'>
-
-            //Create generator next function
-            </span><span class='kw'>let</span> <span class='ident'>next_name</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;!{}_next&quot;</span>, <span class='ident'>name</span>);
-            <span class='kw'>let</span> <span class='ident'>next_params</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>gen_type</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>entry_block_holder</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-
-            <span class='ident'>fb</span>.<span class='ident'>create_function</span>(<span class='ident'>next_name</span>, <span class='ident'>next_params</span>, <span class='ident'>int_type</span>,<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
-                <span class='ident'>fb</span>.<span class='ident'>goto_first_block</span>();<span class='comment'>
-                
-                //have stmts build their restoration code in this block
-                </span><span class='kw'>let</span> <span class='ident'>state_restore</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;gen_state_restore&quot;</span>);<span class='comment'>
-                //have stmts build their state saving code in this block
-                </span><span class='kw'>let</span> <span class='ident'>state_save</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;gen_state_save&quot;</span>);<span class='comment'>
-                //init should set the first block to start at as this entry block
-                </span><span class='kw'>let</span> <span class='ident'>entry</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;gen_state_entry&quot;</span>);<span class='comment'>
-                //early returns should break here and this should return 0 to indicate
-                //the generator is done
-                </span><span class='kw'>let</span> <span class='ident'>exit</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;gen_exit&quot;</span>);
-                <span class='ident'>entry_block_holder</span>.<span class='ident'>push</span>(<span class='ident'>entry</span>);
-
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>possible_labels</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>state_save</span>, <span class='ident'>entry</span>, <span class='ident'>exit</span>);
-
-                <span class='ident'>fb</span>.<span class='ident'>goto_block</span>(<span class='ident'>entry</span>);
-                <span class='ident'>fb</span>.<span class='ident'>break_to</span>(<span class='ident'>exit</span>);<span class='comment'>
-                // for stmt in self.stmts.mut_iter() {
-                //     //pass in gen_ctx here?
-                //     // stmt.gen_gen_code(
-                //           state_save, 
-                //           state_restore, 
-                //           &amp;mut possible_labels,
-                //           fb
-                //        );
-                // }
-
-                // //check which block to resume on
-                </span><span class='ident'>fb</span>.<span class='ident'>goto_block</span>(<span class='ident'>state_restore</span>);
-                <span class='kw'>let</span> <span class='ident'>gen_ctx</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_param</span>(<span class='number'>0</span>);
-                <span class='kw'>let</span> <span class='ident'>ctx_state</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen_ctx</span>, <span class='number'>0</span>, <span class='string'>&quot;ctx_state&quot;</span>);
-                <span class='kw'>let</span> <span class='ident'>label</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>load</span>(<span class='ident'>ctx_state</span>, <span class='string'>&quot;dest&quot;</span>);
-                <span class='ident'>fb</span>.<span class='ident'>indirect_break</span>(<span class='ident'>label</span>, <span class='ident'>possible_labels</span>);
-
-                <span class='ident'>fb</span>.<span class='ident'>goto_block</span>(<span class='ident'>state_save</span>);
-                <span class='kw'>let</span> <span class='ident'>continue_val</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int</span>(<span class='number'>1</span>);
-                <span class='ident'>fb</span>.<span class='ident'>ret</span>(<span class='ident'>continue_val</span>);
-
-                <span class='ident'>fb</span>.<span class='ident'>goto_block</span>(<span class='ident'>exit</span>);
-                <span class='kw'>let</span> <span class='ident'>done_val</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int</span>(<span class='number'>0</span>);
-                <span class='ident'>fb</span>.<span class='ident'>ret</span>(<span class='ident'>done_val</span>);
-            });
-
-
-            <span class='kw'>let</span> <span class='ident'>init_name</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;!{}_init&quot;</span>, <span class='ident'>name</span>);
-            <span class='kw'>let</span> <span class='ident'>init_param_types</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>from_elem</span>(<span class='self'>self</span>.<span class='ident'>params</span>.<span class='ident'>len</span>(), <span class='ident'>int_type</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>init_params</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>gen_type</span>);
-            <span class='ident'>init_params</span>.<span class='ident'>push_all</span>(<span class='ident'>init_param_types</span>.<span class='ident'>as_slice</span>());<span class='comment'>
-
-
-            //Create generator init function...bind parameters and set first block to 
-            //entry block
-            </span><span class='ident'>fb</span>.<span class='ident'>create_function</span>(<span class='ident'>init_name</span>, <span class='ident'>init_params</span>, <span class='ident'>void_type</span>,<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
-                <span class='ident'>fb</span>.<span class='ident'>goto_first_block</span>();
-                
-                <span class='kw'>let</span> <span class='ident'>gen_ctx</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_param</span>(<span class='number'>0</span>);
-                <span class='kw'>let</span> <span class='ident'>ctx_state</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen_ctx</span>, <span class='number'>0</span>, <span class='string'>&quot;ctx_state&quot;</span>);<span class='comment'>
-
-                //setup entry block
-                </span><span class='kw'>let</span> <span class='ident'>next_func</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_function</span>(<span class='ident'>next_name</span>);
-                <span class='kw'>let</span> <span class='ident'>entry_block</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>block_address</span>(<span class='ident'>next_func</span> , <span class='ident'>entry_block_holder</span>.<span class='ident'>as_slice</span>()[<span class='number'>0</span>]);
-
-                <span class='ident'>fb</span>.<span class='ident'>store</span>(<span class='ident'>entry_block</span>, <span class='ident'>ctx_state</span>);<span class='comment'>
-
-                //bind params to local vars
-                </span><span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
-                <span class='kw'>for</span> <span class='ident'>param</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>params</span>.<span class='ident'>iter</span>() {<span class='comment'>
-                    //right now this is pass by value...not by ref
-                    </span><span class='kw'>let</span> <span class='ident'>param_val</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_param</span>(<span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>);
-                    <span class='kw'>let</span> <span class='ident'>state_var_slot</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen_ctx</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;param{}&quot;</span>, <span class='ident'>i</span>));
-                    <span class='ident'>fb</span>.<span class='ident'>store</span>(<span class='ident'>param_val</span>, <span class='ident'>state_var_slot</span>);
-
-                    <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
+            <span class='ident'>gen_builder</span>.<span class='ident'>create_next_function</span>(<span class='ident'>fb</span>, <span class='op'>|</span><span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
+                <span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>stmts</span>.<span class='ident'>mut_iter</span>() {<span class='comment'>
+                //pass in gen_ctx here?
+                    </span><span class='ident'>stmt</span>.<span class='ident'>gen_gen_code</span>(<span class='ident'>ggs</span>, <span class='ident'>fb</span>);
                 }
-
-                <span class='ident'>fb</span>.<span class='ident'>ret_void</span>();
-
-                <span class='ident'>fb</span>.<span class='ident'>goto_block</span>(<span class='ident'>saved_block</span>);
             });
+
+            <span class='ident'>gen_builder</span>.<span class='ident'>create_init_function</span>(<span class='ident'>fb</span>, <span class='ident'>saved_block</span>);
         });
 
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>GenGenerator</span> <span class='kw'>for</span> <span class='ident'>GeneratorDef</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>Node</span> <span class='kw'>for</span> <span class='ident'>GeneratorDef</span> {}
 

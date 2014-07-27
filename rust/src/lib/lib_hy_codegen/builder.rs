@@ -212,7 +212,7 @@ impl Builder {
         
         //                next_block   start_var end_var   ret_val1
         let fields = vec!(string_type, int_type, int_type, int_type);
-        let range_gen_typ = self.create_type(fields, RANGE_GEN_ID);
+        let range_gen_typ = self.create_type(&fields, RANGE_GEN_ID);
 
         self.types.insert(RANGE_GEN_ID.to_owned(), range_gen_typ);
 
@@ -552,7 +552,7 @@ impl Builder {
     /*
         User Created Types
      */
-    pub fn create_type(&mut self, field_typs : Vec<Type>, typ_name : &str) -> Type {
+    pub fn create_type(&mut self, field_typs : &Vec<Type>, typ_name : &str) -> Type {
         let typ = u!(llvm::LLVMStructCreateNamed(self.ctx, chars(typ_name)));
         u!(llvm::LLVMStructSetBody(
             typ,
@@ -691,6 +691,201 @@ impl Builder {
             to,
             chars(name)
         ))
+    }
+}
+
+pub struct GenBuilder<'a> {
+    name        : &'a str,
+    params      : &'a Vec<~str>,
+    obj_type    : Type,
+    gen_types   : Vec<Type>,
+    state_indxs : Vec<uint>,
+    resume_blks : Vec<Block>,
+    entry_block : Option<Block>,
+    gen_type    : Option<Type>
+}
+
+impl<'a> GenBuilder<'a> {
+    
+    pub fn new(name : &'a str, params : &'a Vec<~str>, obj_type : Type, string_type : Type) -> GenBuilder<'a> {
+        let type_buffer = vec!(string_type);
+
+        let mut gb = GenBuilder { 
+            name        : name,
+            params      : params,
+            obj_type    : obj_type,
+            gen_types   : type_buffer,
+            state_indxs : Vec::new(),
+            resume_blks : Vec::new(),
+            entry_block : None,
+            gen_type    : None
+        };
+
+        gb.register_n_variables(params.len());
+
+        gb
+    }
+
+    pub fn register_n_variables(&mut self, n : uint) {
+        let obj_type = self.obj_type;
+
+        for _ in range(0, n) {
+            self.gen_types.push(obj_type);
+        }
+
+        let last_start = match self.state_indxs.last() {
+            Some(last) => *last,
+            None => 1u
+        };
+
+        self.state_indxs.push(last_start + n);
+    }
+
+    fn to_type(&mut self, builder : &mut Builder) -> Type {
+        let concrete_gen_type = builder.create_type(&self.gen_types, self.name);
+        let gen_type = builder.to_ptr_type(concrete_gen_type);
+
+        self.gen_type = Some(gen_type);
+
+        gen_type
+    }
+
+    fn init_name(&mut self) -> ~str {
+        format!("!{}_gen_init", self.name)
+    }
+
+    fn next_name(&mut self) -> ~str {
+        format!("!{}_gen_next", self.name)
+    }
+
+    pub fn create_next_function(&mut self, builder : &mut Builder, build_stmts : |&mut GenGenState, &mut Builder|) {
+        let next_name = self.next_name();
+        let next_params = vec!(self.to_type(builder));
+        let int_type = builder.int32_type();
+
+        builder.create_function(next_name, next_params, int_type,|fb : &mut Builder|{
+            fb.goto_first_block();
+            
+            let gen_ctx = fb.get_param(0);
+
+            //have stmts build their restoration code in this block
+            let state_restore = fb.new_block("gen_state_restore");
+            //have stmts build their state saving code in this block
+            let state_save = fb.new_block("gen_state_save");
+            //init should set the first block to start at as this entry block
+            let entry = fb.new_block("gen_state_entry");
+            //early returns should break here and this should return 0 to indicate
+            //the generator is done
+            let exit = fb.new_block("gen_exit");
+            self.entry_block = Some(entry);
+
+            let mut possible_labels = vec!(state_save, entry, exit);
+
+            fb.goto_block(entry);
+
+            { //magic to make gen_gen_state get dropped so i can get the borrows back
+                let mut gen_gen_state = GenGenState::new(
+                    gen_ctx,
+                    state_save, 
+                    state_restore,
+                    entry,
+                    &mut possible_labels, 
+                    &self.state_indxs
+                );
+
+                build_stmts(&mut gen_gen_state,fb);
+            }
+            fb.break_to(exit);
+
+            // //check which block to resume on
+            fb.goto_block(state_restore);
+            let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
+            let label = fb.load(ctx_state, "dest");
+            fb.indirect_break(label, possible_labels);
+
+            fb.goto_block(state_save);
+            let continue_val = fb.int(1);
+            fb.ret(continue_val);
+
+            fb.goto_block(exit);
+            let done_val = fb.int(0);
+            fb.ret(done_val);
+        });
+
+    }
+
+    pub fn create_init_function(&mut self, builder : &mut Builder, saved_block : Block) {
+        let init_name = self.init_name();
+        let init_param_types = Vec::from_elem(self.params.len(), builder.int32_type());
+        let mut init_params = vec!(self.gen_type.unwrap());
+        init_params.push_all(init_param_types.as_slice());
+
+        let void_type = builder.void_type();
+
+        builder.create_function(init_name, init_params, void_type,|fb : &mut Builder|{
+            fb.goto_first_block();
+            
+            let gen_ctx = fb.get_param(0);
+            let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
+
+            //setup entry block
+            let next_func = fb.get_function(self.next_name());
+            let entry_block = fb.block_address(next_func , self.entry_block.unwrap());
+
+            fb.store(entry_block, ctx_state);
+
+            //bind params to local vars
+            let mut i = 0;
+            for param in self.params.iter() {
+                //right now this is pass by value...not by ref
+                let param_val = fb.get_param(i + 1);
+                let state_var_slot = fb.get_obj_property(gen_ctx, i + 1, format!("param{}", i));
+                fb.store(param_val, state_var_slot);
+
+                i += 1;
+            }
+
+            fb.ret_void();
+
+            fb.goto_block(saved_block);
+        });
+
+    }
+
+}
+
+///Struct to hold state for generator generation
+pub struct GenGenState<'a> {
+    pub context     : Value,
+    pub save_blk    : Block,
+    pub restore_blk : Block,
+    pub stmts_blk   : Block,
+    pub labels      : &'a Vec<Block>,
+    pub state_idxs  : &'a Vec<uint>,
+    pub stmt_idx    : uint
+}
+
+impl<'a> GenGenState<'a> {
+    fn new(context : Value, save_blk : Block, restore_blk : Block, stmts_blk : Block, 
+        labels : &'a Vec<Block>, state_idxs : &'a Vec<uint>) -> GenGenState<'a> {
+        
+        GenGenState {
+            context     : context,
+            save_blk    : save_blk,   
+            restore_blk : restore_blk,
+            stmts_blk   : stmts_blk,
+            labels      : labels,
+            state_idxs  : state_idxs,
+            stmt_idx    : 0   
+        }
+    }
+
+    pub fn set_stmts_blk(&mut self, blk : Block) {
+        self.stmts_blk = blk;
+    }
+
+    pub fn state_index(&mut self) -> uint {
+        self.state_idxs.get(self.stmt_idx).clone()
     }
 }
 

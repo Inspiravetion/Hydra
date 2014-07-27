@@ -11,7 +11,7 @@ function minus(a, b){
 }
 
 gen function squares(n){
-    var b = 1;
+    var a, b, c = 1;
 }
 
 operator[0] times(a, b){

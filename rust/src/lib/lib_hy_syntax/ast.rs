@@ -1,5 +1,5 @@
 use codegen::CodeGenerator;
-use codegen::builder::Builder; 
+use codegen::builder::{Builder, GenBuilder, GenGenState}; 
 use codegen::generator::Generator; 
 use codegen::lltype::{Value, Block, Type};
 // use collections::hashmap::HashMap;
@@ -18,20 +18,24 @@ pub trait Node : CodeGenerator {
     // fn span() -> Span
 }
 
-pub trait GenGenerator {
+pub trait GenGenerator : Node {
     ///Add declared variable types to vec so that a generator state object can 
-    ///be created
-    fn register_state_vars(&mut self, Vec<Type>){
-
+    ///be created...push the number of vars u need in so that you know where to start from on your save restore
+    fn register_state_vars(&mut self, &mut GenBuilder){
+        fail!("this type does not have an implementation for register_state_vars");
     }
 
     ///Generate your regular code but also break to the end of the save and restore
     ///blocks provided to save and restore state variables 
-    fn gen_gen_code(&mut self, Block, Block, &mut Vec<Block>, &mut Builder){
+    ///
+    /// - Block : save block should be where all the state saving code should go
+    /// - Block : restore block should be where all the state restoring code should go
+    /// - Vec<Block> : a vector that holds all the possible blocks that may be resumed
+    /// - Vec<uint> : a vector that holds the offsets of the state variables for each statement
+    ///
+    fn gen_gen_code(&mut self, &mut GenGenState, &mut Builder){
         fail!("This type cannot build code for a generator");
     }
-
-    //TODO: Remember to return a 0 as the last statement to let the caller know it is done
 
 }
 
@@ -313,7 +317,7 @@ impl PrefixUnaryExpr {
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-pub trait Stmt : Node {
+pub trait Stmt : GenGenerator {
     
 }
 
@@ -331,6 +335,8 @@ impl CodeGenerator for ExprStmt {
         self.expr.gen_code(builder);
     }
 }
+
+impl GenGenerator for ExprStmt {}
 
 impl Node for ExprStmt {}
 
@@ -365,6 +371,8 @@ impl CodeGenerator for VarDecl {
         }
     }
 }
+
+impl GenGenerator for VarDecl {}
 
 impl Node for VarDecl {}
 
@@ -406,6 +414,49 @@ impl CodeGenerator for VarAssign {
             
             let name = var.as_slice();
             let var_val = builder.new_var(val, name);
+            builder.set_var(name, var_val);
+
+            i += 1;
+        }
+    }
+}
+
+impl GenGenerator for VarAssign {
+    fn register_state_vars(&mut self, gb : &mut GenBuilder){
+        gb.register_n_variables(self.vars.len());
+    }
+
+    ///Generate your regular code but also break to the end of the save and restore
+    ///blocks provided to save and restore state variables 
+    fn gen_gen_code(&mut self, ggs : &mut GenGenState, builder : &mut Builder){
+        let mut i = 0;
+        let base_state_index = ggs.state_index();
+
+        for var in self.vars.iter() {
+
+            //save block
+            //store current values in ctxt slots here...actually...may not have to save
+            //if we store on assignment
+            builder.goto_block(ggs.save_blk);
+
+            //restore block
+            //may not have to do shit here either if we set vars as the pointer slots
+            builder.goto_block(ggs.restore_blk);
+            
+            //actual code
+            builder.goto_block(ggs.stmts_blk);
+
+            let val = if i < self.vals.len() {
+                self.vals.get_mut(i).to_value(builder)
+            } else {
+                builder.default_value()
+            };
+
+            
+            let name = var.as_slice();
+            //load val into state slot and then set the var to the state slot
+            let var_index = base_state_index + i;
+            let var_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name));
             builder.set_var(name, var_val);
 
             i += 1;
@@ -456,6 +507,8 @@ impl CodeGenerator for AssignStmt {
     }
 }
 
+impl GenGenerator for AssignStmt {}
+
 impl Node for AssignStmt {}
 
 impl Stmt for AssignStmt {}
@@ -500,6 +553,8 @@ impl CodeGenerator for LoopControlStmt {
           }
     }
 }
+
+impl GenGenerator for LoopControlStmt {}
 
 impl Node for LoopControlStmt {}
 
@@ -584,6 +639,8 @@ impl CodeGenerator for IfElseStmt {
         builder.goto_block(if_else_exit);
     }
 }
+
+impl GenGenerator for IfElseStmt {}
 
 impl Node for IfElseStmt {}
 
@@ -689,6 +746,8 @@ impl CodeGenerator for ForInLoop {
     }
 }
 
+impl GenGenerator for ForInLoop {}
+
 impl Node for ForInLoop {}
 
 impl Stmt for ForInLoop {}
@@ -743,6 +802,8 @@ impl CodeGenerator for WhileLoop {
         builder.close_scope();
     }
 }
+
+impl GenGenerator for WhileLoop {}
 
 impl Node for WhileLoop {}
 
@@ -805,6 +866,8 @@ impl CodeGenerator for FunctionDef {
     }
 }
 
+impl GenGenerator for FunctionDef {}
+
 impl Node for FunctionDef {}
 
 impl Stmt for FunctionDef {}
@@ -834,6 +897,8 @@ impl CodeGenerator for ReturnStmt {
         builder.ret(val);
     }
 }
+
+impl GenGenerator for ReturnStmt {}
 
 impl Node for ReturnStmt {}
 
@@ -866,114 +931,28 @@ impl CodeGenerator for GeneratorDef {
         builder.with_fresh_scope(|fb : &mut Builder|{
             
             let name = self.name.as_slice();
-            //This will end up being some general HyObj type or sumthn
-            let int_type = fb.int32_type();
-            let void_type = fb.void_type();
 
-            //Create Type with fields for all state variables and next block to run
-            let mut state_types = vec!(fb.string_type());
-            //Add space for params
-            for param in self.params.iter() {
-                state_types.push(int_type);
-            }
+            let mut gen_builder = GenBuilder::new(name, &self.params, fb.int32_type(), fb.string_type());            
+
             //Add Space for stmts state
             for stmt in self.stmts.mut_iter() {
-                // stmt.register_state_vars(&mut state_types);
+                stmt.register_state_vars(&mut gen_builder);
             }
 
-            //Create gen type
-            let concrete_gen_type = fb.create_type(state_types, name);
-            let gen_type = fb.to_ptr_type(concrete_gen_type);
-
-            //Create generator next function
-            let next_name = format!("!{}_next", name);
-            let next_params = vec!(gen_type);
-            let mut entry_block_holder = Vec::new();
-
-            fb.create_function(next_name, next_params, int_type,|fb : &mut Builder|{
-                fb.goto_first_block();
-                
-                //have stmts build their restoration code in this block
-                let state_restore = fb.new_block("gen_state_restore");
-                //have stmts build their state saving code in this block
-                let state_save = fb.new_block("gen_state_save");
-                //init should set the first block to start at as this entry block
-                let entry = fb.new_block("gen_state_entry");
-                //early returns should break here and this should return 0 to indicate
-                //the generator is done
-                let exit = fb.new_block("gen_exit");
-                entry_block_holder.push(entry);
-
-                let mut possible_labels = vec!(state_save, entry, exit);
-
-                fb.goto_block(entry);
-                fb.break_to(exit);
-                // for stmt in self.stmts.mut_iter() {
-                //     //pass in gen_ctx here?
-                //     // stmt.gen_gen_code(
-                //           state_save, 
-                //           state_restore, 
-                //           &mut possible_labels,
-                //           fb
-                //        );
-                // }
-
-                // //check which block to resume on
-                fb.goto_block(state_restore);
-                let gen_ctx = fb.get_param(0);
-                let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
-                let label = fb.load(ctx_state, "dest");
-                fb.indirect_break(label, possible_labels);
-
-                fb.goto_block(state_save);
-                let continue_val = fb.int(1);
-                fb.ret(continue_val);
-
-                fb.goto_block(exit);
-                let done_val = fb.int(0);
-                fb.ret(done_val);
-            });
-
-
-            let init_name = format!("!{}_init", name);
-            let init_param_types = Vec::from_elem(self.params.len(), int_type);
-            let mut init_params = vec!(gen_type);
-            init_params.push_all(init_param_types.as_slice());
-
-
-            //Create generator init function...bind parameters and set first block to 
-            //entry block
-            fb.create_function(init_name, init_params, void_type,|fb : &mut Builder|{
-                fb.goto_first_block();
-                
-                let gen_ctx = fb.get_param(0);
-                let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
-
-                //setup entry block
-                let next_func = fb.get_function(next_name);
-                let entry_block = fb.block_address(next_func , entry_block_holder.as_slice()[0]);
-
-                fb.store(entry_block, ctx_state);
-
-                //bind params to local vars
-                let mut i = 0;
-                for param in self.params.iter() {
-                    //right now this is pass by value...not by ref
-                    let param_val = fb.get_param(i + 1);
-                    let state_var_slot = fb.get_obj_property(gen_ctx, i + 1, format!("param{}", i));
-                    fb.store(param_val, state_var_slot);
-
-                    i += 1;
+            gen_builder.create_next_function(fb, |ggs : &mut GenGenState, fb : &mut Builder|{
+                for stmt in self.stmts.mut_iter() {
+                //pass in gen_ctx here?
+                    stmt.gen_gen_code(ggs, fb);
                 }
-
-                fb.ret_void();
-
-                fb.goto_block(saved_block);
             });
+
+            gen_builder.create_init_function(fb, saved_block);
         });
 
     }
 }
+
+impl GenGenerator for GeneratorDef {}
 
 impl Node for GeneratorDef {}
 
