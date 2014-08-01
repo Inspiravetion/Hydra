@@ -101,7 +101,8 @@ pub enum TokenType {
     Int_Literal,
     Float_Literal,
     Multiline_Comment,
-    Singleline_Comment
+    Singleline_Comment,
+    NewLine
 }
 
 #[deriving(Clone)]
@@ -223,6 +224,7 @@ pub fn str_to_type(tok_str : &str) -> TokenType {
         "new" => New,
         "upto" => Upto,
         "through" => Through,
+        "\n" => NewLine,
         _ if tok_str.starts_with("'") => String_Literal,
         _ if tok_str.starts_with("\"") => String_Literal,
         _ if tok_str.starts_with("0b") => Binary_Literal,

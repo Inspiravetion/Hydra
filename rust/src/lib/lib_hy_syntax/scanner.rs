@@ -448,8 +448,13 @@ impl<B: Buffer> Scanner<B> {
                     },
                     _ if char::is_whitespace(c) => {
                         //may not want to skip...
-                        self.change_pos(c);
-                        self.next_token()
+                        if c == '\n' {
+                            self.consume(c);
+                            Some(self.tok())
+                        } else {
+                            self.change_pos(c);
+                            self.next_token()                            
+                        }
                     },
                     _ => fail!("Unrecognized character at {}:{}", self.line, self.col)
                 }

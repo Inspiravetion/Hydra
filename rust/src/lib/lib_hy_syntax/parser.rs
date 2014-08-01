@@ -163,7 +163,11 @@ trait HydraBaseParser {
                             self.expect(Function);
                             self.start_gen_parsing();
                             self.function_def()
-                        }
+                        }, 
+                        NewLine => {
+                            self.next();
+                            continue                        
+                        },
                         _   => fail!(
                                 "Statement at {}:{} not allowed at top level", 
                                 self.tok().line,
@@ -454,6 +458,10 @@ trait HydraBaseParser {
                         let yield_vals = self.exprs();
                         self.expect(Semicolon);
                         Some(YieldStmt::new(yield_vals))
+                    },
+                    NewLine => {
+                        self.next();
+                        self.stmt_opt()
                     }
                     _ => None
                 }
@@ -626,7 +634,6 @@ trait HydraBaseParser {
                         Some(self.resolve_bin_expr(expr_opt.unwrap()))
                     },
                     _ => expr_opt
-                    //TODO...if this is an identifier...try to make it a binary operator
                 }
             },
             None => None

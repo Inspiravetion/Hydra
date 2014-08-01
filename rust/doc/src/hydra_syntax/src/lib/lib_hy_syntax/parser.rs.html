@@ -922,6 +922,13 @@
 <span id='882'>882</span>
 <span id='883'>883</span>
 <span id='884'>884</span>
+<span id='885'>885</span>
+<span id='886'>886</span>
+<span id='887'>887</span>
+<span id='888'>888</span>
+<span id='889'>889</span>
+<span id='890'>890</span>
+<span id='891'>891</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -1088,7 +1095,11 @@
                             <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Function</span>);
                             <span class='self'>self</span>.<span class='ident'>start_gen_parsing</span>();
                             <span class='self'>self</span>.<span class='ident'>function_def</span>()
-                        }
+                        }, 
+                        <span class='ident'>NewLine</span> <span class='op'>=&gt;</span> {
+                            <span class='self'>self</span>.<span class='ident'>next</span>();
+                            <span class='kw'>continue</span>                        
+                        },
                         _   <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(
                                 <span class='string'>&quot;Statement at {}:{} not allowed at top level&quot;</span>, 
                                 <span class='self'>self</span>.<span class='ident'>tok</span>().<span class='ident'>line</span>,
@@ -1379,6 +1390,10 @@
                         <span class='kw'>let</span> <span class='ident'>yield_vals</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>exprs</span>();
                         <span class='self'>self</span>.<span class='ident'>expect</span>(<span class='ident'>Semicolon</span>);
                         <span class='prelude-val'>Some</span>(<span class='ident'>YieldStmt</span>::<span class='ident'>new</span>(<span class='ident'>yield_vals</span>))
+                    },
+                    <span class='ident'>NewLine</span> <span class='op'>=&gt;</span> {
+                        <span class='self'>self</span>.<span class='ident'>next</span>();
+                        <span class='self'>self</span>.<span class='ident'>stmt_opt</span>()
                     }
                     _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
                 }
@@ -1550,9 +1565,8 @@
                         <span class='self'>self</span>.<span class='ident'>next</span>();
                         <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>resolve_bin_expr</span>(<span class='ident'>expr_opt</span>.<span class='ident'>unwrap</span>()))
                     },
-                    _ <span class='op'>=&gt;</span> <span class='ident'>expr_opt</span><span class='comment'>
-                    //TODO...if this is an identifier...try to make it a binary operator
-                </span>}
+                    _ <span class='op'>=&gt;</span> <span class='ident'>expr_opt</span>
+                }
             },
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
         }
