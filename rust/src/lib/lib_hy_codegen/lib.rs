@@ -27,7 +27,9 @@ pub mod generator;
 pub mod builder;
 
 pub trait CodeGenerator {
-    fn gen_code(&mut self, &mut builder::Builder);
+    fn gen_code(&mut self, &mut builder::Builder) {
+        fail!("Called gen_code on a non code generating node");
+    }
 }
 
 

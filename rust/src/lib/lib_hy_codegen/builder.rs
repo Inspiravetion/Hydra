@@ -12,15 +12,21 @@ pub struct Builder {
     types      : HashMap<~str, Type>,
     pkgs       : HashMap<~str, Package>,
     curr_pkg   : Option<Package>,
-    curr_func  : Option<Value>,
+    pub curr_func  : Option<Value>,
     curr_scope : Box<Scope>,
     loop_scope : Box<LoopScope>
 }
 
 #[deriving(Clone)]
 enum Scope {
-    GlobalScope(HashMap<~str, Value>),
-    InnerScope(HashMap<~str, Value>, Box<Scope>)
+    GlobalScope(HashMap<~str, Variable>),
+    InnerScope(HashMap<~str, Variable>, Box<Scope>)
+}
+
+#[deriving(Clone)]
+enum Variable {
+    RegVar(Value),
+    GenVar(int)
 }
 
 impl Scope {
@@ -36,13 +42,23 @@ impl Scope {
         match *self {
             GlobalScope(ref mut vars) => {
                 match vars.find(&var_ident.to_owned()) {
-                    Some(val) => Some(*val),
+                    Some(var) => {
+                        match *var {
+                            RegVar(val) => Some(val),
+                            GenVar(_) => { fail!("Generator variables not needed in regular function") }
+                        }
+                    },
                     None      => None
                 }
             },
             InnerScope(ref mut vars, ref mut parent) => {
                 match vars.find(&var_ident.to_owned()) {
-                    Some(val) => Some(*val),
+                    Some(var) => {
+                        match *var {
+                            RegVar(val) => Some(val),
+                            GenVar(_) => { fail!("Generator variables not needed in regular function") }
+                        }
+                    },
                     None      => parent.get(var_ident)
                 }
             }
@@ -52,10 +68,48 @@ impl Scope {
     pub fn put(&mut self, var_ident : &str, val : Value) {
         match *self {
             GlobalScope(ref mut vars) => {
-                vars.insert(var_ident.to_owned(), val);
+                vars.insert(var_ident.to_owned(), RegVar(val));
             },
             InnerScope(ref mut vars, _) => {
-                vars.insert(var_ident.to_owned(), val);                
+                vars.insert(var_ident.to_owned(), RegVar(val));                
+            }
+        };
+    }
+
+    pub fn get_gen(&mut self, var_ident : &str) -> Option<Variable> {
+        match *self {
+            GlobalScope(ref mut vars) => {
+                match vars.find(&var_ident.to_owned()) {
+                    Some(var) => {
+                        match *var {
+                            GenVar(_) => Some(*var),
+                            RegVar(_) => { fail!("Outside variables not supported in generators yet") }
+                        }
+                    },
+                    None      => None
+                }
+            },
+            InnerScope(ref mut vars, ref mut parent) => {
+                match vars.find(&var_ident.to_owned()) {
+                    Some(var) => {
+                        match *var {
+                            GenVar(_) => Some(*var),
+                            RegVar(_) => { fail!("Outside variables not supported in generators yet"); }
+                        }
+                    },
+                    None      => parent.get_gen(var_ident)
+                }
+            }
+        }
+    }
+
+    pub fn put_gen(&mut self, var_ident : &str, idx : int) {
+        match *self {
+            GlobalScope(ref mut vars) => {
+                vars.insert(var_ident.to_owned(), GenVar(idx));
+            },
+            InnerScope(ref mut vars, _) => {
+                vars.insert(var_ident.to_owned(), GenVar(idx));                
             }
         };
     }
@@ -166,12 +220,39 @@ impl Builder {
         self.curr_scope.get(name)
     }
 
+    pub fn get_gen_var(&mut self, name : &str, ctxt : Value) -> Option<Value> {
+        match self.curr_scope.get_gen(name) {
+            Some(var) => {
+                match var {
+                    GenVar(idx) => {
+                        Some(self.get_obj_property(ctxt, idx, format!("_{}", name)))
+                    },
+                    _ => None
+                }
+            }, 
+            None => None
+        }
+    }
+
     pub fn set_var(&mut self, name : &str, val : Value) {
         self.curr_scope.put(name, val);
     }
 
+    pub fn set_gen_var(&mut self, name : &str, idx : int) {
+        self.curr_scope.put_gen(name, idx);
+    }
+
     pub fn assign_var(&mut self, var_val : Value, var_name : &str) {
         let var_ptr = match self.get_var(var_name){
+            Some(ptr) => ptr,
+            None => fail!("No {} in scope.", var_name)
+        };
+
+        self.store(var_val, var_ptr);
+    }
+
+    pub fn assign_gen_var(&mut self, var_val : Value, ctxt : Value, var_name : &str) {
+        let var_ptr = match self.get_gen_var(var_name, ctxt){
             Some(ptr) => ptr,
             None => fail!("No {} in scope.", var_name)
         };
@@ -699,10 +780,11 @@ pub struct GenBuilder<'a> {
     params      : &'a Vec<~str>,
     obj_type    : Type,
     gen_types   : Vec<Type>,
-    state_indxs : Vec<uint>,
+    pub state_indxs : Vec<uint>,
     resume_blks : Vec<Block>,
     entry_block : Option<Block>,
-    gen_type    : Option<Type>
+    gen_type    : Option<Type>,
+    pub num_ret     : Option<uint>
 }
 
 impl<'a> GenBuilder<'a> {
@@ -718,7 +800,8 @@ impl<'a> GenBuilder<'a> {
             state_indxs : Vec::new(),
             resume_blks : Vec::new(),
             entry_block : None,
-            gen_type    : None
+            gen_type    : None,
+            num_ret     : None
         };
 
         gb.register_n_variables(params.len());
@@ -860,14 +943,14 @@ pub struct GenGenState<'a> {
     pub save_blk    : Block,
     pub restore_blk : Block,
     pub stmts_blk   : Block,
-    pub labels      : &'a Vec<Block>,
+    pub labels      : &'a mut Vec<Block>,
     pub state_idxs  : &'a Vec<uint>,
     pub stmt_idx    : uint
 }
 
 impl<'a> GenGenState<'a> {
     fn new(context : Value, save_blk : Block, restore_blk : Block, stmts_blk : Block, 
-        labels : &'a Vec<Block>, state_idxs : &'a Vec<uint>) -> GenGenState<'a> {
+        labels : &'a mut Vec<Block>, state_idxs : &'a Vec<uint>) -> GenGenState<'a> {
         
         GenGenState {
             context     : context,
@@ -886,6 +969,10 @@ impl<'a> GenGenState<'a> {
 
     pub fn state_index(&mut self) -> uint {
         self.state_idxs.get(self.stmt_idx).clone()
+    }
+
+    pub fn next_stmt(&mut self) {
+        self.stmt_idx += 1;
     }
 }
 

@@ -11,7 +11,14 @@ function minus(a, b){
 }
 
 gen function squares(n){
+    var d;
     var a, b, c = 1;
+    
+    a = 2;
+    yield a;
+
+    yield b;
+    b = 2;
 }
 
 operator[0] times(a, b){

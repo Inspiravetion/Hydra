@@ -34,13 +34,15 @@ pub struct AsyncParser {
     tokens      : Receiver<Token>,
     presidences : HashMap<Ident, int>,
     peek_tok    : Option<Token>,
-    tok         : Option<Token>
+    tok         : Option<Token>,
+    parsing_gen : bool
 }
 
 pub struct SyncParser {
     tokens      : Vec<Token>,
     presidences : HashMap<Ident, int>,
-    tok_idx     : uint
+    tok_idx     : uint,
+    parsing_gen : bool
 }
 
 pub trait HydraParser : HydraBaseParser {
@@ -75,6 +77,16 @@ trait HydraBaseParser {
 
     ///Sets the presidence for a token
     fn set_presidence(&mut self, &Token, int);
+
+    ///Returns whether or not parser is currently parsing a generator
+    ///definition
+    fn parsing_generator(&self) -> bool;
+
+    ///Let Parser know it is parsing a generator definition
+    fn start_gen_parsing(&mut self);
+
+    ///Let Parser know it is no longer parsing a generator definition
+    fn end_gen_parsing(&mut self);
 
     ///Advance to next token or fail! if at EOF
     fn next(&mut self) {
@@ -140,7 +152,7 @@ trait HydraBaseParser {
                         },
                         Function => {
                             self.next();
-                            self.function_def(false)
+                            self.function_def()
                         },
                         Operator => {
                             self.next();
@@ -149,7 +161,8 @@ trait HydraBaseParser {
                         Generator => {
                             self.next();
                             self.expect(Function);
-                            self.function_def(true)
+                            self.start_gen_parsing();
+                            self.function_def()
                         }
                         _   => fail!(
                                 "Statement at {}:{} not allowed at top level", 
@@ -166,7 +179,7 @@ trait HydraBaseParser {
         } 
     }
 
-    fn function_def(&mut self, generator : bool) -> Box<Stmt> {
+    fn function_def(&mut self) -> Box<Stmt> {
         self.expect(Identifier);
         let func_name = self.tok().text.to_owned();
 
@@ -177,7 +190,8 @@ trait HydraBaseParser {
 
         let stmts = self.block(); //TODO: this should also be optional
 
-        if generator {
+        if self.parsing_generator() {
+            self.end_gen_parsing();
             GeneratorDef::new(func_name, params, stmts)
         } else {
             FunctionDef::new(func_name, params, stmts)
@@ -206,7 +220,7 @@ trait HydraBaseParser {
             None => fail!("Unexpected end of input")
         };
 
-        self.function_def(false)
+        self.function_def()
     }
 
     fn var_decl(&mut self) -> Box<Stmt> {
@@ -423,10 +437,24 @@ trait HydraBaseParser {
                         Some(self.if_else_stmt())
                     },
                     Return => {
+                        if self.parsing_generator() {
+                            fail!("Return statements are not allowed in generator defninitions");
+                        }
+
                         self.next();
                         let ret_val = self.expr();
                         Some(ReturnStmt::new(ret_val))
                     },
+                    Yield => {
+                        if !self.parsing_generator() {
+                            fail!("Yield statements are only allowed in generator defninitions");
+                        }
+
+                        self.next();
+                        let yield_vals = self.exprs();
+                        self.expect(Semicolon);
+                        Some(YieldStmt::new(yield_vals))
+                    }
                     _ => None
                 }
             },
@@ -707,7 +735,8 @@ impl AsyncParser {
             tokens      : toks,
             presidences : new_presidence_map(),
             peek_tok    : first,
-            tok         : None
+            tok         : None,
+            parsing_gen : false
         }
     }
 }
@@ -752,6 +781,18 @@ impl HydraBaseParser for AsyncParser {
     fn set_presidence(&mut self, tok : &Token, pres : int) {
         self.presidences.insert(tok.text.to_owned(), pres);
     }
+
+    fn parsing_generator(&self) -> bool {
+        self.parsing_gen
+    }
+
+    fn start_gen_parsing(&mut self) {
+        self.parsing_gen = true;
+    }
+
+    fn end_gen_parsing(&mut self) {
+        self.parsing_gen = false;
+    }
 }
 
 impl SyncParser {
@@ -763,7 +804,8 @@ impl SyncParser {
         SyncParser {
             tokens      : toks,
             presidences : new_presidence_map(),
-            tok_idx     : -1
+            tok_idx     : -1,
+            parsing_gen : false
         }
     }
 }
@@ -810,6 +852,18 @@ impl HydraBaseParser for SyncParser {
 
     fn set_presidence(&mut self, tok : &Token, pres : int) {
         self.presidences.insert(tok.text.to_owned(), pres);
+    }
+
+    fn parsing_generator(&self) -> bool {
+        self.parsing_gen
+    }
+
+    fn start_gen_parsing(&mut self) {
+        self.parsing_gen = true;
+    }
+
+    fn end_gen_parsing(&mut self) {
+        self.parsing_gen = false;
     }
 }
 

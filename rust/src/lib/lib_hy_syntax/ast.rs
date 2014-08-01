@@ -21,7 +21,7 @@ pub trait Node : CodeGenerator {
 pub trait GenGenerator : Node {
     ///Add declared variable types to vec so that a generator state object can 
     ///be created...push the number of vars u need in so that you know where to start from on your save restore
-    fn register_state_vars(&mut self, &mut GenBuilder){
+    fn register_state_vars(&mut self, &mut GenBuilder) -> uint {
         fail!("this type does not have an implementation for register_state_vars");
     }
 
@@ -54,6 +54,10 @@ pub trait Expr : Node {
 
     fn to_value(&mut self, &mut Builder) -> Value {
         fail!("to_value called on type that cannot be resolved to a value");        
+    }
+
+    fn to_gen_value(&mut self, &mut Builder, Value) -> Value {
+        fail!("to_gen_value called on type that cannot be resolved to a gen value");        
     }
 }
 
@@ -186,6 +190,10 @@ impl Expr for Int {
     fn to_value(&mut self, builder : &mut Builder) -> Value {
         builder.int(self.value)
     }
+
+    fn to_gen_value(&mut self, builder : &mut Builder, ctxt : Value) -> Value {
+        self.to_value(builder)
+    }
 }
 
 impl Int {
@@ -216,6 +224,15 @@ impl Expr for IdentExpr {
         let name = self.value.as_slice();
 
         match builder.get_var(name) {
+            Some(val) => builder.load(val, name),
+            None => fail!("No {} in current scope", self.value)
+        }
+    }
+
+    fn to_gen_value(&mut self, builder : &mut Builder, ctxt : Value) -> Value {
+        let name = self.value.as_slice();
+
+        match builder.get_gen_var(name, ctxt) {
             Some(val) => builder.load(val, name),
             None => fail!("No {} in current scope", self.value)
         }
@@ -372,7 +389,36 @@ impl CodeGenerator for VarDecl {
     }
 }
 
-impl GenGenerator for VarDecl {}
+impl GenGenerator for VarDecl {
+    fn register_state_vars(&mut self, gb : &mut GenBuilder) -> uint {
+        let num_vars = self.vars.len();
+        gb.register_n_variables(num_vars);
+
+        num_vars
+    }
+
+    ///Generate your regular code but also break to the end of the save and restore
+    ///blocks provided to save and restore state variables 
+    fn gen_gen_code(&mut self, ggs : &mut GenGenState, builder : &mut Builder){
+        let mut i = 0;
+        let base_state_index = ggs.state_index();
+
+        for var in self.vars.iter() {
+            //actual code
+            builder.goto_block(ggs.stmts_blk);
+
+            let val = builder.default_value();
+            let name = var.as_slice();
+            //load val into state slot and then set the var to the state slot
+            let var_index = base_state_index + i;
+            let ptr_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name));
+            builder.store(val, ptr_val);
+            builder.set_gen_var(name, var_index as int);
+
+            i += 1;
+        }
+    }
+}
 
 impl Node for VarDecl {}
 
@@ -422,8 +468,11 @@ impl CodeGenerator for VarAssign {
 }
 
 impl GenGenerator for VarAssign {
-    fn register_state_vars(&mut self, gb : &mut GenBuilder){
-        gb.register_n_variables(self.vars.len());
+    fn register_state_vars(&mut self, gb : &mut GenBuilder) -> uint {
+        let num_vars = self.vars.len();
+        gb.register_n_variables(num_vars);
+
+        num_vars
     }
 
     ///Generate your regular code but also break to the end of the save and restore
@@ -447,7 +496,7 @@ impl GenGenerator for VarAssign {
             builder.goto_block(ggs.stmts_blk);
 
             let val = if i < self.vals.len() {
-                self.vals.get_mut(i).to_value(builder)
+                self.vals.get_mut(i).to_gen_value(builder, ggs.context)
             } else {
                 builder.default_value()
             };
@@ -456,8 +505,9 @@ impl GenGenerator for VarAssign {
             let name = var.as_slice();
             //load val into state slot and then set the var to the state slot
             let var_index = base_state_index + i;
-            let var_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name));
-            builder.set_var(name, var_val);
+            let ptr_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name));
+            builder.store(val, ptr_val);
+            builder.set_gen_var(name, var_index as int);
 
             i += 1;
         }
@@ -507,7 +557,29 @@ impl CodeGenerator for AssignStmt {
     }
 }
 
-impl GenGenerator for AssignStmt {}
+impl GenGenerator for AssignStmt {
+    fn register_state_vars(&mut self, gb : &mut GenBuilder) -> uint {
+        gb.register_n_variables(0);
+        0
+    }
+
+    ///Generate your regular code but also break to the end of the save and restore
+    ///blocks provided to save and restore state variables 
+    fn gen_gen_code(&mut self, ggs : &mut GenGenState, builder : &mut Builder){
+        if self.lhs.len() != self.rhs.len() {
+            fail!("left hand and right hand sides of assignment stmt arent compatible");
+        }
+
+        let mut i = 0;
+
+        for prop_path in self.lhs.iter() {
+            let var_name = prop_path.get(0).as_slice();
+            let var_val = self.rhs.get_mut(i).to_gen_value(builder, ggs.context);
+            builder.assign_gen_var(var_val, ggs.context, var_name);
+            i += 1;
+        }        
+    }
+}
 
 impl Node for AssignStmt {}
 
@@ -549,7 +621,7 @@ impl CodeGenerator for LoopControlStmt {
                     None => {}
                 };
             },
-            _ => fail!("Created a LoopControlStmt with an incompatibly keyword {:?}", self.typ)
+            _ => fail!("Created a LoopControlStmt with an incompatable keyword {:?}", self.typ)
           }
     }
 }
@@ -935,14 +1007,18 @@ impl CodeGenerator for GeneratorDef {
             let mut gen_builder = GenBuilder::new(name, &self.params, fb.int32_type(), fb.string_type());            
 
             //Add Space for stmts state
+            let mut vars_registered = 0;
             for stmt in self.stmts.mut_iter() {
-                stmt.register_state_vars(&mut gen_builder);
+                vars_registered = stmt.register_state_vars(&mut gen_builder);
             }
+            let ret_idx = gen_builder.state_indxs.last().unwrap() + vars_registered;
+            gen_builder.state_indxs.push(ret_idx);
 
             gen_builder.create_next_function(fb, |ggs : &mut GenGenState, fb : &mut Builder|{
                 for stmt in self.stmts.mut_iter() {
                 //pass in gen_ctx here?
                     stmt.gen_gen_code(ggs, fb);
+                    ggs.next_stmt();
                 }
             });
 
@@ -964,6 +1040,79 @@ impl GeneratorDef {
             name   : name,
             params : params, 
             stmts  : stmts
+        } as Box<Stmt>
+    }
+}
+
+
+///////////////////////////////////////
+//       Generator Definition        //
+///////////////////////////////////////
+
+///A generator definition
+pub struct YieldStmt {
+    values : Vec<Box<Expr>>
+}
+
+impl CodeGenerator for YieldStmt {}
+
+impl GenGenerator for YieldStmt {
+    fn register_state_vars(&mut self, gb : &mut GenBuilder) -> uint {
+        match gb.num_ret {
+            Some(last_ret) => {
+                if last_ret != self.values.len() {
+                    fail!("Multiple Yield statements returning different amounts of values is not supported yet");
+                }
+            }, 
+            None => {
+                gb.num_ret = Some(self.values.len());
+            }
+        };
+
+        gb.register_n_variables(0);
+        0
+    }
+
+    //all yield stmts must be the same size ATM
+    fn gen_gen_code(&mut self, ggs : &mut GenGenState, builder : &mut Builder){
+        //save the values into their proper return slots and return 1 to signal that you arent done
+        //Get the index of the return slots of the gen_type
+        let start_idx = ggs.state_idxs.last().unwrap();
+        let mut idx_padding = -1;
+        for val in self.values.mut_iter() {
+            println!("{}", start_idx + idx_padding);
+            let slot_ptr = builder.get_obj_property(ggs.context, (start_idx + idx_padding) as int, format!("ret_{}", idx_padding + 2));
+            let val = val.to_gen_value(builder, ggs.context);
+
+            builder.store(val, slot_ptr);
+
+            idx_padding += 1;
+        }
+
+        let post_yield_block = builder.new_block("post_yield");
+        ggs.labels.push(post_yield_block);
+        let func = builder.curr_func.unwrap();
+        let address = builder.block_address(func ,post_yield_block);
+        
+        let resume_block_slot = builder.get_obj_property(ggs.context, 0, "resume_block_slot");
+        builder.store(address, resume_block_slot);
+
+        let ret = builder.int(1);
+        builder.ret(ret);
+
+        builder.goto_block(post_yield_block);
+    }
+
+}
+
+impl Node for YieldStmt {}
+
+impl Stmt for YieldStmt {}
+
+impl YieldStmt {
+    pub fn new(values : Vec<Box<Expr>>) -> Box<Stmt> {
+        box YieldStmt {
+            values : values
         } as Box<Stmt>
     }
 }

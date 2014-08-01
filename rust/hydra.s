@@ -432,7 +432,27 @@ LBB17_1:                                ## %gen_state_save
 	ret
 Ltmp24:                                 ## Block address taken
 LBB17_2:                                ## %gen_state_entry
-LBB17_3:                                ## %gen_exit
+	movl	$-1, 12(%rdi)
+	movl	$1, 16(%rdi)
+	movl	$-1, 20(%rdi)
+	movl	$-1, 24(%rdi)
+	movl	$2, 16(%rdi)
+	movl	$2, 24(%rdi)
+	leaq	Ltmp25(%rip), %rax
+	jmp	LBB17_4
+Ltmp25:                                 ## Block address taken
+LBB17_3:                                ## %post_yield
+	movl	20(%rdi), %eax
+	movl	%eax, 24(%rdi)
+	leaq	Ltmp26(%rip), %rax
+LBB17_4:                                ## %post_yield
+	movq	%rax, (%rdi)
+	movl	$1, %eax
+	ret
+Ltmp26:                                 ## Block address taken
+LBB17_5:                                ## %post_yield5
+	movl	$2, 20(%rdi)
+LBB17_6:                                ## %gen_exit
 	xorl	%eax, %eax
 	ret
 	.cfi_endproc
@@ -454,7 +474,7 @@ _times:                                 ## @times
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp26:
+Ltmp28:
 	.cfi_def_cfa_offset 16
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
@@ -470,7 +490,7 @@ _plus:                                  ## @plus
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp28:
+Ltmp30:
 	.cfi_def_cfa_offset 16
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
