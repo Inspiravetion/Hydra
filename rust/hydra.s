@@ -432,25 +432,32 @@ LBB17_1:                                ## %gen_state_save
 	ret
 Ltmp24:                                 ## Block address taken
 LBB17_2:                                ## %gen_state_entry
-	movl	$-1, 12(%rdi)
-	movl	$1, 16(%rdi)
-	movl	$-1, 20(%rdi)
-	movl	$-1, 24(%rdi)
-	movl	$2, 16(%rdi)
-	movl	$2, 24(%rdi)
+	movabsq	$12884901887, %rax      ## imm = 0x2FFFFFFFF
+	movq	%rax, 12(%rdi)
+	movabsq	$-4294967295, %rcx      ## imm = 0xFFFFFFFF00000001
+	movq	%rcx, 16(%rdi)
+	movq	%rax, 24(%rdi)
+	movl	12(%rdi), %eax
+	movl	%eax, 32(%rdi)
+	movl	20(%rdi), %eax
+	movl	%eax, 36(%rdi)
 	leaq	Ltmp25(%rip), %rax
 	jmp	LBB17_4
 Ltmp25:                                 ## Block address taken
 LBB17_3:                                ## %post_yield
 	movl	20(%rdi), %eax
-	movl	%eax, 24(%rdi)
+	movl	%eax, 28(%rdi)
+	movl	24(%rdi), %eax
+	movl	%eax, 32(%rdi)
+	movl	16(%rdi), %eax
+	movl	%eax, 36(%rdi)
 	leaq	Ltmp26(%rip), %rax
 LBB17_4:                                ## %post_yield
 	movq	%rax, (%rdi)
 	movl	$1, %eax
 	ret
 Ltmp26:                                 ## Block address taken
-LBB17_5:                                ## %post_yield5
+LBB17_5:                                ## %post_yield13
 	movl	$2, 20(%rdi)
 LBB17_6:                                ## %gen_exit
 	xorl	%eax, %eax

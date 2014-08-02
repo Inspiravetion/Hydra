@@ -15,9 +15,9 @@ gen function squares(n){
     var a, b, c = 1;
     
     a = 2;
-    yield a;
+    yield a, d, b;
 
-    yield b;
+    yield b, c, a;
     b = 2;
 }
 

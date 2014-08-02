@@ -1011,8 +1011,16 @@ impl CodeGenerator for GeneratorDef {
             for stmt in self.stmts.mut_iter() {
                 vars_registered = stmt.register_state_vars(&mut gen_builder);
             }
-            let ret_idx = gen_builder.state_indxs.last().unwrap() + vars_registered;
-            gen_builder.state_indxs.push(ret_idx);
+
+            //add space for yield stmts
+            let max_num_yield = match gen_builder.num_ret {
+                Some(num) => num,
+                None => 0
+            };
+            gen_builder.register_n_variables(max_num_yield);
+
+            //fix index vec to record where return slots start
+            gen_builder.state_indxs.pop();
 
             gen_builder.create_next_function(fb, |ggs : &mut GenGenState, fb : &mut Builder|{
                 for stmt in self.stmts.mut_iter() {
@@ -1075,10 +1083,10 @@ impl GenGenerator for YieldStmt {
 
     //all yield stmts must be the same size ATM
     fn gen_gen_code(&mut self, ggs : &mut GenGenState, builder : &mut Builder){
-        //save the values into their proper return slots and return 1 to signal that you arent done
+        //save the values into their proper return slots and return 1 to signal that the generator isn't done
         //Get the index of the return slots of the gen_type
         let start_idx = ggs.state_idxs.last().unwrap();
-        let mut idx_padding = -1;
+        let mut idx_padding = 0;
         for val in self.values.mut_iter() {
             println!("{}", start_idx + idx_padding);
             let slot_ptr = builder.get_obj_property(ggs.context, (start_idx + idx_padding) as int, format!("ret_{}", idx_padding + 2));

@@ -309,7 +309,7 @@ trait HydraBaseParser {
         idents
     }
 
-    fn ident_prefixs(&mut self) -> IdentPrefix {
+    fn stmt_ident_prefixs(&mut self) -> IdentPrefix {
         let first = self.ident_prefix();
 
         if self.next_is(Comma) {
@@ -332,6 +332,16 @@ trait HydraBaseParser {
             } else {
                 SingleIdentList(first)
             }
+        }
+    }
+
+    fn expr_ident_prefixs(&mut self) -> IdentPrefix {
+        let prefix = self.ident_prefix();
+
+        if prefix.len() == 1 {
+            SingleIdent(prefix.get(0).to_owned())
+        } else {
+            SingleIdentList(prefix)
         }
     }
 
@@ -362,7 +372,7 @@ trait HydraBaseParser {
     }
 
     fn func_call_or_assignment_stmt(&mut self) -> Box<Stmt> {
-        let prop_paths = self.ident_prefixs();
+        let prop_paths = self.stmt_ident_prefixs();
 
         match self.peek() {
             Some(tok) => {
@@ -558,7 +568,7 @@ trait HydraBaseParser {
     }
 
     fn ident_or_func_call(&mut self) -> Box<Expr> {
-        let prop_paths = self.ident_prefixs();
+        let prop_paths = self.expr_ident_prefixs();
 
         match prop_paths {
             SingleIdentList(path) => {
@@ -574,6 +584,9 @@ trait HydraBaseParser {
                         }
                     },
                     None => {
+                        //TODO: removing this and returning another identexpr will
+                        //remove the need for a semicolon...hmmm unless the semicolon
+                        //is checked by the caller
                         let tok = self.tok();
                         fail!("Expected Expression at {}:{}", tok.line, tok.col);
                     }
@@ -594,14 +607,16 @@ trait HydraBaseParser {
                         }
                     },
                     None => {
+                        //same here
                         let tok = self.tok();
                         fail!("Expected Expression at {}:{}", tok.line, tok.col);
                     }
                 }
             },
             MultiIdentList(paths) => {
-                //this is a tuple
-                fail!("Tuples are supported yet!");
+                //this should never happen as this function should be returning basic
+                //expressions not lists of them
+                fail!("PARSER ERROR: THIS SHOULD BE UNREACHABLE");
             }
         }
     }

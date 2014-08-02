@@ -1,7 +1,7 @@
 ; ModuleID = 'hydra'
 
 %"!range_gen" = type { i8*, i32, i32, i32 }
-%squares = type { i8*, i32, i32, i32, i32, i32 }
+%squares = type { i8*, i32, i32, i32, i32, i32, i32, i32, i32 }
 
 @global_gen_fmt = private unnamed_addr constant [3 x i8] c"%d\00"
 
@@ -303,7 +303,7 @@ define i32 @"!squares_gen_next"(%squares*) {
 gen_state_restore:                                ; No predecessors!
   %ctx_state = getelementptr inbounds %squares* %0, i32 0, i32 0
   %dest = load i8** %ctx_state
-  indirectbr i8* %dest, [label %gen_state_save, label %gen_state_entry, label %gen_exit, label %post_yield, label %post_yield5]
+  indirectbr i8* %dest, [label %gen_state_save, label %gen_state_entry, label %gen_exit, label %post_yield, label %post_yield13]
 
 gen_state_save:                                   ; preds = %gen_state_restore
   ret i32 1
@@ -319,29 +319,45 @@ gen_state_entry:                                  ; preds = %gen_state_restore
   store i32 -1, i32* %_c
   %_a1 = getelementptr inbounds %squares* %0, i32 0, i32 3
   store i32 2, i32* %_a1
-  %ret_1 = getelementptr inbounds %squares* %0, i32 0, i32 5
+  %ret_2 = getelementptr inbounds %squares* %0, i32 0, i32 6
   %_a2 = getelementptr inbounds %squares* %0, i32 0, i32 3
   %a = load i32* %_a2
-  store i32 %a, i32* %ret_1
+  store i32 %a, i32* %ret_2
+  %ret_3 = getelementptr inbounds %squares* %0, i32 0, i32 7
+  %_d3 = getelementptr inbounds %squares* %0, i32 0, i32 2
+  %d = load i32* %_d3
+  store i32 %d, i32* %ret_3
+  %ret_4 = getelementptr inbounds %squares* %0, i32 0, i32 8
+  %_b4 = getelementptr inbounds %squares* %0, i32 0, i32 4
+  %b = load i32* %_b4
+  store i32 %b, i32* %ret_4
   %resume_block_slot = getelementptr inbounds %squares* %0, i32 0, i32 0
   store i8* blockaddress(@"!squares_gen_next", %post_yield), i8** %resume_block_slot
   ret i32 1
 
-gen_exit:                                         ; preds = %gen_state_restore, %post_yield5
+gen_exit:                                         ; preds = %gen_state_restore, %post_yield13
   ret i32 0
 
 post_yield:                                       ; preds = %gen_state_restore
-  %ret_13 = getelementptr inbounds %squares* %0, i32 0, i32 5
-  %_b4 = getelementptr inbounds %squares* %0, i32 0, i32 4
-  %b = load i32* %_b4
-  store i32 %b, i32* %ret_13
-  %resume_block_slot6 = getelementptr inbounds %squares* %0, i32 0, i32 0
-  store i8* blockaddress(@"!squares_gen_next", %post_yield5), i8** %resume_block_slot6
+  %ret_25 = getelementptr inbounds %squares* %0, i32 0, i32 6
+  %_b6 = getelementptr inbounds %squares* %0, i32 0, i32 4
+  %b7 = load i32* %_b6
+  store i32 %b7, i32* %ret_25
+  %ret_38 = getelementptr inbounds %squares* %0, i32 0, i32 7
+  %_c9 = getelementptr inbounds %squares* %0, i32 0, i32 5
+  %c = load i32* %_c9
+  store i32 %c, i32* %ret_38
+  %ret_410 = getelementptr inbounds %squares* %0, i32 0, i32 8
+  %_a11 = getelementptr inbounds %squares* %0, i32 0, i32 3
+  %a12 = load i32* %_a11
+  store i32 %a12, i32* %ret_410
+  %resume_block_slot14 = getelementptr inbounds %squares* %0, i32 0, i32 0
+  store i8* blockaddress(@"!squares_gen_next", %post_yield13), i8** %resume_block_slot14
   ret i32 1
 
-post_yield5:                                      ; preds = %gen_state_restore
-  %_b7 = getelementptr inbounds %squares* %0, i32 0, i32 4
-  store i32 2, i32* %_b7
+post_yield13:                                     ; preds = %gen_state_restore
+  %_b15 = getelementptr inbounds %squares* %0, i32 0, i32 4
+  store i32 2, i32* %_b15
   br label %gen_exit
 }
 

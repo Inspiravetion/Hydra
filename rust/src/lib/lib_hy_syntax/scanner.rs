@@ -594,3 +594,10 @@ fn ident_tokens(){
         Identifier, Identifier, Identifier, Identifier
     ]);
 }
+
+#[test]
+fn newline_token(){
+    test_types!("abc \n\n" -> [
+        Identifier, NewLine, NewLine
+    ]);
+}
