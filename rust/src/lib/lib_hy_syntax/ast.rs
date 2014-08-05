@@ -2,12 +2,10 @@ use codegen::CodeGenerator;
 use codegen::builder::{Builder, GenBuilder, GenGenState}; 
 use codegen::generator::Generator; 
 use codegen::lltype::{Value, Block, Type};
-// use collections::hashmap::HashMap;
+
 use std::vec::Vec;
 use std::owned::Box;
-// use std::iter::FromIterator;
-// use std::strbuf::StrBuf;
-// use std::fmt::{Show, Formatter, Result};
+
 use token::*;
 
 
