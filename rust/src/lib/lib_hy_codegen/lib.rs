@@ -17,6 +17,7 @@
 extern crate rustc;
 extern crate libc;
 extern crate collections;
+extern crate syntax = "hydra_syntax";
 
 macro_rules! u (
     ($e:expr) => ( unsafe { $e }; )
@@ -26,10 +27,6 @@ pub mod lltype;
 pub mod generator;
 pub mod builder;
 
-pub trait CodeGenerator {
-    fn gen_code(&mut self, &mut builder::Builder) {
-        fail!("Called gen_code on a non code generating node");
-    }
-}
+
 
 

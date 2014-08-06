@@ -10,7 +10,7 @@ use syntax::parser;
 
 use codegen::builder::Builder; 
 use codegen::lltype::Block; 
-use codegen::CodeGenerator;
+// use codegen::CodeGenerator;
 
 use std::os;
 
@@ -245,7 +245,8 @@ fn main(){
         let mut ast = parser::parse_file_async("test.hy");
         
         for node in ast.mut_iter() {
-            node.gen_code(fb);
+            // node.gen_code(fb);
+            println!("{}",node);
         }
 
         let ret = fb.int(0);

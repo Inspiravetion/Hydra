@@ -1,7 +1,7 @@
 use std::fmt::{Show, Formatter, Result};
 use std::char;
 
-#[deriving(Clone, Eq)]
+#[deriving(Clone, Eq, Show)]
 pub enum TokenType {
     Identifier,
     Period,
