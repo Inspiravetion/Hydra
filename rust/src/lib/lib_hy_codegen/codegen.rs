@@ -1,4 +1,4 @@
-use syntax::ast*;
+use syntax::ast::*;
 
 use builder::{Builder, GenBuilder, GenGenState}; 
 use generator::Generator; 
@@ -11,6 +11,7 @@ pub trait CodeGenerator {
     }
 }
 
+//Only for Stmts
 pub trait GenGenerator : CodeGenerator {
     ///Add declared variable types to vec so that a generator state object can 
     ///be created...push the number of vars u need in so that you know where to start from on your save restore
@@ -19,19 +20,15 @@ pub trait GenGenerator : CodeGenerator {
     }
 
     ///Generate your regular code but also break to the end of the save and restore
-    ///blocks provided to save and restore state variables 
-    ///
-    /// - Block : save block should be where all the state saving code should go
-    /// - Block : restore block should be where all the state restoring code should go
-    /// - Vec<Block> : a vector that holds all the possible blocks that may be resumed
-    /// - Vec<uint> : a vector that holds the offsets of the state variables for each statement
-    ///
+    ///blocks provided to save and restore state variables so this can be done in 
+    ///one pass
     fn gen_gen_code(&mut self, &mut GenGenState, &mut Builder){
         fail!("This type cannot build code for a generator");
     }
 
 }
 
+//Only for Exprs
 pub trait ExprGenerator : CodeGenerator {
     ///Return a Generator struct with the params for its llvm init function already
     ///created
@@ -39,7 +36,7 @@ pub trait ExprGenerator : CodeGenerator {
         fail!("to_generator called on non generator type");
     }
 
-    fn to_value(&mut self, &mut Builder) -> Value {
+    fn to_value(&self, &mut Builder) -> Value {
         fail!("to_value called on type that cannot be resolved to a value");        
     }
 
@@ -56,109 +53,121 @@ pub trait StmtGenerator : GenGenerator {}
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+impl CodeGenerator for Expr {
+    fn gen_code(&mut self, builder : &mut Builder){
+        match self.node {
+            FuncCall(ref prop_path, ref mut params) => func_call_gen_code(prop_path, params, builder),
+            _ => fail!("Called gen_code on a non code generating node")       
+        }
+        
+    }
+}
+
+impl ExprGenerator for Expr {
+    fn to_generator(&mut self, builder : &mut Builder) -> Generator {
+        fail!("to_generator called on non generator type");
+    }
+
+    fn to_value(&self, builder : &mut Builder) -> Value {
+        match self.node {
+            FuncCall(ref prop_path, ref params) => func_call_to_value(prop_path, params, builder),
+            _ => fail!("to_value called on type that cannot be resolved to a value")       
+        }
+    }
+
+    fn to_gen_value(&mut self, builder : &mut Builder, ctxt : Value) -> Value {
+        match self.node {
+            FuncCall(ref prop_path, ref mut params) => func_call_to_gen_value(prop_path, params, builder, ctxt),
+            _ => fail!("to_gen_value called on type that cannot be resolved to a gen value")        
+        }
+    }
+}
 
 ///////////////////////////////////////
 //         FuncCall Generation       //
 ///////////////////////////////////////
 
-impl CodeGenerator for FuncCall {
-    fn gen_code(&mut self, builder : &mut Builder){
-        self.to_value(builder);
-    }
+fn func_call_gen_code(prop_path : &Vec<Ident>, params : &mut Vec<Box<Expr>>, builder : &mut Builder){
+    func_call_to_value(prop_path, params, builder);
 }
 
-impl ExprGenerator for FuncCall {
-    fn to_value(&mut self, builder : &mut Builder) -> Value {
-        let mut params = Vec::new();
-        for param in self.params.mut_iter() {
-            params.push(param.to_value(builder));
-        }
-
-        //getting the function name will change later
-        let func_name = self.prop_path.get(0).as_slice();
-        builder.call(func_name, params, format!("{}_tmp", func_name))
+fn func_call_to_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder : &mut Builder) -> Value {
+    let mut param_vals = Vec::new();
+    for param in params.iter() {
+        param_vals.push(param.to_value(builder));
     }
+
+    //getting the function name will change later
+    let func_name = prop_path.get(0).as_slice();
+    builder.call(func_name, param_vals, format!("{}_tmp", func_name))
+}
+
+fn func_call_to_gen_value(prop_path : &Vec<Ident>, params : &mut Vec<Box<Expr>>, builder : &mut Builder, ctxt : Value) -> Value {
+    let mut param_vals = Vec::new();
+    for param in params.mut_iter() {
+        param_vals.push(param.to_gen_value(builder, ctxt));
+    }
+
+    //getting the function name will change later
+    let func_name = prop_path.get(0).as_slice();
+    builder.call(func_name, param_vals, format!("{}_tmp", func_name))
 }
 
 ///////////////////////////////////////
 //     Inclusive Range Generation    //
 ///////////////////////////////////////
 
-impl CodeGenerator for InclusiveRange {
-    fn gen_code(&mut self, builder : &mut Builder){}
-}
+fn incl_range_to_generator(start : Box<Expr>, end : Box<Expr>, builder : &mut Builder) -> Generator {
+    let start = start.to_value(builder);
+    let end = end.to_value(builder);
 
-impl ExprGenerator for InclusiveRange {
-    fn to_generator(&mut self, builder : &mut Builder) -> Generator {
-        let start = self.start.to_value(builder);
-        let end = self.end.to_value(builder);
-
-        let one = builder.int(1);
-        let end_plus_one = builder.add_op(end, one, "add_tmp");
-        builder.range_gen(start, end_plus_one)
-    }
+    let one = builder.int(1);
+    let end_plus_one = builder.add_op(end, one, "add_tmp");
+    builder.range_gen(start, end_plus_one)
 }
 
 ///////////////////////////////////////
 //     Exclusive Range Generation    //
 ///////////////////////////////////////
 
-impl CodeGenerator for ExclusiveRange {
-    fn gen_code(&mut self, builder : &mut Builder){}
-}
+fn excl_range_to_generator(start : Box<Expr>, end : Box<Expr>, builder : &mut Builder) -> Generator {
+    let start = start.to_value(builder);
+    let end = end.to_value(builder);
 
-impl ExprGenerator for ExclusiveRange {
-    fn to_generator(&mut self, builder : &mut Builder) -> Generator {
-        let start = self.start.to_value(builder);
-        let end = self.end.to_value(builder);
-
-        builder.range_gen(start, end)
-    }
+    builder.range_gen(start, end)
 }
 
 ///////////////////////////////////////
 //            Int Generation         //
 ///////////////////////////////////////
 
-impl CodeGenerator for Int {
-    fn gen_code(&mut self, builder : &mut Builder){}
+fn int_to_value(value : int, builder : &mut Builder) -> Value {
+    builder.int(value)
 }
 
-impl ExprGenerator for Int {
-    fn to_value(&mut self, builder : &mut Builder) -> Value {
-        builder.int(self.value)
-    }
-
-    fn to_gen_value(&mut self, builder : &mut Builder, ctxt : Value) -> Value {
-        self.to_value(builder)
-    }
+fn int_to_gen_value(value : int, builder : &mut Builder, ctxt : Value) -> Value {
+    int_to_value(value, builder)
 }
 
 ///////////////////////////////////////
 //        Identifier Generation      //
 ///////////////////////////////////////
 
-impl CodeGenerator for IdentExpr {
-    fn gen_code(&mut self, builder : &mut Builder){}
+fn ident_expr_to_value(value : Ident, builder : &mut Builder) -> Value {
+    let name = value.as_slice();
+
+    match builder.get_var(name) {
+        Some(val) => builder.load(val, name),
+        None => fail!("No {} in current scope", value)
+    }
 }
 
-impl ExprGenerator for IdentExpr {
-    fn to_value(&mut self, builder : &mut Builder) -> Value {
-        let name = self.value.as_slice();
+fn ident_expr_to_gen_value(value : Ident, builder : &mut Builder, ctxt : Value) -> Value {
+    let name = value.as_slice();
 
-        match builder.get_var(name) {
-            Some(val) => builder.load(val, name),
-            None => fail!("No {} in current scope", self.value)
-        }
-    }
-
-    fn to_gen_value(&mut self, builder : &mut Builder, ctxt : Value) -> Value {
-        let name = self.value.as_slice();
-
-        match builder.get_gen_var(name, ctxt) {
-            Some(val) => builder.load(val, name),
-            None => fail!("No {} in current scope", self.value)
-        }
+    match builder.get_gen_var(name, ctxt) {
+        Some(val) => builder.load(val, name),
+        None => fail!("No {} in current scope", value)
     }
 }
 

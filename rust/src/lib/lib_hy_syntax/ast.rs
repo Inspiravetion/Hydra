@@ -4,7 +4,7 @@ use token::*;
 pub type Ident = ~str;
 
 pub struct Expr {
-    node : Expr_ //This might have to be boxed
+    pub node : Expr_ //This might have to be boxed
 }
 
 impl Show for Expr {
@@ -14,7 +14,7 @@ impl Show for Expr {
 }
 
 pub struct Stmt {
-    node : Stmt_ //This might have to be boxed
+    pub node : Stmt_ //This might have to be boxed
 }
 
 impl Show for Stmt {

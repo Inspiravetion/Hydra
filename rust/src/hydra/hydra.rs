@@ -2,15 +2,15 @@
 #![allow(unused_variable)]
 
 extern crate syntax = "hydra_syntax";
-extern crate codegen = "hydra_codegen";
+extern crate hyll = "hydra_llvm";
 
 use syntax::scanner;
 use syntax::parser::{AsyncParser, SyncParser, HydraParser};
 use syntax::parser;
 
-use codegen::builder::Builder; 
-use codegen::lltype::Block; 
-// use codegen::CodeGenerator;
+use hyll::builder::Builder; 
+use hyll::lltype::Block; 
+use hyll::codegen::CodeGenerator;
 
 use std::os;
 
