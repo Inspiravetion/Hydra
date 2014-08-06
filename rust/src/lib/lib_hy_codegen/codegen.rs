@@ -32,15 +32,15 @@ pub trait GenGenerator : CodeGenerator {
 pub trait ExprGenerator : CodeGenerator {
     ///Return a Generator struct with the params for its llvm init function already
     ///created
-    fn to_generator(&mut self, &mut Builder) -> Generator {
-        fail!("to_generator called on non generator type");
+    fn to_generator(&self, &mut Builder) -> Generator {
+        fail!("to_generator cd on non generator type");
     }
 
     fn to_value(&self, &mut Builder) -> Value {
         fail!("to_value called on type that cannot be resolved to a value");        
     }
 
-    fn to_gen_value(&mut self, &mut Builder, Value) -> Value {
+    fn to_gen_value(&self, &mut Builder, Value) -> Value {
         fail!("to_gen_value called on type that cannot be resolved to a gen value");        
     }
 }
@@ -54,9 +54,9 @@ pub trait StmtGenerator : GenGenerator {}
 ////////////////////////////////////////////////////////////////////////////////
 
 impl CodeGenerator for Expr {
-    fn gen_code(&mut self, builder : &mut Builder){
+    fn gen_code(&self, builder : &mut Builder){
         match self.node {
-            FuncCall(ref prop_path, ref mut params) => func_call_gen_code(prop_path, params, builder),
+            FuncCall(ref prop_path, ref params) => func_call_gen_code(prop_path, params, builder),
             _ => fail!("Called gen_code on a non code generating node")       
         }
         
@@ -64,7 +64,7 @@ impl CodeGenerator for Expr {
 }
 
 impl ExprGenerator for Expr {
-    fn to_generator(&mut self, builder : &mut Builder) -> Generator {
+    fn to_generator(&self, builder : &mut Builder) -> Generator {
         fail!("to_generator called on non generator type");
     }
 
@@ -75,9 +75,9 @@ impl ExprGenerator for Expr {
         }
     }
 
-    fn to_gen_value(&mut self, builder : &mut Builder, ctxt : Value) -> Value {
+    fn to_gen_value(&self, builder : &mut Builder, ctxt : Value) -> Value {
         match self.node {
-            FuncCall(ref prop_path, ref mut params) => func_call_to_gen_value(prop_path, params, builder, ctxt),
+            FuncCall(ref prop_path, ref params) => func_call_to_gen_value(prop_path, params, builder, ctxt),
             _ => fail!("to_gen_value called on type that cannot be resolved to a gen value")        
         }
     }
@@ -87,7 +87,7 @@ impl ExprGenerator for Expr {
 //         FuncCall Generation       //
 ///////////////////////////////////////
 
-fn func_call_gen_code(prop_path : &Vec<Ident>, params : &mut Vec<Box<Expr>>, builder : &mut Builder){
+fn func_call_gen_code(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder : &mut Builder){
     func_call_to_value(prop_path, params, builder);
 }
 
@@ -102,9 +102,9 @@ fn func_call_to_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder
     builder.call(func_name, param_vals, format!("{}_tmp", func_name))
 }
 
-fn func_call_to_gen_value(prop_path : &Vec<Ident>, params : &mut Vec<Box<Expr>>, builder : &mut Builder, ctxt : Value) -> Value {
+fn func_call_to_gen_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder : &mut Builder, ctxt : Value) -> Value {
     let mut param_vals = Vec::new();
-    for param in params.mut_iter() {
+    for param in params.iter() {
         param_vals.push(param.to_gen_value(builder, ctxt));
     }
 
