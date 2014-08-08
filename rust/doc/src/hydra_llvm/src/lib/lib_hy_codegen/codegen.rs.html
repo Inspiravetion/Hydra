@@ -213,22 +213,71 @@
 <span id='173'>173</span>
 <span id='174'>174</span>
 <span id='175'>175</span>
+<span id='176'>176</span>
+<span id='177'>177</span>
+<span id='178'>178</span>
+<span id='179'>179</span>
+<span id='180'>180</span>
+<span id='181'>181</span>
+<span id='182'>182</span>
+<span id='183'>183</span>
+<span id='184'>184</span>
+<span id='185'>185</span>
+<span id='186'>186</span>
+<span id='187'>187</span>
+<span id='188'>188</span>
+<span id='189'>189</span>
+<span id='190'>190</span>
+<span id='191'>191</span>
+<span id='192'>192</span>
+<span id='193'>193</span>
+<span id='194'>194</span>
+<span id='195'>195</span>
+<span id='196'>196</span>
+<span id='197'>197</span>
+<span id='198'>198</span>
+<span id='199'>199</span>
+<span id='200'>200</span>
+<span id='201'>201</span>
+<span id='202'>202</span>
+<span id='203'>203</span>
+<span id='204'>204</span>
+<span id='205'>205</span>
+<span id='206'>206</span>
+<span id='207'>207</span>
+<span id='208'>208</span>
+<span id='209'>209</span>
+<span id='210'>210</span>
+<span id='211'>211</span>
+<span id='212'>212</span>
+<span id='213'>213</span>
+<span id='214'>214</span>
+<span id='215'>215</span>
+<span id='216'>216</span>
+<span id='217'>217</span>
+<span id='218'>218</span>
+<span id='219'>219</span>
+<span id='220'>220</span>
+<span id='221'>221</span>
+<span id='222'>222</span>
+<span id='223'>223</span>
+<span id='224'>224</span>
+<span id='225'>225</span>
+<span id='226'>226</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='op'>*</span>;
+<span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>token</span>::<span class='ident'>Token</span>;
 
 <span class='kw'>use</span> <span class='ident'>builder</span>::{<span class='ident'>Builder</span>, <span class='ident'>GenBuilder</span>, <span class='ident'>GenGenState</span>}; 
 <span class='kw'>use</span> <span class='ident'>generator</span>::<span class='ident'>Generator</span>; 
 <span class='kw'>use</span> <span class='ident'>lltype</span>::{<span class='ident'>Value</span>, <span class='ident'>Block</span>, <span class='ident'>Type</span>};
 
-
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>CodeGenerator</span> {
-    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) {
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>StmtGenerator</span> {<span class='comment'>
+    //ExprStmt will have to switch over the espressions it gets and generate their code automatically
+    </span><span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) {
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Called gen_code on a non code generating node&quot;</span>);
     }
-}<span class='comment'>
 
-//Only for Stmts
-</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>GenGenerator</span> : <span class='ident'>CodeGenerator</span> {
     <span class='doccomment'>///Add declared variable types to vec so that a generator state object can 
 </span>    <span class='doccomment'>///be created...push the number of vars u need in so that you know where to start from on your save restore
 </span>    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
@@ -241,11 +290,9 @@
 </span>    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;This type cannot build code for a generator&quot;</span>);
     }
+}
 
-}<span class='comment'>
-
-//Only for Exprs
-</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>ExprGenerator</span> : <span class='ident'>CodeGenerator</span> {
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>ExprGenerator</span> {
     <span class='doccomment'>///Return a Generator struct with the params for its llvm init function already
 </span>    <span class='doccomment'>///created
 </span>    <span class='kw'>fn</span> <span class='ident'>to_generator</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
@@ -259,9 +306,7 @@
     <span class='kw'>fn</span> <span class='ident'>to_gen_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_gen_value called on type that cannot be resolved to a gen value&quot;</span>);        
     }
-}
-
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>StmtGenerator</span> : <span class='ident'>GenGenerator</span> {}<span class='comment'>
+}<span class='comment'>
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -269,24 +314,22 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-</span><span class='kw'>impl</span> <span class='ident'>CodeGenerator</span> <span class='kw'>for</span> <span class='ident'>Expr</span> {
-    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
-            <span class='ident'>FuncCall</span>(<span class='kw-2'>ref</span> <span class='ident'>prop_path</span>, <span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>params</span>) <span class='op'>=&gt;</span> <span class='ident'>func_call_gen_code</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>),
-            _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Called gen_code on a non code generating node&quot;</span>)       
-        }
-        
-    }
-}
-
-<span class='kw'>impl</span> <span class='ident'>ExprGenerator</span> <span class='kw'>for</span> <span class='ident'>Expr</span> {
+</span><span class='kw'>impl</span> <span class='ident'>ExprGenerator</span> <span class='kw'>for</span> <span class='ident'>Expr</span> {
     <span class='kw'>fn</span> <span class='ident'>to_generator</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
-        <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_generator called on non generator type&quot;</span>);
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
+            <span class='ident'>InclusiveRange</span>(<span class='kw-2'>ref</span> <span class='ident'>start</span>, <span class='kw-2'>ref</span> <span class='ident'>end</span>) <span class='op'>=&gt;</span> <span class='ident'>incl_range_to_generator</span>(<span class='ident'>start</span>, <span class='ident'>end</span>, <span class='ident'>builder</span>),
+            <span class='ident'>ExclusiveRange</span>(<span class='kw-2'>ref</span> <span class='ident'>start</span>, <span class='kw-2'>ref</span> <span class='ident'>end</span>) <span class='op'>=&gt;</span> <span class='ident'>excl_range_to_generator</span>(<span class='ident'>start</span>, <span class='ident'>end</span>, <span class='ident'>builder</span>),
+            _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_generator called on non generator type&quot;</span>)
+        }
     }
 
     <span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>FuncCall</span>(<span class='kw-2'>ref</span> <span class='ident'>prop_path</span>, <span class='kw-2'>ref</span> <span class='ident'>params</span>) <span class='op'>=&gt;</span> <span class='ident'>func_call_to_value</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>),
+            <span class='ident'>Int</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='ident'>int_to_value</span>(<span class='ident'>num</span>, <span class='ident'>builder</span>),
+            <span class='ident'>IdentExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>ident</span>) <span class='op'>=&gt;</span> <span class='ident'>ident_expr_to_value</span>(<span class='ident'>ident</span>, <span class='ident'>builder</span>),
+            <span class='ident'>BinaryExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>lhs</span>, <span class='kw-2'>ref</span> <span class='ident'>op</span>, <span class='kw-2'>ref</span> <span class='ident'>rhs</span>) <span class='op'>=&gt;</span> <span class='ident'>bin_expr_to_value</span>(<span class='ident'>lhs</span>, <span class='ident'>op</span>, <span class='ident'>rhs</span>, <span class='ident'>builder</span>),
+            <span class='ident'>PrefixUnaryExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>op</span>, <span class='kw-2'>ref</span> <span class='ident'>expr</span>) <span class='op'>=&gt;</span> <span class='ident'>prfx_unary_expr_to_value</span>(<span class='ident'>op</span>, <span class='ident'>expr</span>, <span class='ident'>builder</span>),
             _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_value called on type that cannot be resolved to a value&quot;</span>)       
         }
     }
@@ -294,6 +337,8 @@
     <span class='kw'>fn</span> <span class='ident'>to_gen_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>ctxt</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>FuncCall</span>(<span class='kw-2'>ref</span> <span class='ident'>prop_path</span>, <span class='kw-2'>ref</span> <span class='ident'>params</span>) <span class='op'>=&gt;</span> <span class='ident'>func_call_to_gen_value</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>, <span class='ident'>ctxt</span>),
+            <span class='ident'>Int</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='ident'>int_to_gen_value</span>(<span class='ident'>num</span>, <span class='ident'>builder</span>, <span class='ident'>ctxt</span>),
+            <span class='ident'>IdentExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>ident</span>) <span class='op'>=&gt;</span> <span class='ident'>ident_expr_to_gen_value</span>(<span class='ident'>ident</span>, <span class='ident'>builder</span>, <span class='ident'>ctxt</span>),
             _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_gen_value called on type that cannot be resolved to a gen value&quot;</span>)        
         }
     }
@@ -303,7 +348,8 @@
 //         FuncCall Generation       //
 ///////////////////////////////////////
 
-</span><span class='kw'>fn</span> <span class='ident'>func_call_gen_code</span>(<span class='ident'>prop_path</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+//for exprstmt
+</span><span class='kw'>fn</span> <span class='ident'>func_call_gen_code</span>(<span class='ident'>prop_path</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='ident'>func_call_to_value</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>);
 }
 
@@ -333,7 +379,7 @@
 //     Inclusive Range Generation    //
 ///////////////////////////////////////
 
-</span><span class='kw'>fn</span> <span class='ident'>incl_range_to_generator</span>(<span class='ident'>start</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
+</span><span class='kw'>fn</span> <span class='ident'>incl_range_to_generator</span>(<span class='ident'>start</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
     <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='ident'>start</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
     <span class='kw'>let</span> <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>end</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
@@ -346,7 +392,7 @@
 //     Exclusive Range Generation    //
 ///////////////////////////////////////
 
-</span><span class='kw'>fn</span> <span class='ident'>excl_range_to_generator</span>(<span class='ident'>start</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
+</span><span class='kw'>fn</span> <span class='ident'>excl_range_to_generator</span>(<span class='ident'>start</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
     <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='ident'>start</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
     <span class='kw'>let</span> <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>end</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
@@ -369,7 +415,7 @@
 //        Identifier Generation      //
 ///////////////////////////////////////
 
-</span><span class='kw'>fn</span> <span class='ident'>ident_expr_to_value</span>(<span class='ident'>value</span> : <span class='ident'>Ident</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+</span><span class='kw'>fn</span> <span class='ident'>ident_expr_to_value</span>(<span class='ident'>value</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>as_slice</span>();
 
     <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_var</span>(<span class='ident'>name</span>) {
@@ -378,18 +424,74 @@
     }
 }
 
-<span class='kw'>fn</span> <span class='ident'>ident_expr_to_gen_value</span>(<span class='ident'>value</span> : <span class='ident'>Ident</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>ctxt</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+<span class='kw'>fn</span> <span class='ident'>ident_expr_to_gen_value</span>(<span class='ident'>value</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>ctxt</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>as_slice</span>();
 
     <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_gen_var</span>(<span class='ident'>name</span>, <span class='ident'>ctxt</span>) {
         <span class='prelude-val'>Some</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>val</span>, <span class='ident'>name</span>),
         <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;No {} in current scope&quot;</span>, <span class='ident'>value</span>)
     }
-}
+}<span class='comment'>
 
+///////////////////////////////////////
+//    Binary Expression Generation   //
+///////////////////////////////////////
 
+</span><span class='kw'>fn</span> <span class='ident'>bin_expr_to_value</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>op</span> : <span class='kw-2'>&amp;</span><span class='ident'>Token</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+    <span class='kw'>let</span> <span class='ident'>left_val</span>  <span class='op'>=</span> <span class='ident'>lhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
+    <span class='kw'>let</span> <span class='ident'>right_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);<span class='comment'>
 
-</pre>
+    //TODO: verify that the operator being used is visible in the current scope
+    </span><span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>);
+    <span class='ident'>builder</span>.<span class='ident'>call</span>(
+        <span class='ident'>op</span>.<span class='ident'>text</span>, 
+        <span class='ident'>args</span>, 
+        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>op</span>.<span class='ident'>text</span>)
+    )
+}<span class='comment'>
+
+///////////////////////////////////////
+//       Unary Prefix Expression     //
+///////////////////////////////////////
+
+</span><span class='kw'>fn</span> <span class='ident'>prfx_unary_expr_to_value</span>(<span class='ident'>op</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+    <span class='kw'>let</span> <span class='ident'>expr_val</span> <span class='op'>=</span> <span class='ident'>expr</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);<span class='comment'>
+
+    //TODO: verify that the operator being used is visible in the current scope
+    </span><span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>expr_val</span>);
+    <span class='ident'>builder</span>.<span class='ident'>call</span>(
+        <span class='op'>*</span><span class='ident'>op</span>, 
+        <span class='ident'>args</span>, 
+        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>op</span>)
+    )
+}<span class='comment'>
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//                           Statement Generation                             //                
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+// impl StmtGenerator for Stmt {
+//     //ExprStmt will have to switch over the espressions it gets and generate their code automatically
+//     fn gen_code(&amp;mut self, &amp;mut Builder) {
+//         fail!(&quot;Called gen_code on a non code generating node&quot;);
+//     }
+
+//     ///Add declared variable types to vec so that a generator state object can 
+//     ///be created...push the number of vars u need in so that you know where to start from on your save restore
+//     fn register_state_vars(&amp;mut self, &amp;mut GenBuilder) -&gt; uint {
+//         fail!(&quot;this type does not have an implementation for register_state_vars&quot;);
+//     }
+
+//     ///Generate your regular code but also break to the end of the save and restore
+//     ///blocks provided to save and restore state variables so this can be done in 
+//     ///one pass
+//     fn gen_gen_code(&amp;mut self, &amp;mut GenGenState, &amp;mut Builder){
+//         fail!(&quot;This type cannot build code for a generator&quot;);
+//     }
+// }
+</span></pre>
 </section>
     <section id='search' class="content hidden"></section>
 

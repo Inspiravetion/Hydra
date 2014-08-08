@@ -10,7 +10,7 @@ use syntax::parser;
 
 use hyll::builder::Builder; 
 use hyll::lltype::Block; 
-use hyll::codegen::CodeGenerator;
+use hyll::codegen::StmtGenerator;
 
 use std::os;
 

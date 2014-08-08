@@ -48,7 +48,7 @@ pub enum Expr_ {
 }
 
 pub mod FuncCall {
-    use self::super::{Expr, Stmt, Ident, FuncCall};
+    use self::super::{Expr, Ident, FuncCall};
 
     pub fn new(prop_path : Vec<Ident>, params : Vec<Box<Expr>>) -> Box<Expr> {
         box Expr {
@@ -58,7 +58,7 @@ pub mod FuncCall {
 }
 
 pub mod InclusiveRange {
-    use self::super::{Expr, Stmt, Ident, InclusiveRange};
+    use self::super::{Expr, InclusiveRange};
 
     pub fn new(start : Box<Expr>, end : Box<Expr>) -> Box<Expr> {
         box Expr {
@@ -68,7 +68,7 @@ pub mod InclusiveRange {
 }
 
 pub mod ExclusiveRange {
-    use self::super::{Expr, Stmt, Ident, ExclusiveRange};
+    use self::super::{Expr, ExclusiveRange};
 
     pub fn new(start : Box<Expr>, end : Box<Expr>) -> Box<Expr> {
         box Expr {
@@ -78,7 +78,7 @@ pub mod ExclusiveRange {
 }
 
 pub mod Int {
-    use self::super::{Expr, Stmt, Ident, Int};
+    use self::super::{Expr, Int};
 
     pub fn new(value : int) -> Box<Expr> {
         box Expr {
@@ -88,7 +88,7 @@ pub mod Int {
 }
 
 pub mod IdentExpr {
-    use self::super::{Expr, Stmt, Ident, IdentExpr};
+    use self::super::{Expr, Ident, IdentExpr};
 
     pub fn new(value : Ident) -> Box<Expr> {
         box Expr {
@@ -98,7 +98,7 @@ pub mod IdentExpr {
 }
 
 pub mod BinaryExpr {
-    use self::super::{Expr, Stmt, BinaryExpr};
+    use self::super::{Expr, BinaryExpr};
     use token::Token;
 
     pub fn new(lhs : Box<Expr>, op : Token, rhs : Box<Expr>) -> Box<Expr> {
@@ -109,7 +109,7 @@ pub mod BinaryExpr {
 }
 
 pub mod PrefixUnaryExpr {
-    use self::super::{Expr, Stmt, Ident, PrefixUnaryExpr};
+    use self::super::{Expr, Ident, PrefixUnaryExpr};
 
     pub fn new(op : Ident, expr : Box<Expr>) -> Box<Expr> {
         box Expr {
@@ -158,7 +158,7 @@ pub enum Stmt_ {
 }
 
 pub mod ExprStmt {
-    use self::super::{Expr, Stmt, Ident, ExprStmt};
+    use self::super::{Expr, Stmt, ExprStmt};
 
     pub fn new(expr : Box<Expr>) -> Box<Stmt> {
         box Stmt {
@@ -168,7 +168,7 @@ pub mod ExprStmt {
 }
 
 pub mod VarDecl {
-    use self::super::{Expr, Stmt, Ident, VarDecl};
+    use self::super::{Stmt, Ident, VarDecl};
 
     pub fn new(vars : Vec<Ident>) -> Box<Stmt> {
         box Stmt {
@@ -198,7 +198,7 @@ pub mod AssignStmt {
 }
 
 pub mod LoopControlStmt {
-    use self::super::{Expr, Stmt, LoopControlStmt};
+    use self::super::{Stmt, LoopControlStmt};
     use token::TokenType;
 
     pub fn new(typ : TokenType) -> Box<Stmt> {
@@ -229,7 +229,7 @@ impl Show for IfElseBranch {
 }
 
 pub mod IfElseStmt {
-    use self::super::{Expr, Stmt, IfElseBranch, IfElseStmt};
+    use self::super::{Stmt, IfElseBranch, IfElseStmt};
 
     pub fn new(branches : Vec<IfElseBranch>) -> Box<Stmt> {
         box Stmt {
@@ -249,7 +249,7 @@ pub mod ForInLoop {
 }
 
 pub mod WhileLoop {
-    use self::super::{Expr, Stmt, Ident, WhileLoop};
+    use self::super::{Expr, Stmt, WhileLoop};
 
     pub fn new(cond : Box<Expr>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
         box Stmt {
@@ -259,7 +259,7 @@ pub mod WhileLoop {
 }
 
 pub mod FunctionDef {
-    use self::super::{Expr, Stmt, Ident, FunctionDef};
+    use self::super::{Stmt, Ident, FunctionDef};
 
     pub fn new(name : Ident, params : Vec<Ident>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
         box Stmt {
@@ -269,7 +269,7 @@ pub mod FunctionDef {
 }
 
 pub mod ReturnStmt {
-    use self::super::{Expr, Stmt, Ident, ReturnStmt};
+    use self::super::{Expr, Stmt, ReturnStmt};
 
     pub fn new(ret_expr : Box<Expr>) -> Box<Stmt> {
         box Stmt {
@@ -279,7 +279,7 @@ pub mod ReturnStmt {
 }
 
 pub mod GeneratorDef {
-    use self::super::{Expr, Stmt, Ident, GeneratorDef};
+    use self::super::{Stmt, Ident, GeneratorDef};
 
     pub fn new(name : Ident, params : Vec<Ident>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
         box Stmt {
@@ -289,7 +289,7 @@ pub mod GeneratorDef {
 }
 
 pub mod YieldStmt {
-    use self::super::{Expr, Stmt, Ident, YieldStmt};
+    use self::super::{Expr, Stmt, YieldStmt};
 
     pub fn new(values : Vec<Box<Expr>>) -> Box<Stmt> {
         box Stmt {

@@ -41,7 +41,7 @@ pub struct AsyncParser {
 pub struct SyncParser {
     tokens      : Vec<Token>,
     presidences : HashMap<Ident, int>,
-    tok_idx     : uint,
+    tok_idx     : int, 
     parsing_gen : bool
 }
 
@@ -847,10 +847,10 @@ impl HydraBaseParser for SyncParser {
     }
 
     fn peek(&mut self) -> Option<Token> {
-        if self.tok_idx >= (self.tokens.len() - 1) {
+        if self.tok_idx >= ((self.tokens.len() as int) - 1) {
             None
         } else {
-            let peek_idx = self.tok_idx + 1;
+            let peek_idx = (self.tok_idx + 1) as uint;
             Some(self.tokens.get(peek_idx).clone())
         }
     }
@@ -862,7 +862,7 @@ impl HydraBaseParser for SyncParser {
             fail!("Tried to get token before advancing");
         }
 
-        self.tokens.get(idx).clone()
+        self.tokens.get(idx as uint).clone()
     }
 
     fn get_presidence(&mut self, tok : &Token) -> int {

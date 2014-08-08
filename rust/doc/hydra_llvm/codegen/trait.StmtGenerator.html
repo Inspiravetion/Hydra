@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='../index.html'>hydra_llvm</a>&#8203;::<a href='index.html'>codegen</a></p><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.CodeGenerator.html'>CodeGenerator</a><br/><a class='trait ' href='trait.ExprGenerator.html'>ExprGenerator</a><br/><a class='trait ' href='trait.GenGenerator.html'>GenGenerator</a><br/><a class='trait current' href='trait.StmtGenerator.html'>StmtGenerator</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_llvm</a>&#8203;::<a href='index.html'>codegen</a></p><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.ExprGenerator.html'>ExprGenerator</a><br/><a class='trait current' href='trait.StmtGenerator.html'>StmtGenerator</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,8 +39,20 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='../index.html'>hydra_llvm</a>::<a href='index.html'>codegen</a>::<a class='trait' href=''>StmtGenerator</a><a class='source' href='../../src/hydra_llvm/src/lib/lib_hy_codegen/codegen.rs.html#48'>[src]</a></h1>
-<pre class='rust trait'>pub trait StmtGenerator: <a class='trait' href='../../hydra_llvm/codegen/trait.GenGenerator.html' title='hydra_llvm::codegen::GenGenerator'>GenGenerator</a> { }</pre></section>
+<h1 class='fqn'>Trait <a href='../index.html'>hydra_llvm</a>::<a href='index.html'>codegen</a>::<a class='trait' href=''>StmtGenerator</a><a class='source' href='../../src/hydra_llvm/src/lib/lib_hy_codegen/codegen.rs.html#8-26'>[src]</a></h1>
+<pre class='rust trait'>pub trait StmtGenerator {
+    fn <a href='#method.gen_code' class='fnname'>gen_code</a>(&amp;mut self, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.Builder.html' title='hydra_llvm::builder::Builder'>Builder</a>) { ... }
+    fn <a href='#method.register_state_vars' class='fnname'>register_state_vars</a>(&amp;mut self, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.GenBuilder.html' title='hydra_llvm::builder::GenBuilder'>GenBuilder</a>) -&gt; uint { ... }
+    fn <a href='#method.gen_gen_code' class='fnname'>gen_gen_code</a>(&amp;mut self, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.GenGenState.html' title='hydra_llvm::builder::GenGenState'>GenGenState</a>, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.Builder.html' title='hydra_llvm::builder::Builder'>Builder</a>) { ... }
+}</pre>
+            <h2 id='provided-methods'>Provided Methods</h2>
+            <div class='methods'>
+        <h3 id='method.gen_code' class='method'><code>fn <a href='#method.gen_code' class='fnname'>gen_code</a>(&amp;mut self, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.Builder.html' title='hydra_llvm::builder::Builder'>Builder</a>)</code></h3><h3 id='method.register_state_vars' class='method'><code>fn <a href='#method.register_state_vars' class='fnname'>register_state_vars</a>(&amp;mut self, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.GenBuilder.html' title='hydra_llvm::builder::GenBuilder'>GenBuilder</a>) -&gt; uint</code></h3><div class='docblock'><p>Add declared variable types to vec so that a generator state object can
+be created...push the number of vars u need in so that you know where to start from on your save restore</p>
+</div><h3 id='method.gen_gen_code' class='method'><code>fn <a href='#method.gen_gen_code' class='fnname'>gen_gen_code</a>(&amp;mut self, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.GenGenState.html' title='hydra_llvm::builder::GenGenState'>GenGenState</a>, &amp;mut <a class='struct' href='../../hydra_llvm/builder/struct.Builder.html' title='hydra_llvm::builder::Builder'>Builder</a>)</code></h3><div class='docblock'><p>Generate your regular code but also break to the end of the save and restore
+blocks provided to save and restore state variables so this can be done in 
+one pass</p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
