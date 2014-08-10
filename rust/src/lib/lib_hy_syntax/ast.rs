@@ -209,8 +209,8 @@ pub mod LoopControlStmt {
 }
 
 pub struct IfElseBranch {
-    cond  : Option<Box<Expr>>,
-    stmts : Vec<Box<Stmt>>
+    pub cond  : Option<Box<Expr>>,
+    pub stmts : Vec<Box<Stmt>>
 }
 
 impl IfElseBranch {

@@ -245,7 +245,7 @@ fn main(){
         let mut ast = parser::parse_file_async("test.hy");
         
         for node in ast.mut_iter() {
-            // node.gen_code(fb);
+            node.gen_code(fb);
             println!("{}",node);
         }
 

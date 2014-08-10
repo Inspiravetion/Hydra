@@ -25,11 +25,13 @@ operator[0] times(a, b){
     return a * b
 }
 
-for i in 0 upto 1 + 2 * 3 / 2 - 1 times 10 do
+print_int(1 + 2 * 3 / 2 - 1 times 10);
+
+for i in 0 upto 3 do
     var padding = 10;
 
-    for i in 0 through i do
-        print_int(i + 1 - 1 + padding);
+    for j in 0 through i do
+        print_int(i);
         break;
     end
 

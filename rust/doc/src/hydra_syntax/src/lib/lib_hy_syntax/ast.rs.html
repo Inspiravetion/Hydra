@@ -550,8 +550,8 @@
 }
 
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>IfElseBranch</span> {
-    <span class='ident'>cond</span>  : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>,
-    <span class='ident'>stmts</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>
+    <span class='kw'>pub</span> <span class='ident'>cond</span>  : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>stmts</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>
 }
 
 <span class='kw'>impl</span> <span class='ident'>IfElseBranch</span> {
