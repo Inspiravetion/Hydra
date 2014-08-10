@@ -1,9 +1,49 @@
 use syntax::ast::*;
 use syntax::token::*;
+use syntax::parser;
 
 use builder::{Builder, GenBuilder, GenGenState}; 
 use generator::Generator; 
 use lltype::{Value, Block, Type};
+
+pub fn gen_code_from_file_sync(path : &str, out_name : &str, builder : &mut Builder){
+    let mut ast = parser::parse_file_sync(path);
+    gen_code_from_ast(&mut ast, out_name, builder);
+}
+
+pub fn gen_code_from_str_sync(code : &str, out_name : &str, builder : &mut Builder){
+    let mut ast = parser::parse_str_sync(code);
+    gen_code_from_ast(&mut ast, out_name, builder);
+}
+
+pub fn gen_code_from_file_async(path : &str, out_name : &str, builder : &mut Builder){
+    let mut ast = parser::parse_file_async(path);
+    gen_code_from_ast(&mut ast, out_name, builder);
+}
+
+pub fn gen_code_from_str_async(code : &str, out_name : &str, builder : &mut Builder){
+    let mut ast = parser::parse_str_async(code);
+    gen_code_from_ast(&mut ast, out_name, builder);
+}
+
+//TODO: Create and initialize builder in this function
+fn gen_code_from_ast(ast : &mut Vec<Box<Stmt>>, file_name : &str, builder : &mut Builder) {
+    let int_type = builder.int32_type();
+
+    builder.create_function("main", Vec::new(), int_type,|fb : &mut Builder|{
+        fb.goto_first_block();
+        
+        for node in ast.mut_iter() {
+            node.gen_code(fb);
+            println!("{}",node);
+        }
+
+        let ret = fb.int(0);
+        fb.ret(ret);
+    });
+
+    builder.print_module(file_name);
+}
 
 pub trait StmtGenerator {
     //ExprStmt will have to switch over the espressions it gets and generate their code automatically
