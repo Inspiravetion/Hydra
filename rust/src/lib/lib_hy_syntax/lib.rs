@@ -15,7 +15,6 @@
 
 extern crate native;
 extern crate collections;
-extern crate codegen = "hydra_codegen";
 
 pub mod token;
 pub mod scanner;

@@ -1,5 +1,5 @@
-#![crate_id = "hydra_codegen"]
-#![comment = "Hydra Code Generation and Jit"]
+#![crate_id = "hydra_llvm"]
+#![comment = "Hydra LLVM Code Generation and Jit"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
@@ -17,6 +17,7 @@
 extern crate rustc;
 extern crate libc;
 extern crate collections;
+extern crate syntax = "hydra_syntax";
 
 macro_rules! u (
     ($e:expr) => ( unsafe { $e }; )
@@ -25,11 +26,8 @@ macro_rules! u (
 pub mod lltype;
 pub mod generator;
 pub mod builder;
+pub mod codegen;
 
-pub trait CodeGenerator {
-    fn gen_code(&mut self, &mut builder::Builder) {
-        fail!("Called gen_code on a non code generating node");
-    }
-}
+
 
 

@@ -145,100 +145,97 @@ function_def_bridge3:                             ; preds = %gen_def_bridge
   %-_tmp = call i32 @-(i32 %"/_tmp", i32 1)
   %times_tmp = call i32 @times(i32 %-_tmp, i32 10)
   %"+_tmp4" = call i32 @"+"(i32 1, i32 %times_tmp)
+  %print_int_tmp5 = call i32 @print_int(i32 %"+_tmp4")
   %range_generator = alloca %"!range_gen"
   br label %for_loop_init
 
 for_loop_init:                                    ; preds = %function_def_bridge3
-  call void @"!range_gen_init"(%"!range_gen"* %range_generator, i32 0, i32 %"+_tmp4")
+  call void @"!range_gen_init"(%"!range_gen"* %range_generator, i32 0, i32 3)
   %i = alloca i32
   store i32 -1, i32* %i
   br label %for_loop_check
 
-for_loop_check:                                   ; preds = %for_loop_exit11, %for_loop_exit11, %for_loop_init
+for_loop_check:                                   ; preds = %for_loop_exit12, %for_loop_exit12, %for_loop_init
   %done = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator)
   %done_cmp = icmp eq i32 %done, 0
   br i1 %done_cmp, label %for_loop_exit, label %for_loop_stmts
 
 for_loop_stmts:                                   ; preds = %for_loop_check
   %ctx_ret = getelementptr inbounds %"!range_gen"* %range_generator, i32 0, i32 3
-  %i5 = load i32* %ctx_ret
-  store i32 %i5, i32* %i
+  %i6 = load i32* %ctx_ret
+  store i32 %i6, i32* %i
   %padding = alloca i32
   store i32 10, i32* %padding
-  %i6 = load i32* %i
-  %add_tmp = add i32 %i6, 1
-  %range_generator7 = alloca %"!range_gen"
-  br label %for_loop_init8
+  %i7 = load i32* %i
+  %add_tmp = add i32 %i7, 1
+  %range_generator8 = alloca %"!range_gen"
+  br label %for_loop_init9
 
 for_loop_exit:                                    ; preds = %for_loop_check
-  br label %function_def_bridge25
+  br label %function_def_bridge21
 
-for_loop_init8:                                   ; preds = %for_loop_stmts
-  call void @"!range_gen_init"(%"!range_gen"* %range_generator7, i32 0, i32 %add_tmp)
-  %i12 = alloca i32
-  store i32 -1, i32* %i12
-  br label %for_loop_check9
+for_loop_init9:                                   ; preds = %for_loop_stmts
+  call void @"!range_gen_init"(%"!range_gen"* %range_generator8, i32 0, i32 %add_tmp)
+  %j = alloca i32
+  store i32 -1, i32* %j
+  br label %for_loop_check10
 
-for_loop_check9:                                  ; preds = %for_loop_stmts10, %for_loop_init8
-  %done13 = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator7)
+for_loop_check10:                                 ; preds = %for_loop_stmts11, %for_loop_init9
+  %done13 = call i32 @"!range_gen_next"(%"!range_gen"* %range_generator8)
   %done_cmp14 = icmp eq i32 %done13, 0
-  br i1 %done_cmp14, label %for_loop_exit11, label %for_loop_stmts10
+  br i1 %done_cmp14, label %for_loop_exit12, label %for_loop_stmts11
 
-for_loop_stmts10:                                 ; preds = %for_loop_check9
-  %ctx_ret15 = getelementptr inbounds %"!range_gen"* %range_generator7, i32 0, i32 3
-  %i16 = load i32* %ctx_ret15
-  store i32 %i16, i32* %i12
-  %i17 = load i32* %i12
-  %"+_tmp18" = call i32 @"+"(i32 %i17, i32 1)
-  %-_tmp19 = call i32 @-(i32 %"+_tmp18", i32 1)
-  %padding20 = load i32* %padding
-  %"+_tmp21" = call i32 @"+"(i32 %-_tmp19, i32 %padding20)
-  %print_int_tmp22 = call i32 @print_int(i32 %"+_tmp21")
-  br label %for_loop_exit11
-  br label %for_loop_check9
+for_loop_stmts11:                                 ; preds = %for_loop_check10
+  %ctx_ret15 = getelementptr inbounds %"!range_gen"* %range_generator8, i32 0, i32 3
+  %j16 = load i32* %ctx_ret15
+  store i32 %j16, i32* %j
+  %i17 = load i32* %i
+  %print_int_tmp18 = call i32 @print_int(i32 %i17)
+  br label %for_loop_exit12
+  br label %for_loop_check10
 
-for_loop_exit11:                                  ; preds = %for_loop_stmts10, %for_loop_check9
+for_loop_exit12:                                  ; preds = %for_loop_stmts11, %for_loop_check10
   br label %for_loop_check
   store i32 100, i32* %i
-  %i23 = load i32* %i
-  %print_int_tmp24 = call i32 @print_int(i32 %i23)
+  %i19 = load i32* %i
+  %print_int_tmp20 = call i32 @print_int(i32 %i19)
   br label %for_loop_check
 
-function_def_bridge25:                            ; preds = %for_loop_exit
+function_def_bridge21:                            ; preds = %for_loop_exit
   %plus_tmp = call i32 @plus(i32 1200, i32 34)
   %added = alloca i32
   store i32 %plus_tmp, i32* %added
-  %added26 = load i32* %added
-  %print_int_tmp27 = call i32 @print_int(i32 %added26)
-  %i28 = alloca i32
-  store i32 11, i32* %i28
-  %j = alloca i32
-  store i32 12, i32* %j
-  %i29 = load i32* %i28
-  %j30 = load i32* %j
-  %"+_tmp31" = call i32 @"+"(i32 %i29, i32 %j30)
-  %print_int_tmp32 = call i32 @print_int(i32 %"+_tmp31")
-  store i32 21, i32* %i28
-  store i32 22, i32* %j
-  %i33 = load i32* %i28
-  %j34 = load i32* %j
-  %"+_tmp35" = call i32 @"+"(i32 %i33, i32 %j34)
-  %print_int_tmp36 = call i32 @print_int(i32 %"+_tmp35")
-  %done37 = alloca i32
-  store i32 0, i32* %done37
+  %added22 = load i32* %added
+  %print_int_tmp23 = call i32 @print_int(i32 %added22)
+  %i24 = alloca i32
+  store i32 11, i32* %i24
+  %j25 = alloca i32
+  store i32 12, i32* %j25
+  %i26 = load i32* %i24
+  %j27 = load i32* %j25
+  %"+_tmp28" = call i32 @"+"(i32 %i26, i32 %j27)
+  %print_int_tmp29 = call i32 @print_int(i32 %"+_tmp28")
+  store i32 21, i32* %i24
+  store i32 22, i32* %j25
+  %i30 = load i32* %i24
+  %j31 = load i32* %j25
+  %"+_tmp32" = call i32 @"+"(i32 %i30, i32 %j31)
+  %print_int_tmp33 = call i32 @print_int(i32 %"+_tmp32")
+  %done34 = alloca i32
+  store i32 0, i32* %done34
   br label %while_loop_check
 
-while_loop_check:                                 ; preds = %while_loop_stmts, %function_def_bridge25
-  %done38 = load i32* %done37
-  %"<=_tmp" = call i32 @"<="(i32 %done38, i32 5)
+while_loop_check:                                 ; preds = %while_loop_stmts, %function_def_bridge21
+  %done35 = load i32* %done34
+  %"<=_tmp" = call i32 @"<="(i32 %done35, i32 5)
   %while_cmp = icmp eq i32 0, %"<=_tmp"
   br i1 %while_cmp, label %while_loop_exit, label %while_loop_stmts
 
 while_loop_stmts:                                 ; preds = %while_loop_check
-  %print_int_tmp39 = call i32 @print_int(i32 1000000)
-  %done40 = load i32* %done37
-  %"+_tmp41" = call i32 @"+"(i32 %done40, i32 1)
-  store i32 %"+_tmp41", i32* %done37
+  %print_int_tmp36 = call i32 @print_int(i32 1000000)
+  %done37 = load i32* %done34
+  %"+_tmp38" = call i32 @"+"(i32 %done37, i32 1)
+  store i32 %"+_tmp38", i32* %done34
   br label %while_loop_check
 
 while_loop_exit:                                  ; preds = %while_loop_check
@@ -247,35 +244,35 @@ while_loop_exit:                                  ; preds = %while_loop_check
   br label %if_cond
 
 if_cond:                                          ; preds = %while_loop_exit
-  %i42 = load i32* %i28
-  %">_tmp" = call i32 @">"(i32 %i42, i32 1000)
+  %i39 = load i32* %i24
+  %">_tmp" = call i32 @">"(i32 %i39, i32 1000)
   %if_cmp = icmp eq i32 %">_tmp", 0
   br i1 %if_cmp, label %if_else_cond, label %if_else_stmts
 
-if_else_exit:                                     ; preds = %if_else_cond46, %if_else_stmts47, %if_else_stmts
-  %abc50 = load i32* %abc
-  %print_int_tmp51 = call i32 @print_int(i32 %abc50)
+if_else_exit:                                     ; preds = %if_else_cond43, %if_else_stmts44, %if_else_stmts
+  %abc47 = load i32* %abc
+  %print_int_tmp48 = call i32 @print_int(i32 %abc47)
   %minus_tmp = call i32 @minus(i32 10, i32 100)
-  %print_int_tmp52 = call i32 @print_int(i32 %minus_tmp)
+  %print_int_tmp49 = call i32 @print_int(i32 %minus_tmp)
   ret i32 0
 
 if_else_cond:                                     ; preds = %if_cond
   %"<_tmp" = call i32 @"<"(i32 1, i32 100)
-  %if_cmp45 = icmp eq i32 %"<_tmp", 0
-  br i1 %if_cmp45, label %if_else_cond46, label %if_else_stmts47
+  %if_cmp42 = icmp eq i32 %"<_tmp", 0
+  br i1 %if_cmp42, label %if_else_cond43, label %if_else_stmts44
 
 if_else_stmts:                                    ; preds = %if_cond
-  %i43 = load i32* %i28
-  %print_int_tmp44 = call i32 @print_int(i32 %i43)
+  %i40 = load i32* %i24
+  %print_int_tmp41 = call i32 @print_int(i32 %i40)
   br label %if_else_exit
 
-if_else_cond46:                                   ; preds = %if_else_cond
-  %print_int_tmp49 = call i32 @print_int(i32 1000)
+if_else_cond43:                                   ; preds = %if_else_cond
+  %print_int_tmp46 = call i32 @print_int(i32 1000)
   br label %if_else_exit
 
-if_else_stmts47:                                  ; preds = %if_else_cond
+if_else_stmts44:                                  ; preds = %if_else_cond
   store i32 2, i32* %abc
-  %print_int_tmp48 = call i32 @print_int(i32 100)
+  %print_int_tmp45 = call i32 @print_int(i32 100)
   br label %if_else_exit
 }
 
