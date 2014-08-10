@@ -27,13 +27,13 @@ pub fn gen_code_from_str_async(code : &str, out_name : &str, builder : &mut Buil
 }
 
 //TODO: Create and initialize builder in this function
-fn gen_code_from_ast(ast : &mut Vec<Box<Stmt>>, file_name : &str, builder : &mut Builder) {
+fn gen_code_from_ast(ast : &Vec<Box<Stmt>>, file_name : &str, builder : &mut Builder) {
     let int_type = builder.int32_type();
 
     builder.create_function("main", Vec::new(), int_type,|fb : &mut Builder|{
         fb.goto_first_block();
         
-        for node in ast.mut_iter() {
+        for node in ast.iter() {
             node.gen_code(fb);
             println!("{}",node);
         }
@@ -47,16 +47,16 @@ fn gen_code_from_ast(ast : &mut Vec<Box<Stmt>>, file_name : &str, builder : &mut
 
 pub trait StmtGenerator {
     //ExprStmt will have to switch over the espressions it gets and generate their code automatically
-    fn gen_code(&mut self, &mut Builder);
+    fn gen_code(&self, &mut Builder);
 
     ///Add declared variable types to vec so that a generator state object can 
     ///be created...push the number of vars u need in so that you know where to start from on your save restore
-    fn register_state_vars(&mut self, &mut GenBuilder) -> uint;
+    fn register_state_vars(&self, &mut GenBuilder) -> uint;
 
     ///Generate your regular code but also break to the end of the save and restore
     ///blocks provided to save and restore state variables so this can be done in 
     ///one pass
-    fn gen_gen_code(&mut self, &mut GenGenState, &mut Builder);
+    fn gen_gen_code(&self, &mut GenGenState, &mut Builder);
 }
 
 pub trait ExprGenerator {
@@ -236,26 +236,26 @@ fn prfx_unary_expr_to_value(op : &Ident, expr : &Box<Expr>, builder : &mut Build
 
 impl StmtGenerator for Stmt {
     //ExprStmt will have to switch over the espressions it gets and generate their code automatically
-    fn gen_code(&mut self, builder : &mut Builder) {
+    fn gen_code(&self, builder : &mut Builder) {
         match self.node {
             ExprStmt(ref expr) => expr_stmt_gen_code(expr, builder),
             VarDecl(ref vars)  => var_decl_gen_code(vars, builder),
-            VarAssign(ref vars, ref mut vals) => var_assign_gen_code(vars, vals, builder),
-            AssignStmt(ref lhs, ref mut rhs) => assign_stmt_gen_code(lhs, rhs, builder),
+            VarAssign(ref vars, ref vals) => var_assign_gen_code(vars, vals, builder),
+            AssignStmt(ref lhs, ref rhs) => assign_stmt_gen_code(lhs, rhs, builder),
             LoopControlStmt(typ) => loop_ctrl_stmt_gen_code(typ, builder),
-            IfElseStmt(ref mut branches) => if_else_stmt_gen_code(branches, builder),
-            ForInLoop(ref vars, ref cond, ref mut stmts) => for_in_gen_code(vars, cond, stmts, builder),
-            WhileLoop(ref cond, ref mut stmts) => while_loop_gen_code(cond, stmts, builder),
-            FunctionDef(ref name, ref params, ref mut stmts) => func_def_gen_code(name, params, stmts, builder),
+            IfElseStmt(ref branches) => if_else_stmt_gen_code(branches, builder),
+            ForInLoop(ref vars, ref cond, ref stmts) => for_in_gen_code(vars, cond, stmts, builder),
+            WhileLoop(ref cond, ref stmts) => while_loop_gen_code(cond, stmts, builder),
+            FunctionDef(ref name, ref params, ref stmts) => func_def_gen_code(name, params, stmts, builder),
             ReturnStmt(ref val) => return_stmt_gen_code(val, builder),
-            GeneratorDef(ref name, ref params, ref mut stmts) => gen_def_gen_code(name, params, stmts, builder),
+            GeneratorDef(ref name, ref params, ref stmts) => gen_def_gen_code(name, params, stmts, builder),
             _ => fail!("Called gen_code on a non code generating node")
         };
     }
 
     ///Add declared variable types to vec so that a generator state object can 
     ///be created...push the number of vars u need in so that you know where to start from on your save restore
-    fn register_state_vars(&mut self, gbuilder : &mut GenBuilder) -> uint {
+    fn register_state_vars(&self, gbuilder : &mut GenBuilder) -> uint {
         match self.node {
             VarDecl(ref vars)  => var_decl_reg_state_vars(vars, gbuilder),
             VarAssign(ref vars, ref vals) => var_assign_reg_state_vars(vars, vals, gbuilder),
@@ -268,11 +268,11 @@ impl StmtGenerator for Stmt {
     ///Generate your regular code but also break to the end of the save and restore
     ///blocks provided to save and restore state variables so this can be done in 
     ///one pass
-    fn gen_gen_code(&mut self, gstate : &mut GenGenState, builder : &mut Builder){
+    fn gen_gen_code(&self, gstate : &mut GenGenState, builder : &mut Builder){
         match self.node {
             VarDecl(ref vars)  => var_decl_gen_gen_code(vars, gstate, builder),
-            VarAssign(ref vars, ref mut vals) => var_assign_gen_gen_code(vars, vals, gstate, builder),
-            AssignStmt(ref lhs, ref mut rhs) => assign_stmt_gen_gen_code(lhs, rhs, gstate, builder),
+            VarAssign(ref vars, ref vals) => var_assign_gen_gen_code(vars, vals, gstate, builder),
+            AssignStmt(ref lhs, ref rhs) => assign_stmt_gen_gen_code(lhs, rhs, gstate, builder),
             YieldStmt(ref vals) => yield_stmt_gen_gen_code(vals, gstate, builder),
             _ => fail!("This type cannot build code for a generator")
         };
@@ -342,12 +342,12 @@ fn var_decl_gen_gen_code(vars : &Vec<Ident>, ggs : &mut GenGenState, builder : &
 //  var a, b, c = 1, 2               //
 ///////////////////////////////////////
 
-fn var_assign_gen_code(vars : &Vec<Ident>, vals : &mut Vec<Box<Expr>>, builder : &mut Builder){
+fn var_assign_gen_code(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, builder : &mut Builder){
     let mut i = 0;
 
     for var in vars.iter() {
         let val = if i < vals.len() {
-            vals.get_mut(i).to_value(builder)
+            vals.get(i).to_value(builder)
         } else {
             builder.default_value()
         };
@@ -370,7 +370,7 @@ fn var_assign_reg_state_vars(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, gb : &m
 
 ///Generate your regular code but also break to the end of the save and restore
 ///blocks provided to save and restore state variables 
-fn var_assign_gen_gen_code(vars : &Vec<Ident>, vals : &mut Vec<Box<Expr>>, ggs : &mut GenGenState, builder : &mut Builder){
+fn var_assign_gen_gen_code(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, ggs : &mut GenGenState, builder : &mut Builder){
     let mut i = 0;
     let base_state_index = ggs.state_index();
 
@@ -389,7 +389,7 @@ fn var_assign_gen_gen_code(vars : &Vec<Ident>, vals : &mut Vec<Box<Expr>>, ggs :
         builder.goto_block(ggs.stmts_blk);
 
         let val = if i < vals.len() {
-            vals.get_mut(i).to_gen_value(builder, ggs.context)
+            vals.get(i).to_gen_value(builder, ggs.context)
         } else {
             builder.default_value()
         };
@@ -413,7 +413,7 @@ fn var_assign_gen_gen_code(vars : &Vec<Ident>, vals : &mut Vec<Box<Expr>>, ggs :
 //  a, b, c = 1, 2, 3                //
 ///////////////////////////////////////
 
-fn assign_stmt_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &mut Vec<Box<Expr>>, builder : &mut Builder){
+fn assign_stmt_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &Vec<Box<Expr>>, builder : &mut Builder){
     if lhs.len() != rhs.len() {
         fail!("left hand and right hand sides of assignment stmt arent compatible");
     }
@@ -422,7 +422,7 @@ fn assign_stmt_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &mut Vec<Box<Expr>>, build
 
     for prop_path in lhs.iter() {
         let var_name = prop_path.get(0).as_slice();
-        let var_val = rhs.get_mut(i).to_value(builder);
+        let var_val = rhs.get(i).to_value(builder);
         builder.assign_var(var_val, var_name);
         i += 1;
     }        
@@ -435,7 +435,7 @@ fn assign_stmt_reg_state_vars(gb : &mut GenBuilder) -> uint {
 
 ///Generate your regular code but also break to the end of the save and restore
 ///blocks provided to save and restore state variables 
-fn assign_stmt_gen_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &mut Vec<Box<Expr>>, ggs : &mut GenGenState, builder : &mut Builder){
+fn assign_stmt_gen_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &Vec<Box<Expr>>, ggs : &mut GenGenState, builder : &mut Builder){
     if lhs.len() != rhs.len() {
         fail!("left hand and right hand sides of assignment stmt arent compatible");
     }
@@ -444,7 +444,7 @@ fn assign_stmt_gen_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &mut Vec<Box<Expr>>, g
 
     for prop_path in lhs.iter() {
         let var_name = prop_path.get(0).as_slice();
-        let var_val = rhs.get_mut(i).to_gen_value(builder, ggs.context);
+        let var_val = rhs.get(i).to_gen_value(builder, ggs.context);
         builder.assign_gen_var(var_val, ggs.context, var_name);
         i += 1;
     }        
@@ -480,15 +480,15 @@ fn loop_ctrl_stmt_gen_code(typ : TokenType, builder : &mut Builder){
 //ie.                                //
 ///////////////////////////////////////
 
-fn if_else_stmt_gen_code(branches : &mut Vec<IfElseBranch>, builder : &mut Builder){
+fn if_else_stmt_gen_code(branches : &Vec<IfElseBranch>, builder : &mut Builder){
     let mut next_cond = builder.new_block("if_cond");
     let if_else_exit = builder.new_block("if_else_exit");
 
     builder.break_to(next_cond);
 
-    for branch in branches.mut_iter() {
+    for branch in branches.iter() {
         match branch.cond {
-          Some(ref mut expr) => {
+          Some(ref expr) => {
             builder.goto_block(next_cond);
 
             let cond = expr.to_value(builder);
@@ -502,7 +502,7 @@ fn if_else_stmt_gen_code(branches : &mut Vec<IfElseBranch>, builder : &mut Build
             builder.goto_block(stmts_block);
             builder.open_scope();
 
-            for stmt in branch.stmts.mut_iter() {
+            for stmt in branch.stmts.iter() {
                 stmt.gen_code(builder);
             }
 
@@ -513,7 +513,7 @@ fn if_else_stmt_gen_code(branches : &mut Vec<IfElseBranch>, builder : &mut Build
             builder.goto_block(next_cond);
             builder.open_scope();
 
-            for stmt in branch.stmts.mut_iter() {
+            for stmt in branch.stmts.iter() {
                 stmt.gen_code(builder);
             }
 
@@ -530,7 +530,7 @@ fn if_else_stmt_gen_code(branches : &mut Vec<IfElseBranch>, builder : &mut Build
 //       For In Loop Generation      //
 ///////////////////////////////////////
 
-fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &mut Vec<Box<Stmt>>, builder : &mut Builder){
+fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &Vec<Box<Stmt>>, builder : &mut Builder){
     builder.open_scope();
 
     let gen = gen.to_generator(builder);
@@ -595,7 +595,7 @@ fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &mut Vec<Box<St
         builder.assign_var(var_val, var_name);
     }
 
-    for stmt in stmts.mut_iter(){
+    for stmt in stmts.iter(){
         stmt.gen_code(builder);
     }
     builder.break_to(loop_check);
@@ -612,7 +612,7 @@ fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &mut Vec<Box<St
 //        While Loop Generation      //
 ///////////////////////////////////////
 
-fn while_loop_gen_code(cond  : &Box<Expr>, stmts : &mut Vec<Box<Stmt>>, builder : &mut Builder){
+fn while_loop_gen_code(cond  : &Box<Expr>, stmts : &Vec<Box<Stmt>>, builder : &mut Builder){
     builder.open_scope();
 
     let loop_check = builder.new_block("while_loop_check");
@@ -630,7 +630,7 @@ fn while_loop_gen_code(cond  : &Box<Expr>, stmts : &mut Vec<Box<Stmt>>, builder 
     builder.conditional_break(cmp, loop_exit, loop_stmts);
 
     builder.goto_block(loop_stmts);
-    for stmt in stmts.mut_iter(){
+    for stmt in stmts.iter(){
         stmt.gen_code(builder);
     }
     builder.break_to(loop_check);
@@ -646,7 +646,7 @@ fn while_loop_gen_code(cond  : &Box<Expr>, stmts : &mut Vec<Box<Stmt>>, builder 
 //   Function Definition Generation  //
 ///////////////////////////////////////
 
-fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &mut Vec<Box<Stmt>>, builder : &mut Builder){
+fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>>, builder : &mut Builder){
     let saved_block = builder.new_block("function_def_bridge");
     builder.break_to(saved_block);
 
@@ -672,7 +672,7 @@ fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &mut Vec<Box<S
                 i += 1;
             }
 
-            for stmt in stmts.mut_iter() {
+            for stmt in stmts.iter() {
                 stmt.gen_code(fb);
             }
 
@@ -694,7 +694,7 @@ fn return_stmt_gen_code(ret_expr : &Box<Expr>, builder : &mut Builder){
 //       Generator Definition        //
 ///////////////////////////////////////
 
-fn gen_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &mut Vec<Box<Stmt>>, builder : &mut Builder){
+fn gen_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>>, builder : &mut Builder){
     let saved_block = builder.new_block("gen_def_bridge");
     builder.break_to(saved_block);
 
@@ -706,7 +706,7 @@ fn gen_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &mut Vec<Box<St
 
         //Add Space for stmts state
         let mut vars_registered = 0;
-        for stmt in stmts.mut_iter() {
+        for stmt in stmts.iter() {
             vars_registered = stmt.register_state_vars(&mut gen_builder);
         }
 
@@ -721,7 +721,7 @@ fn gen_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &mut Vec<Box<St
         gen_builder.state_indxs.pop();
 
         gen_builder.create_next_function(fb, |ggs : &mut GenGenState, fb : &mut Builder|{
-            for stmt in stmts.mut_iter() {
+            for stmt in stmts.iter() {
             //pass in gen_ctx here?
                 stmt.gen_gen_code(ggs, fb);
                 ggs.next_stmt();
