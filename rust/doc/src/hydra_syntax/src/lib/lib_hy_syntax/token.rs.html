@@ -391,7 +391,7 @@
     <span class='ident'>NewLine</span>
 }
 
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Token</span> {
     <span class='kw'>pub</span> <span class='ident'>text</span>       : <span class='kw-2'>~</span><span class='ident'>str</span>,
     <span class='kw'>pub</span> <span class='ident'>typ</span>        : <span class='ident'>TokenType</span>,

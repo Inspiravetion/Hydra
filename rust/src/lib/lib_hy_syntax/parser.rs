@@ -607,9 +607,7 @@ trait HydraBaseParser {
                         }
                     },
                     None => {
-                        //same here
-                        let tok = self.tok();
-                        fail!("Expected Expression at {}:{}", tok.line, tok.col);
+                        IdentExpr::new(ident)
                     }
                 }
             },
@@ -651,7 +649,7 @@ trait HydraBaseParser {
                     _ => expr_opt
                 }
             },
-            None => None
+            None => expr_opt
         }
     }
 
@@ -903,4 +901,59 @@ fn new_presidence_map() -> HashMap<Ident, int> {
     map.insert("^".to_owned(), 4);
 
     map
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                    Tests                                   //
+////////////////////////////////////////////////////////////////////////////////
+
+macro_rules! check_expr(
+    ($code:expr -> $expr_lit:expr) => ({
+        let tokens = scanner::stream_from_str($code);
+        let expr   = AsyncParser::new(tokens).expr();
+        assert!(expr == $expr_lit);        
+    });
+)
+
+#[test]
+fn int_expr(){
+    check_expr!("123" -> Int::new(123));
+}
+
+#[test]
+fn ident_expr(){
+    check_expr!("abc" -> IdentExpr::new("abc".to_owned()));
+}
+
+#[test]
+fn basic_func_call_expr(){
+    check_expr!("abc()" -> FuncCall::new(vec!("abc".to_owned()), vec!()));
+}
+
+#[test]
+fn func_call_expr_with_params(){
+    check_expr!("abc(1, def)" -> FuncCall::new(
+        vec!("abc".to_owned()), 
+        vec!(Int::new(1), IdentExpr::new("def".to_owned()))
+    ));
+}
+
+#[test]
+fn inclusive_range_expr(){
+    check_expr!("0 through 10" -> InclusiveRange::new(Int::new(0), Int::new(10)));
+}
+
+#[test]
+fn dotted_inclusive_range_expr(){
+    check_expr!("0...10" -> InclusiveRange::new(Int::new(0), Int::new(10)));
+}
+
+#[test]
+fn exclusive_range_expr(){
+    check_expr!("0 upto 10" -> ExclusiveRange::new(Int::new(0), Int::new(10)));
+}
+
+#[test]
+fn dotted_exclusive_range_expr(){
+    check_expr!("0..10" -> ExclusiveRange::new(Int::new(0), Int::new(10)));
 }

@@ -105,7 +105,7 @@ pub enum TokenType {
     NewLine
 }
 
-#[deriving(Clone)]
+#[deriving(Clone, Eq)]
 pub struct Token {
     pub text       : ~str,
     pub typ        : TokenType,

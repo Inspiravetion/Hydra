@@ -944,6 +944,59 @@
 <span id='904'>904</span>
 <span id='905'>905</span>
 <span id='906'>906</span>
+<span id='907'>907</span>
+<span id='908'>908</span>
+<span id='909'>909</span>
+<span id='910'>910</span>
+<span id='911'>911</span>
+<span id='912'>912</span>
+<span id='913'>913</span>
+<span id='914'>914</span>
+<span id='915'>915</span>
+<span id='916'>916</span>
+<span id='917'>917</span>
+<span id='918'>918</span>
+<span id='919'>919</span>
+<span id='920'>920</span>
+<span id='921'>921</span>
+<span id='922'>922</span>
+<span id='923'>923</span>
+<span id='924'>924</span>
+<span id='925'>925</span>
+<span id='926'>926</span>
+<span id='927'>927</span>
+<span id='928'>928</span>
+<span id='929'>929</span>
+<span id='930'>930</span>
+<span id='931'>931</span>
+<span id='932'>932</span>
+<span id='933'>933</span>
+<span id='934'>934</span>
+<span id='935'>935</span>
+<span id='936'>936</span>
+<span id='937'>937</span>
+<span id='938'>938</span>
+<span id='939'>939</span>
+<span id='940'>940</span>
+<span id='941'>941</span>
+<span id='942'>942</span>
+<span id='943'>943</span>
+<span id='944'>944</span>
+<span id='945'>945</span>
+<span id='946'>946</span>
+<span id='947'>947</span>
+<span id='948'>948</span>
+<span id='949'>949</span>
+<span id='950'>950</span>
+<span id='951'>951</span>
+<span id='952'>952</span>
+<span id='953'>953</span>
+<span id='954'>954</span>
+<span id='955'>955</span>
+<span id='956'>956</span>
+<span id='957'>957</span>
+<span id='958'>958</span>
+<span id='959'>959</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -1553,10 +1606,8 @@
                             }
                         }
                     },
-                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //same here
-                        </span><span class='kw'>let</span> <span class='ident'>tok</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>tok</span>();
-                        <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Expected Expression at {}:{}&quot;</span>, <span class='ident'>tok</span>.<span class='ident'>line</span>, <span class='ident'>tok</span>.<span class='ident'>col</span>);
+                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
+                        <span class='ident'>IdentExpr</span>::<span class='ident'>new</span>(<span class='ident'>ident</span>)
                     }
                 }
             },
@@ -1598,7 +1649,7 @@
                     _ <span class='op'>=&gt;</span> <span class='ident'>expr_opt</span>
                 }
             },
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>expr_opt</span>
         }
     }
 
@@ -1850,6 +1901,61 @@
     <span class='ident'>map</span>.<span class='ident'>insert</span>(<span class='string'>&quot;^&quot;</span>.<span class='ident'>to_owned</span>(), <span class='number'>4</span>);
 
     <span class='ident'>map</span>
+}<span class='comment'>
+
+////////////////////////////////////////////////////////////////////////////////
+//                                    Tests                                   //
+////////////////////////////////////////////////////////////////////////////////
+
+</span><span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>check_expr</span>(
+    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>code</span>:<span class='ident'>expr</span> <span class='op'>-&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>expr_lit</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> ({
+        <span class='kw'>let</span> <span class='ident'>tokens</span> <span class='op'>=</span> <span class='ident'>scanner</span>::<span class='ident'>stream_from_str</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>code</span>);
+        <span class='kw'>let</span> <span class='ident'>expr</span>   <span class='op'>=</span> <span class='ident'>AsyncParser</span>::<span class='ident'>new</span>(<span class='ident'>tokens</span>).<span class='ident'>expr</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>expr</span> <span class='op'>==</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>expr_lit</span>);        
+    });
+)
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>int_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;123&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>123</span>));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>ident_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;abc&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>IdentExpr</span>::<span class='ident'>new</span>(<span class='string'>&quot;abc&quot;</span>.<span class='ident'>to_owned</span>()));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>basic_func_call_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;abc()&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>FuncCall</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>(<span class='string'>&quot;abc&quot;</span>.<span class='ident'>to_owned</span>()), <span class='macro'>vec</span><span class='macro'>!</span>()));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>func_call_expr_with_params</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;abc(1, def)&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>FuncCall</span>::<span class='ident'>new</span>(
+        <span class='macro'>vec</span><span class='macro'>!</span>(<span class='string'>&quot;abc&quot;</span>.<span class='ident'>to_owned</span>()), 
+        <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>1</span>), <span class='ident'>IdentExpr</span>::<span class='ident'>new</span>(<span class='string'>&quot;def&quot;</span>.<span class='ident'>to_owned</span>()))
+    ));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>inclusive_range_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;0 through 10&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>InclusiveRange</span>::<span class='ident'>new</span>(<span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>0</span>), <span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>10</span>)));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>dotted_inclusive_range_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;0...10&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>InclusiveRange</span>::<span class='ident'>new</span>(<span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>0</span>), <span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>10</span>)));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>exclusive_range_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;0 upto 10&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>ExclusiveRange</span>::<span class='ident'>new</span>(<span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>0</span>), <span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>10</span>)));
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>dotted_exclusive_range_expr</span>(){
+    <span class='macro'>check_expr</span><span class='macro'>!</span>(<span class='string'>&quot;0..10&quot;</span> <span class='op'>-&gt;</span> <span class='ident'>ExclusiveRange</span>::<span class='ident'>new</span>(<span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>0</span>), <span class='ident'>Int</span>::<span class='ident'>new</span>(<span class='number'>10</span>)));
 }
 </pre>
 </section>

@@ -641,6 +641,7 @@
 <span id='601'>601</span>
 <span id='602'>602</span>
 <span id='603'>603</span>
+<span id='604'>604</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufReader</span>, <span class='ident'>BufferedReader</span>, <span class='ident'>Buffer</span>, <span class='ident'>File</span>, <span class='ident'>EndOfFile</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::{<span class='ident'>channel</span>, <span class='ident'>Sender</span>, <span class='ident'>Receiver</span>};
@@ -1109,7 +1110,7 @@
 }<span class='comment'>
 
 ////////////////////////////////////////////////////////////////////////////////
-/////                                 Tests                                   //
+//                                    Tests                                   //
 ////////////////////////////////////////////////////////////////////////////////
 
 </span><span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>test_types</span>(
@@ -1118,9 +1119,10 @@
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
             <span class='kw'>let</span> <span class='ident'>tokens</span> <span class='op'>=</span> <span class='ident'>tokenize_str</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>code</span>);
             $(
-                <span class='kw'>match</span> <span class='ident'>tokens</span>.<span class='ident'>get</span>(<span class='ident'>i</span>).<span class='ident'>typ</span> {
+                <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>tokens</span>.<span class='ident'>get</span>(<span class='ident'>i</span>);
+                <span class='kw'>match</span> <span class='ident'>t</span>.<span class='ident'>typ</span> {
                     <span class='ident'>token</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tok_typ</span> <span class='op'>=&gt;</span> {}, 
-                    _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Expected token at {} to be {:?}&quot;</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>, <span class='ident'>token</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tok_typ</span>)
+                    _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Expected token at {} to be {:?} but it was {}&quot;</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>, <span class='ident'>token</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tok_typ</span>, <span class='ident'>t</span>.<span class='ident'>typ</span>)
                 }
                 <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
             )<span class='op'>+</span>
@@ -1215,7 +1217,7 @@
 <span class='attribute'>#[<span class='ident'>test</span>]</span>
 <span class='kw'>fn</span> <span class='ident'>backslash_tokens</span>(){
     <span class='macro'>test_types</span><span class='macro'>!</span>(<span class='string'>&quot;/ /= /****This is a \n multiline comment****///this is a comment\n/****This is a \n multiline comment****/&quot;</span> <span class='op'>-&gt;</span> [
-        <span class='ident'>Div_Op</span>, <span class='ident'>Div_Eq</span>, <span class='ident'>Multiline_Comment</span>, <span class='ident'>Singleline_Comment</span>, <span class='ident'>Multiline_Comment</span>
+        <span class='ident'>Div_Op</span>, <span class='ident'>Div_Eq</span>, <span class='ident'>Multiline_Comment</span>, <span class='ident'>Singleline_Comment</span>, <span class='ident'>NewLine</span>, <span class='ident'>Multiline_Comment</span> 
     ])
 }
 
@@ -1225,10 +1227,10 @@
         end class import as export super supers this return operator extends 
         gen either wait_for break continue yield given is var true false new 
         upto through&quot;</span> <span class='op'>-&gt;</span> [
-        <span class='ident'>Function</span>, <span class='ident'>Spawn</span>, <span class='ident'>If</span>, <span class='ident'>Else</span>, <span class='ident'>Then</span>, <span class='ident'>For</span>, <span class='ident'>In</span>, <span class='ident'>While</span>, <span class='ident'>Do</span>, <span class='ident'>Not</span>, <span class='ident'>And</span>, <span class='ident'>Or</span>, <span class='ident'>From</span>, <span class='ident'>To</span>, <span class='ident'>By</span>, 
-        <span class='ident'>End</span>, <span class='ident'>Class</span>, <span class='ident'>Import</span>, <span class='ident'>As</span>, <span class='ident'>Export</span>, <span class='ident'>Super</span>, <span class='ident'>Supers</span>, <span class='ident'>This</span>, <span class='ident'>Return</span>, <span class='ident'>Operator</span>, <span class='ident'>Extends</span>, 
+        <span class='ident'>Function</span>, <span class='ident'>Spawn</span>, <span class='ident'>If</span>, <span class='ident'>Else</span>, <span class='ident'>Then</span>, <span class='ident'>For</span>, <span class='ident'>In</span>, <span class='ident'>While</span>, <span class='ident'>Do</span>, <span class='ident'>Not</span>, <span class='ident'>And</span>, <span class='ident'>Or</span>, <span class='ident'>From</span>, <span class='ident'>To</span>, <span class='ident'>By</span>, <span class='ident'>NewLine</span>,
+        <span class='ident'>End</span>, <span class='ident'>Class</span>, <span class='ident'>Import</span>, <span class='ident'>As</span>, <span class='ident'>Export</span>, <span class='ident'>Super</span>, <span class='ident'>Supers</span>, <span class='ident'>This</span>, <span class='ident'>Return</span>, <span class='ident'>Operator</span>, <span class='ident'>Extends</span>, <span class='ident'>NewLine</span>,
         <span class='ident'>Generator</span>, <span class='ident'>Either</span>, <span class='ident'>Wait_For</span>, <span class='ident'>Break</span>, <span class='ident'>Continue</span>, <span class='ident'>Yield</span>, <span class='ident'>Given</span>, <span class='ident'>Is</span>, <span class='ident'>Var</span>, <span class='ident'>True</span>, 
-        <span class='ident'>False</span>, <span class='ident'>New</span>, <span class='ident'>Upto</span>, <span class='ident'>Through</span>
+        <span class='ident'>False</span>, <span class='ident'>New</span>, <span class='ident'>NewLine</span>, <span class='ident'>Upto</span>, <span class='ident'>Through</span>
     ]);
 }
 

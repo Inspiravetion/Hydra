@@ -338,12 +338,16 @@
 <span id='298'>298</span>
 <span id='299'>299</span>
 <span id='300'>300</span>
+<span id='301'>301</span>
+<span id='302'>302</span>
+<span id='303'>303</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Show</span>, <span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>};
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
 
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Ident</span> <span class='op'>=</span> <span class='kw-2'>~</span><span class='ident'>str</span>;
 
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Expr</span> {
     <span class='kw'>pub</span> <span class='ident'>node</span> : <span class='ident'>Expr_</span> 
 }
@@ -354,6 +358,7 @@
     }
 }
 
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Stmt</span> {
     <span class='kw'>pub</span> <span class='ident'>node</span> : <span class='ident'>Stmt_</span> 
 }
@@ -364,7 +369,7 @@
     }
 }
 
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>, <span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Expr_</span> {<span class='comment'>
     //1.prop_path, 2.params
     </span><span class='ident'>FuncCall</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),<span class='comment'>
@@ -459,7 +464,7 @@
     }
 }
 
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>, <span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Stmt_</span> {<span class='comment'>
     //1.expr
     </span><span class='ident'>ExprStmt</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),<span class='comment'>
@@ -549,6 +554,7 @@
     }
 }
 
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>IfElseBranch</span> {
     <span class='kw'>pub</span> <span class='ident'>cond</span>  : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>,
     <span class='kw'>pub</span> <span class='ident'>stmts</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>

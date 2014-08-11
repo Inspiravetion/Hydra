@@ -3,6 +3,7 @@ use token::*;
 
 pub type Ident = ~str;
 
+#[deriving(Eq)]
 pub struct Expr {
     pub node : Expr_ 
 }
@@ -13,6 +14,7 @@ impl Show for Expr {
     }
 }
 
+#[deriving(Eq)]
 pub struct Stmt {
     pub node : Stmt_ 
 }
@@ -23,7 +25,7 @@ impl Show for Stmt {
     }
 }
 
-#[deriving(Show)]
+#[deriving(Show, Eq)]
 pub enum Expr_ {
     //1.prop_path, 2.params
     FuncCall(Vec<Ident>, Vec<Box<Expr>>),
@@ -118,7 +120,7 @@ pub mod PrefixUnaryExpr {
     }
 }
 
-#[deriving(Show)]
+#[deriving(Show, Eq)]
 pub enum Stmt_ {
     //1.expr
     ExprStmt(Box<Expr>),
@@ -208,6 +210,7 @@ pub mod LoopControlStmt {
     }
 }
 
+#[deriving(Eq)]
 pub struct IfElseBranch {
     pub cond  : Option<Box<Expr>>,
     pub stmts : Vec<Box<Stmt>>

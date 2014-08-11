@@ -465,7 +465,7 @@ impl<B: Buffer> Scanner<B> {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/////                                 Tests                                   //
+//                                    Tests                                   //
 ////////////////////////////////////////////////////////////////////////////////
 
 macro_rules! test_types(
@@ -474,9 +474,10 @@ macro_rules! test_types(
             let mut i = 0;
             let tokens = tokenize_str($code);
             $(
-                match tokens.get(i).typ {
+                let t = tokens.get(i);
+                match t.typ {
                     token::$tok_typ => {}, 
-                    _ => fail!("Expected token at {} to be {:?}", i + 1, token::$tok_typ)
+                    _ => fail!("Expected token at {} to be {:?} but it was {}", i + 1, token::$tok_typ, t.typ)
                 }
                 i += 1;
             )+
@@ -571,7 +572,7 @@ fn string_lit_tokens(){
 #[test]
 fn backslash_tokens(){
     test_types!("/ /= /****This is a \n multiline comment****///this is a comment\n/****This is a \n multiline comment****/" -> [
-        Div_Op, Div_Eq, Multiline_Comment, Singleline_Comment, Multiline_Comment
+        Div_Op, Div_Eq, Multiline_Comment, Singleline_Comment, NewLine, Multiline_Comment 
     ])
 }
 
@@ -581,10 +582,10 @@ fn keyword_tokens() {
         end class import as export super supers this return operator extends 
         gen either wait_for break continue yield given is var true false new 
         upto through" -> [
-        Function, Spawn, If, Else, Then, For, In, While, Do, Not, And, Or, From, To, By, 
-        End, Class, Import, As, Export, Super, Supers, This, Return, Operator, Extends, 
+        Function, Spawn, If, Else, Then, For, In, While, Do, Not, And, Or, From, To, By, NewLine,
+        End, Class, Import, As, Export, Super, Supers, This, Return, Operator, Extends, NewLine,
         Generator, Either, Wait_For, Break, Continue, Yield, Given, Is, Var, True, 
-        False, New, Upto, Through
+        False, New, NewLine, Upto, Through
     ]);
 }
 
