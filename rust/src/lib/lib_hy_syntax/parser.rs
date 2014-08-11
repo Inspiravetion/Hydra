@@ -524,11 +524,11 @@ trait HydraBaseParser {
         match op2 {
             Some(ref op) => {
                 if !self.is_binary_op(op.typ) {
-                    return BinaryExpr::new(expr1, op1, expr2);
+                    return BinaryExpr::new(expr1, op1.text, expr2);
                 }
             },
             None => {
-                return BinaryExpr::new(expr1, op1, expr2);
+                return BinaryExpr::new(expr1, op1.text, expr2);
             }
         };
 
@@ -540,11 +540,11 @@ trait HydraBaseParser {
         let op2_pres = self.get_presidence(&op2);
 
         if op1_pres >= op2_pres {
-            let expr_tmp = BinaryExpr::new(expr1, op1, expr2);
+            let expr_tmp = BinaryExpr::new(expr1, op1.text, expr2);
             self.resolve_bin_expr(expr_tmp)
         } else {
             let expr_tmp = self.resolve_bin_expr(expr2);
-            BinaryExpr::new(expr1, op1, expr_tmp)
+            BinaryExpr::new(expr1, op1.text, expr_tmp)
         }
     }
 
@@ -956,4 +956,48 @@ fn exclusive_range_expr(){
 #[test]
 fn dotted_exclusive_range_expr(){
     check_expr!("0..10" -> ExclusiveRange::new(Int::new(0), Int::new(10)));
+}
+
+#[test]
+fn basic_bin_expr(){
+    check_expr!("1 + ten" -> BinaryExpr::new(
+        Int::new(1),
+        "+".to_owned(),
+        IdentExpr::new("ten".to_owned())
+    ));
+}
+
+#[test]
+fn complex_bin_expr(){
+    check_expr!("1 + 2 * 3 - 4 / 5" -> 
+        BinaryExpr::new(
+            Int::new(1),
+            "+".to_owned(),
+            BinaryExpr::new(
+                BinaryExpr::new(
+                    Int::new(2),
+                    "*".to_owned(),
+                    Int::new(3)
+                ),
+                "-".to_owned(),
+                BinaryExpr::new(
+                    Int::new(4),
+                    "/".to_owned(),
+                    Int::new(5)
+                ),
+            )
+        )
+    );
+}
+
+#[test]
+fn prefix_unary_expr(){
+    check_expr!("double 1 + 1" -> PrefixUnaryExpr::new(
+        "double".to_owned(),
+        BinaryExpr::new(
+            Int::new(1),
+            "+".to_owned(),
+            Int::new(1)            
+        )
+    ));
 }

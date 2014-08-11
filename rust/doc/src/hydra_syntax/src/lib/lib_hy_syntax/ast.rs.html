@@ -340,7 +340,6 @@
 <span id='300'>300</span>
 <span id='301'>301</span>
 <span id='302'>302</span>
-<span id='303'>303</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Show</span>, <span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>};
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='op'>*</span>;
@@ -387,7 +386,7 @@
     </span><span class='ident'>IdentExpr</span>(<span class='ident'>Ident</span>),<span class='comment'>
 
     //1.lhs, 2.op, 3.rhs
-    </span><span class='ident'>BinaryExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Token</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),<span class='comment'>
+    </span><span class='ident'>BinaryExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='kw-2'>~</span><span class='ident'>str</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),<span class='comment'>
 
     //1.op, 2.expr
     </span><span class='ident'>PrefixUnaryExpr</span>(<span class='ident'>Ident</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)
@@ -445,9 +444,8 @@
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>BinaryExpr</span> {
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>super</span>::{<span class='ident'>Expr</span>, <span class='ident'>BinaryExpr</span>};
-    <span class='kw'>use</span> <span class='ident'>token</span>::<span class='ident'>Token</span>;
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>lhs</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>op</span> : <span class='ident'>Token</span>, <span class='ident'>rhs</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>lhs</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>op</span> : <span class='kw-2'>~</span><span class='ident'>str</span>, <span class='ident'>rhs</span> : <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span> {
         <span class='kw'>box</span> <span class='ident'>Expr</span> {
             <span class='ident'>node</span> : <span class='ident'>BinaryExpr</span>(<span class='ident'>lhs</span>, <span class='ident'>op</span>, <span class='ident'>rhs</span>)
         }

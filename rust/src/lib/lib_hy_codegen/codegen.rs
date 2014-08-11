@@ -199,16 +199,16 @@ fn ident_expr_to_gen_value(value : &Ident, builder : &mut Builder, ctxt : Value)
 //    Binary Expression Generation   //
 ///////////////////////////////////////
 
-fn bin_expr_to_value(lhs : &Box<Expr>, op : &Token, rhs : &Box<Expr>, builder : &mut Builder) -> Value {
+fn bin_expr_to_value(lhs : &Box<Expr>, op : &~str, rhs : &Box<Expr>, builder : &mut Builder) -> Value {
     let left_val  = lhs.to_value(builder);
     let right_val = rhs.to_value(builder);
 
     //TODO: verify that the operator being used is visible in the current scope
     let args = vec!(left_val, right_val);
     builder.call(
-        op.text, 
+        *op, 
         args, 
-        format!("{}_tmp", op.text)
+        format!("{}_tmp", *op)
     )
 }
 

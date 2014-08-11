@@ -43,7 +43,7 @@ pub enum Expr_ {
     IdentExpr(Ident),
 
     //1.lhs, 2.op, 3.rhs
-    BinaryExpr(Box<Expr>, Token, Box<Expr>),
+    BinaryExpr(Box<Expr>, ~str, Box<Expr>),
 
     //1.op, 2.expr
     PrefixUnaryExpr(Ident, Box<Expr>)
@@ -101,9 +101,8 @@ pub mod IdentExpr {
 
 pub mod BinaryExpr {
     use self::super::{Expr, BinaryExpr};
-    use token::Token;
 
-    pub fn new(lhs : Box<Expr>, op : Token, rhs : Box<Expr>) -> Box<Expr> {
+    pub fn new(lhs : Box<Expr>, op : ~str, rhs : Box<Expr>) -> Box<Expr> {
         box Expr {
             node : BinaryExpr(lhs, op, rhs)
         }
