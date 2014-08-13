@@ -480,7 +480,7 @@ fn loop_ctrl_stmt_gen_code(typ : TokenType, builder : &mut Builder){
 //ie.                                //
 ///////////////////////////////////////
 
-fn if_else_stmt_gen_code(branches : &Vec<IfElseBranch>, builder : &mut Builder){
+fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Builder){
     let mut next_cond = builder.new_block("if_cond");
     let if_else_exit = builder.new_block("if_else_exit");
 

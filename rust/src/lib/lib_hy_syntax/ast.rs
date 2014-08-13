@@ -137,7 +137,7 @@ pub enum Stmt_ {
     LoopControlStmt(TokenType),
 
     //1.branches 
-    IfElseStmt(Vec<IfElseBranch>),
+    IfElseStmt(Vec<Box<IfElseBranch>>),
 
     //1.vars, 2.gen, 3.stmts
     ForInLoop(Vec<Ident>, Box<Expr>,  Vec<Box<Stmt>>),
@@ -216,8 +216,8 @@ pub struct IfElseBranch {
 }
 
 impl IfElseBranch {
-    pub fn new(cond  : Option<Box<Expr>>, stmts : Vec<Box<Stmt>>) -> IfElseBranch {
-        IfElseBranch {
+    pub fn new(cond  : Option<Box<Expr>>, stmts : Vec<Box<Stmt>>) -> Box<IfElseBranch> {
+        box IfElseBranch {
             cond  : cond,
             stmts : stmts
         }
@@ -233,7 +233,7 @@ impl Show for IfElseBranch {
 pub mod IfElseStmt {
     use self::super::{Stmt, IfElseBranch, IfElseStmt};
 
-    pub fn new(branches : Vec<IfElseBranch>) -> Box<Stmt> {
+    pub fn new(branches : Vec<Box<IfElseBranch>>) -> Box<Stmt> {
         box Stmt {
             node : IfElseStmt(branches)
         }

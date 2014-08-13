@@ -480,7 +480,7 @@
     </span><span class='ident'>LoopControlStmt</span>(<span class='ident'>TokenType</span>),<span class='comment'>
 
     //1.branches 
-    </span><span class='ident'>IfElseStmt</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;</span>),<span class='comment'>
+    </span><span class='ident'>IfElseStmt</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;&gt;</span>),<span class='comment'>
 
     //1.vars, 2.gen, 3.stmts
     </span><span class='ident'>ForInLoop</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>,  <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>),<span class='comment'>
@@ -559,8 +559,8 @@
 }
 
 <span class='kw'>impl</span> <span class='ident'>IfElseBranch</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>cond</span>  : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>stmts</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>IfElseBranch</span> {
-        <span class='ident'>IfElseBranch</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>cond</span>  : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>stmts</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;</span> {
+        <span class='kw'>box</span> <span class='ident'>IfElseBranch</span> {
             <span class='ident'>cond</span>  : <span class='ident'>cond</span>,
             <span class='ident'>stmts</span> : <span class='ident'>stmts</span>
         }
@@ -576,7 +576,7 @@
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>IfElseStmt</span> {
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>super</span>::{<span class='ident'>Stmt</span>, <span class='ident'>IfElseBranch</span>, <span class='ident'>IfElseStmt</span>};
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>branches</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>branches</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;</span> {
         <span class='kw'>box</span> <span class='ident'>Stmt</span> {
             <span class='ident'>node</span> : <span class='ident'>IfElseStmt</span>(<span class='ident'>branches</span>)
         }

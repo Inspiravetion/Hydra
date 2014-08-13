@@ -907,6 +907,10 @@ fn new_presidence_map() -> HashMap<Ident, int> {
 //                                    Tests                                   //
 ////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////
+//            Expressions            //
+///////////////////////////////////////
+
 macro_rules! check_expr(
     ($code:expr -> $expr_lit:expr) => ({
         let tokens = scanner::stream_from_str($code);
@@ -1000,4 +1004,295 @@ fn prefix_unary_expr(){
             Int::new(1)            
         )
     ));
+}
+
+///////////////////////////////////////
+//            Statements             //
+///////////////////////////////////////
+
+macro_rules! check_stmt(
+    ($code:expr -> $stmt_lit:expr) => ({
+        let tokens = scanner::stream_from_str($code);
+        let stmts  = AsyncParser::new(tokens).parse();
+        assert!(stmts.get(0) == &$stmt_lit);        
+    });
+)
+
+#[test]
+fn expr_stmt(){
+    check_stmt!("abc(1, def);" -> ExprStmt::new(
+        FuncCall::new(
+            vec!("abc".to_owned()), 
+            vec!(
+                Int::new(1), 
+                IdentExpr::new("def".to_owned())
+            )
+        )
+    ));
+}
+
+#[test]
+fn single_var_decl(){
+    check_stmt!("var a;" -> VarDecl::new(
+        vec!(
+            "a".to_owned()
+        )
+    ));
+}
+
+#[test]
+fn multi_var_decl(){
+    check_stmt!("var a, b, c;" -> VarDecl::new(
+        vec!(
+            "a".to_owned(),
+            "b".to_owned(),
+            "c".to_owned()
+        )
+    ));
+}
+
+#[test]
+fn single_var_assign(){
+    check_stmt!("var a = 1;" -> VarAssign::new(
+        vec!(
+            "a".to_owned()
+        ),
+        vec!(
+            Int::new(1)
+        )
+    ));
+}
+
+#[test]
+fn multi_var_assign(){
+    check_stmt!("var a, b, c = 1, hy, dra();" -> VarAssign::new(
+        vec!(
+            "a".to_owned(),
+            "b".to_owned(),
+            "c".to_owned()
+        ),
+        vec!(
+            Int::new(1),
+            IdentExpr::new("hy".to_owned()),
+            FuncCall::new(
+                vec!("dra".to_owned()),
+                vec!()
+            )
+        )
+    ));
+}
+
+#[test]
+fn uneven_var_assign(){
+    check_stmt!("var a, b, c = 1;" -> VarAssign::new(
+        vec!(
+            "a".to_owned(),
+            "b".to_owned(),
+            "c".to_owned()
+        ),
+        vec!(
+            Int::new(1)
+        )
+    ));
+}
+
+#[test]
+fn single_assign(){
+    check_stmt!("a = 1;" -> AssignStmt::new(
+        vec!(vec!("a".to_owned())),
+        vec!(Int::new(1))
+    ));
+}
+
+
+#[test]
+fn multiple_assign(){
+    check_stmt!("a, b = 1, 2;" -> AssignStmt::new(
+        vec!(
+            vec!("a".to_owned()), 
+            vec!("b".to_owned())
+        ),
+        vec!(
+            Int::new(1),
+            Int::new(2)
+        )
+    ));
+}
+
+#[test]
+fn if_branch(){
+    check_stmt!("if cond then something(); end" -> IfElseStmt::new(
+        vec!(
+            IfElseBranch::new(
+                Some(IdentExpr::new("cond".to_owned())),
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            )
+        )
+    ));
+}
+
+#[test]
+fn if_else_branch(){
+    check_stmt!("if cond then something(); else something_else(); end" -> IfElseStmt::new(
+        vec!(
+            IfElseBranch::new(
+                Some(IdentExpr::new("cond".to_owned())),
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            ),
+            IfElseBranch::new(
+                None,
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something_else".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            )
+        )
+    ));
+}
+
+#[test]
+fn if_elseif_branch(){
+    check_stmt!("if cond then something(); else if cond2 then something_else(); end" -> IfElseStmt::new(
+        vec!(
+            IfElseBranch::new(
+                Some(IdentExpr::new("cond".to_owned())),
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            ),
+            IfElseBranch::new(
+                Some(IdentExpr::new("cond2".to_owned())),
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something_else".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            )
+        )
+    ));
+}
+
+#[test]
+fn if_elseif_else_branch(){
+    check_stmt!("if cond then something(); else if cond2 then something_else(); else nothing(); end" -> IfElseStmt::new(
+        vec!(
+            IfElseBranch::new(
+                Some(IdentExpr::new("cond".to_owned())),
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            ),
+            IfElseBranch::new(
+                Some(IdentExpr::new("cond2".to_owned())),
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("something_else".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            ),
+            IfElseBranch::new(
+                None,
+                vec!(
+                    ExprStmt::new(
+                        FuncCall::new(
+                            vec!("nothing".to_owned()),
+                            vec!()
+                        )
+                    )
+                )
+            )
+        )
+    ));
+}
+
+#[test]
+fn for_in_loop_single_var(){
+    check_stmt!("for i in 0..10 do break; end" -> ForInLoop::new(
+        vec!(
+            "i".to_owned()
+        ),
+        ExclusiveRange::new(
+            Int::new(0),
+            Int::new(10)
+        ),
+        vec!(
+            LoopControlStmt::new(Break)
+        )
+    ));
+}
+
+#[test]
+fn for_in_loop_multi_var(){
+    check_stmt!("for i, j in positions do continue; end" -> ForInLoop::new(
+        vec!(
+            "i".to_owned(),
+            "j".to_owned()
+        ),
+        IdentExpr::new("positions".to_owned()),
+        vec!(
+            LoopControlStmt::new(Continue)
+        )
+    ));
+}
+
+#[test]
+#[should_fail]
+fn break_top_level_fail() {
+    let tokens = scanner::stream_from_str("break");
+    AsyncParser::new(tokens).parse();
+}
+
+#[test]
+#[should_fail]
+fn continue_top_level_fail() {
+    let tokens = scanner::stream_from_str("continue");
+    AsyncParser::new(tokens).parse();
+}
+
+#[test]
+#[should_fail]
+fn return_top_level_fail() {
+    let tokens = scanner::stream_from_str("return");
+    AsyncParser::new(tokens).parse();
+}
+
+#[test]
+#[should_fail]
+fn yield_top_level_fail() {
+    let tokens = scanner::stream_from_str("yield");
+    AsyncParser::new(tokens).parse();
 }
