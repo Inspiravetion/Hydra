@@ -456,7 +456,11 @@ trait HydraBaseParser {
                         }
 
                         self.next();
+                        //TODO: this should be optional...you should be able to return early
                         let ret_val = self.expr();
+
+                        self.next_is(Semicolon);
+
                         Some(ReturnStmt::new(ret_val))
                     },
                     Yield => {
@@ -1267,6 +1271,144 @@ fn for_in_loop_multi_var(){
             LoopControlStmt::new(Continue)
         )
     ));
+}
+
+#[test]
+fn while_loop(){
+    check_stmt!("while cond do break; continue; end" -> WhileLoop::new(
+        IdentExpr::new("cond".to_owned()),
+        vec!(
+            LoopControlStmt::new(Break),
+            LoopControlStmt::new(Continue)
+        )
+    ));
+}
+
+#[test]
+fn func_def_no_params(){
+    //CURRENTLY FAILS AS PARAMS AREN'T OPTIONAL
+    check_stmt!("function abc(){ stuff(); }" -> FunctionDef::new(
+            "abc".to_owned(),
+            vec!(),
+            vec!(
+                ExprStmt::new(    
+                    FuncCall::new(
+                        vec!("stuff".to_owned()),
+                        vec!()
+                    )
+                )
+            )
+        )
+    );
+}
+
+#[test]
+fn func_def_single_param(){
+    check_stmt!("function abc(a){ stuff(); }" -> FunctionDef::new(
+            "abc".to_owned(),
+            vec!(
+                "a".to_owned()
+            ),
+            vec!(
+                ExprStmt::new(    
+                    FuncCall::new(
+                        vec!("stuff".to_owned()),
+                        vec!()
+                    )
+                )
+            )
+        )
+    );
+}
+
+#[test]
+fn func_def_multi_param(){
+    check_stmt!("function abc(a, b, c){ return a; }" -> FunctionDef::new(
+            "abc".to_owned(),
+            vec!(
+                "a".to_owned(),
+                "b".to_owned(),
+                "c".to_owned()
+            ),
+            vec!(
+                ReturnStmt::new(
+                    IdentExpr::new("a".to_owned())      
+                )
+            )
+        )
+    );
+}
+
+#[test]
+fn gen_func_def_no_params(){
+    //CURRENTLY FAILS AS PARAMS AREN'T OPTIONAL
+    check_stmt!("gen function abc(){ stuff(); }" -> GeneratorDef::new(
+            "abc".to_owned(),
+            vec!(),
+            vec!(
+                ExprStmt::new(    
+                    FuncCall::new(
+                        vec!("stuff".to_owned()),
+                        vec!()
+                    )
+                )
+            )
+        )
+    );
+}
+
+#[test]
+fn gen_func_def_single_param(){
+    check_stmt!("gen function abc(a){ yield a; }" -> GeneratorDef::new(
+            "abc".to_owned(),
+            vec!(
+                "a".to_owned()
+            ),
+            vec!(
+                YieldStmt::new(
+                    vec!(
+                        IdentExpr::new("a".to_owned())
+                    )
+                )
+            )
+        )
+    );
+}
+
+#[test]
+fn gen_func_def_multi_param(){
+    check_stmt!("gen function abc(a, b, c){ yield a, b, c; }" -> GeneratorDef::new(
+            "abc".to_owned(),
+            vec!(
+                "a".to_owned(),
+                "b".to_owned(),
+                "c".to_owned()
+            ),
+            vec!(
+                YieldStmt::new(
+                    vec!(
+                        IdentExpr::new("a".to_owned()),
+                        IdentExpr::new("b".to_owned()),
+                        IdentExpr::new("c".to_owned())
+                    )
+                )
+            )
+        )
+    );
+}
+
+#[test]
+#[should_fail]
+fn func_def_yield_fail() {
+    let tokens = scanner::stream_from_str("function abc(a, b, c){ yield a; }");
+    AsyncParser::new(tokens).parse();
+}
+
+#[test]
+#[should_fail]
+fn gen_func_def_yield_fail() {
+    let tokens = scanner::stream_from_str("gen function abc(a, b, c){ return a; }");
+    AsyncParser::new(tokens).parse();
 }
 
 #[test]
