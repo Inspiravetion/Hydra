@@ -1,33 +1,86 @@
-use std::comm::Receiver;
+use std::comm::{channel, Receiver};
 use token::*;
 use ast::*;
 use std::from_str::from_str;
 use scanner;
 use collections::hashmap::HashMap;
 
+use native::task::spawn;
 
-///Scan and Parse a file in parallel
+///Scan and Parse a file in parallel producing an AST
 pub fn parse_file_async(path : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::stream_from_file(path);
-    AsyncParser::new(tokens).parse()
+    AsyncParser::new(tokens).parse_sync()
 }
 
-///Scan and then Parse a file
+///Scan and then Parse a file producing an AST
 pub fn parse_file_sync(path : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::tokenize_file(path);
-    SyncParser::new(tokens).parse()
+    SyncParser::new(tokens).parse_sync()
 }
 
-///Scan and Parse a string in parallel
+///Scan and Parse a string in parallel producing an AST
 pub fn parse_str_async(code : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::stream_from_str(code);
-    AsyncParser::new(tokens).parse()
+    AsyncParser::new(tokens).parse_sync()
 }
 
-///Scan and then Parse a string
+///Scan and then Parse a string producing an AST
 pub fn parse_str_sync(code : &str) -> Vec<Box<Stmt>> {
     let tokens = scanner::tokenize_str(code);
-    SyncParser::new(tokens).parse()
+    SyncParser::new(tokens).parse_sync()
+}
+
+///Scan and Parse a file in parallel producing a stream of top level AST nodes
+pub fn parse_and_stream_file_async(path : &str) -> Receiver<Box<Stmt>> {
+    let (sendr, recvr) = channel();
+    let path = path.to_owned();
+
+    spawn(proc(){
+        let tokens = scanner::stream_from_file(path);
+        AsyncParser::new(tokens).parse_async(sendr);
+    });
+
+    recvr
+}
+
+///Scan and then Parse a file producing a stream of top level AST nodes
+pub fn parse_and_stream_file_sync(path : &str) -> Receiver<Box<Stmt>> {
+    let (sendr, recvr) = channel();
+    let path = path.to_owned();
+
+    spawn(proc(){
+        let tokens = scanner::tokenize_file(path);
+        SyncParser::new(tokens).parse_async(sendr);
+    });
+
+    recvr
+}
+
+///Scan and Parse a string in parallel producing a stream of top level AST nodes
+pub fn parse_and_stream_str_async(path : &str) -> Receiver<Box<Stmt>> {
+    let (sendr, recvr) = channel();
+    let path = path.to_owned();
+
+    spawn(proc(){
+        let tokens = scanner::stream_from_str(path);
+        AsyncParser::new(tokens).parse_async(sendr);
+    });
+
+    recvr
+}
+
+///Scan and then Parse a string producing a stream of top level AST nodes
+pub fn parse_and_stream_str_sync(path : &str) -> Receiver<Box<Stmt>> {
+    let (sendr, recvr) = channel();
+    let path = path.to_owned();
+
+    spawn(proc(){
+        let tokens = scanner::tokenize_str(path);
+        SyncParser::new(tokens).parse_async(sendr);
+    });
+
+    recvr
 }
 
 pub struct AsyncParser {
@@ -46,9 +99,21 @@ pub struct SyncParser {
 }
 
 pub trait HydraParser : HydraBaseParser {
-    fn parse(&mut self) -> Vec<Box<Stmt>> {
-        self.program_stmts()
+    fn parse_sync(&mut self) -> Vec<Box<Stmt>> {
+        let mut stmts = Vec::new();
+
+        self.for_each_stmt(|stmt : Box<Stmt>|{
+            stmts.push(stmt);
+        });
+
+        stmts
     }  
+
+    fn parse_async(&mut self, sendr : Sender<Box<Stmt>>) {
+        self.for_each_stmt(|stmt : Box<Stmt>|{
+            sendr.send(stmt);
+        });
+    }
 }
 
 ///abc or abc.def or a.b.c, d.e.f
@@ -125,62 +190,72 @@ trait HydraBaseParser {
         }
     }
 
-    fn program_stmts(&mut self) -> Vec<Box<Stmt>> {
-        let mut stmts = Vec::new();
+    fn for_each_stmt(&mut self, cb : |Box<Stmt>|) {
         loop {
-            match self.peek() {
-                Some(tok) => {
-                    let stmt = match tok.typ {
-                        For => {
-                            self.next();
-                            self.for_in_loop()
-                        },
-                        While => {
-                            self.next();
-                            self.while_loop()
-                        },
-                        Var => { 
-                            self.next();
-                            self.var_decl()
-                        },
-                        Identifier => {
-                            self.func_call_or_assignment_stmt()
-                        },
-                        If => {
-                            self.next();
-                            self.if_else_stmt()
-                        },
-                        Function => {
-                            self.next();
-                            self.function_def()
-                        },
-                        Operator => {
-                            self.next();
-                            self.operator_def()
-                        },
-                        Generator => {
-                            self.next();
-                            self.expect(Function);
-                            self.start_gen_parsing();
-                            self.function_def()
-                        }, 
-                        NewLine => {
-                            self.next();
-                            continue                        
-                        },
-                        _   => fail!(
-                                "Statement at {}:{} not allowed at top level", 
-                                self.tok().line,
-                                self.tok().col
-                            )
-                    };
-                    stmts.push(stmt);
-                },
-                None => {
-                    return stmts
-                }
+            let stmt = match self.program_stmt() {
+                Some(s) => s,
+                None    => return
             };
-        } 
+            cb(stmt);
+        }
+    }
+
+    fn program_stmt(&mut self) -> Option<Box<Stmt>> {
+        match self.peek() {
+            Some(tok) => {
+                let stmt = match tok.typ {
+                    For => {
+                        self.next();
+                        self.for_in_loop()
+                    },
+                    While => {
+                        self.next();
+                        self.while_loop()
+                    },
+                    Var => { 
+                        self.next();
+                        self.var_decl()
+                    },
+                    Identifier => {
+                        self.func_call_or_assignment_stmt()
+                    },
+                    If => {
+                        self.next();
+                        self.if_else_stmt()
+                    },
+                    Function => {
+                        self.next();
+                        self.function_def()
+                    },
+                    Operator => {
+                        self.next();
+                        self.operator_def()
+                    },
+                    Generator => {
+                        self.next();
+                        self.expect(Function);
+                        self.start_gen_parsing();
+                        self.function_def()
+                    }, 
+                    NewLine => {
+                        self.next();
+                        match self.program_stmt() {
+                            Some(stmt) => stmt,
+                            None => return None
+                        }
+                    },
+                    _   => fail!(
+                            "Statement at {}:{} not allowed at top level", 
+                            self.tok().line,
+                            self.tok().col
+                        )
+                };
+                Some(stmt)
+            },
+            None => {
+                None
+            }
+        }
     }
 
     fn function_def(&mut self) -> Box<Stmt> {
