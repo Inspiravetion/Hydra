@@ -7,29 +7,34 @@ use syntax::parser;
 use builder::{Builder, GenBuilder, GenGenState}; 
 use generator::Generator; 
 use lltype::{Value, Block, Type};
+use intrinsics;
 
-pub fn gen_code_from_file_sync(path : &str, out_name : &str, builder : &mut Builder){
+pub fn gen_code_from_file_sync(path : &str, out_name : &str){
     let ast = parser::parse_file_sync(path);
-    gen_code_from_ast_sync(&ast, out_name, builder);
+    gen_code_from_ast_sync(&ast, out_name);
 }
 
-pub fn gen_code_from_str_sync(code : &str, out_name : &str, builder : &mut Builder){
+pub fn gen_code_from_str_sync(code : &str, out_name : &str){
     let ast = parser::parse_str_sync(code);
-    gen_code_from_ast_sync(&ast, out_name, builder);
+    gen_code_from_ast_sync(&ast, out_name);
 }
 
-pub fn gen_code_from_file_async(path : &str, out_name : &str, builder : &mut Builder){
+pub fn gen_code_from_file_async(path : &str, out_name : &str){
     let ast = parser::parse_and_stream_file_async(path);
-    gen_code_from_ast_async(ast, out_name, builder);
+    gen_code_from_ast_async(ast, out_name);
 }
 
-pub fn gen_code_from_str_async(code : &str, out_name : &str, builder : &mut Builder){
+pub fn gen_code_from_str_async(code : &str, out_name : &str){
     let ast = parser::parse_and_stream_str_async(code);
-    gen_code_from_ast_async(ast, out_name, builder);
+    gen_code_from_ast_async(ast, out_name);
 }
 
 //TODO: Create and initialize builder in this function
-fn gen_code_from_ast_sync(ast : &Vec<Box<Stmt>>, file_name : &str, builder : &mut Builder) {
+fn gen_code_from_ast_sync(ast : &Vec<Box<Stmt>>, file_name : &str) {
+    let mut builder = Builder::new();
+
+    intrinsics::gen_intrinsics(&mut builder);
+
     let int_type = builder.int32_type();
 
     builder.create_function("main", Vec::new(), int_type,|fb : &mut Builder|{
@@ -49,7 +54,11 @@ fn gen_code_from_ast_sync(ast : &Vec<Box<Stmt>>, file_name : &str, builder : &mu
 
 //TODO: Create and initialize builder in this function
 //This use generics to combine this with the sync version...all u need is an Iterator<Box<Stmt>>
-fn gen_code_from_ast_async(ast : Receiver<Box<Stmt>>, file_name : &str, builder : &mut Builder) {
+fn gen_code_from_ast_async(ast : Receiver<Box<Stmt>>, file_name : &str) {
+    let mut builder = Builder::new();
+
+    intrinsics::gen_intrinsics(&mut builder);
+
     let int_type = builder.int32_type();
 
     builder.create_function("main", Vec::new(), int_type,|fb : &mut Builder|{

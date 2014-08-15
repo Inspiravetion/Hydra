@@ -26,6 +26,7 @@ macro_rules! u (
 pub mod lltype;
 pub mod generator;
 pub mod builder;
+pub mod intrinsics;
 pub mod codegen;
 
 
