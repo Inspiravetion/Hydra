@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_llvm library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `generator` mod in crate `hydra_llvm`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, generator">
 
     <title>hydra_llvm::generator - Rust</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,10 +22,11 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
-        <p class='location'><a href='../index.html'>hydra_llvm</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../builder/index.html'>builder</a><br/><a class='mod ' href='../codegen/index.html'>codegen</a><br/><a class='mod current' href='../generator/index.html'>generator</a><br/><a class='mod ' href='../intrinsics/index.html'>intrinsics</a><br/><a class='mod ' href='../lltype/index.html'>lltype</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_llvm</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../builder/index.html'>builder</a><a class='mod ' href='../codegen/index.html'>codegen</a><a class='mod current' href='../generator/index.html'>generator</a><a class='mod ' href='../intrinsics/index.html'>intrinsics</a><a class='mod ' href='../lltype/index.html'>lltype</a></div>
     </section>
 
     <nav class="sub">
@@ -32,18 +34,21 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Module <a href='../index.html'>hydra_llvm</a>::<a class='mod' href=''>generator</a><a class='source' href='../../src/hydra_llvm/src/lib/lib_hy_codegen/generator.rs.html#2-30'>[src]</a></h1>
+<h1 class='fqn'><div class='in-band'>Module <a href='../index.html'>hydra_llvm</a>&#8203;::<a class='mod' href=''>generator</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-35' href='../../src/hydra_llvm/src/lib/lib_hy_codegen/generator.rs.html#2-30'>[src]</a></div></h1>
 <h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr>
-                        <td><a class='struct' href='struct.Generator.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Generator.html'
                                title='hydra_llvm::generator::Generator'>Generator</a></td>
                         <td class='docblock short'><p>All the info needed to create and use a Generator in llvm.
 llvm generator types are structured like this</p>
@@ -52,17 +57,17 @@ llvm generator types are structured like this</p>
                 </table><h2 id='statics' class='section-header'><a href="#statics">Statics</a></h2>
 <table>
                     <tr>
-                        <td><code>pub static RANGE_GEN_ID: &amp;'static str</code><code> = </code><code>"!range_gen"</code></td>
+                        <td><a class='stability Unmarked' title='No stability level'></a><code>pub static RANGE_GEN_ID: &amp;'static <a href='http://doc.rust-lang.org/master/std/primitive.str.html'>str</a></code><code> = </code><code>"!range_gen"</code></td>
                         <td class='docblock'>&nbsp;</td>
                     </tr>
                 
                     <tr>
-                        <td><code>pub static RANGE_GEN_INIT: &amp;'static str</code><code> = </code><code>"!range_gen_init"</code></td>
+                        <td><a class='stability Unmarked' title='No stability level'></a><code>pub static RANGE_GEN_INIT: &amp;'static <a href='http://doc.rust-lang.org/master/std/primitive.str.html'>str</a></code><code> = </code><code>"!range_gen_init"</code></td>
                         <td class='docblock'>&nbsp;</td>
                     </tr>
                 
                     <tr>
-                        <td><code>pub static RANGE_GEN_NEXT: &amp;'static str</code><code> = </code><code>"!range_gen_next"</code></td>
+                        <td><a class='stability Unmarked' title='No stability level'></a><code>pub static RANGE_GEN_NEXT: &amp;'static <a href='http://doc.rust-lang.org/master/std/primitive.str.html'>str</a></code><code> = </code><code>"!range_gen_next"</code></td>
                         <td class='docblock'>&nbsp;</td>
                     </tr>
                 </table></section>
@@ -78,9 +83,9 @@ llvm generator types are structured like this</p>
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -94,19 +99,23 @@ llvm generator types are structured like this</p>
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../";
-        var currentCrate = "hydra_llvm";
+        window.rootPath = "../../";
+        window.currentCrate = "hydra_llvm";
+        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
+    
     <script async src="../../search-index.js"></script>
 </body>
 </html>

@@ -23,8 +23,8 @@ pub struct Generator {
     pub typ       : Type,
     pub gen       : Value,
     pub init_args : Vec<Value>,
-    pub init_func : ~str,
-    pub next_func : ~str,
+    pub init_func : String,
+    pub next_func : String,
     pub var_count : uint, //might turn this into a hashmap of identifiers => gen_index
     pub ret_count : uint  //might turn this into a hashmap of identifiers => gen_index
 }

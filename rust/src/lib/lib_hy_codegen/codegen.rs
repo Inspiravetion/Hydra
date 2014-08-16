@@ -153,8 +153,8 @@ fn func_call_to_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder
     }
 
     //getting the function name will change later
-    let func_name = prop_path.get(0).as_slice();
-    builder.call(func_name, param_vals, format!("{}_tmp", func_name))
+    let func_name = prop_path[0].as_slice();
+    builder.call(func_name, param_vals, format!("{}_tmp", func_name).as_slice())
 }
 
 fn func_call_to_gen_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder : &mut Builder, ctxt : Value) -> Value {
@@ -164,8 +164,8 @@ fn func_call_to_gen_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, bui
     }
 
     //getting the function name will change later
-    let func_name = prop_path.get(0).as_slice();
-    builder.call(func_name, param_vals, format!("{}_tmp", func_name))
+    let func_name = prop_path[0].as_slice();
+    builder.call(func_name, param_vals, format!("{}_tmp", func_name).as_slice())
 }
 
 ///////////////////////////////////////
@@ -230,16 +230,16 @@ fn ident_expr_to_gen_value(value : &Ident, builder : &mut Builder, ctxt : Value)
 //    Binary Expression Generation   //
 ///////////////////////////////////////
 
-fn bin_expr_to_value(lhs : &Box<Expr>, op : &~str, rhs : &Box<Expr>, builder : &mut Builder) -> Value {
+fn bin_expr_to_value(lhs : &Box<Expr>, op : &String, rhs : &Box<Expr>, builder : &mut Builder) -> Value {
     let left_val  = lhs.to_value(builder);
     let right_val = rhs.to_value(builder);
 
     //TODO: verify that the operator being used is visible in the current scope
     let args = vec!(left_val, right_val);
     builder.call(
-        *op, 
+        op.as_slice(), 
         args, 
-        format!("{}_tmp", *op)
+        format!("{}_tmp", *op).as_slice()
     )
 }
 
@@ -253,9 +253,9 @@ fn prfx_unary_expr_to_value(op : &Ident, expr : &Box<Expr>, builder : &mut Build
     //TODO: verify that the operator being used is visible in the current scope
     let args = vec!(expr_val);
     builder.call(
-        *op, 
+        op.as_slice(), 
         args, 
-        format!("{}_tmp", op)
+        format!("{}_tmp", op).as_slice()
     )
 }
 
@@ -357,7 +357,7 @@ fn var_decl_gen_gen_code(vars : &Vec<Ident>, ggs : &mut GenGenState, builder : &
         let name = var.as_slice();
         //load val into state slot and then set the var to the state slot
         let var_index = base_state_index + i;
-        let ptr_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name));
+        let ptr_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name).as_slice());
         builder.store(val, ptr_val);
         builder.set_gen_var(name, var_index as int);
 
@@ -378,7 +378,7 @@ fn var_assign_gen_code(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, builder : &mu
 
     for var in vars.iter() {
         let val = if i < vals.len() {
-            vals.get(i).to_value(builder)
+            vals[i].to_value(builder)
         } else {
             builder.default_value()
         };
@@ -420,7 +420,7 @@ fn var_assign_gen_gen_code(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, ggs : &mu
         builder.goto_block(ggs.stmts_blk);
 
         let val = if i < vals.len() {
-            vals.get(i).to_gen_value(builder, ggs.context)
+            vals[i].to_gen_value(builder, ggs.context)
         } else {
             builder.default_value()
         };
@@ -429,7 +429,7 @@ fn var_assign_gen_gen_code(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, ggs : &mu
         let name = var.as_slice();
         //load val into state slot and then set the var to the state slot
         let var_index = base_state_index + i;
-        let ptr_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name));
+        let ptr_val = builder.get_obj_property(ggs.context, var_index as int, format!("_{}", name).as_slice());
         builder.store(val, ptr_val);
         builder.set_gen_var(name, var_index as int);
 
@@ -452,8 +452,8 @@ fn assign_stmt_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &Vec<Box<Expr>>, builder :
     let mut i = 0;
 
     for prop_path in lhs.iter() {
-        let var_name = prop_path.get(0).as_slice();
-        let var_val = rhs.get(i).to_value(builder);
+        let var_name = prop_path[0].as_slice();
+        let var_val = rhs[i].to_value(builder);
         builder.assign_var(var_val, var_name);
         i += 1;
     }        
@@ -474,8 +474,8 @@ fn assign_stmt_gen_gen_code(lhs : &Vec<Vec<Ident>>, rhs : &Vec<Box<Expr>>, ggs :
     let mut i = 0;
 
     for prop_path in lhs.iter() {
-        let var_name = prop_path.get(0).as_slice();
-        let var_val = rhs.get(i).to_gen_value(builder, ggs.context);
+        let var_name = prop_path[0].as_slice();
+        let var_val = rhs[i].to_gen_value(builder, ggs.context);
         builder.assign_gen_var(var_val, ggs.context, var_name);
         i += 1;
     }        
@@ -583,9 +583,10 @@ fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &Vec<Box<Stmt>>
 
     //initialize generator
     builder.goto_block(loop_init);
-    let init_fn = gen.init_func.clone();
+    // let init_fn = gen.init_func.clone();
     let init_args = gen.init_args.clone();
-    builder.call(init_fn, init_args, "");
+    // builder.call(init_fn, init_args, "");
+    builder.call(gen.init_func.as_slice(), init_args, "");
 
     //create variables 
     for var in vars.iter(){
@@ -598,7 +599,7 @@ fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &Vec<Box<Stmt>>
 
     //check to see if generator is done or not
     builder.goto_block(loop_check);
-    let done = builder.call(gen.next_func, vec!(gen.gen), "done");
+    let done = builder.call(gen.next_func.as_slice(), vec!(gen.gen), "done");
     let done_value = builder.int(0);
     let cmp = builder.cmp_eq(done, done_value, "done_cmp");
     builder.conditional_break(cmp, loop_exit, loop_stmts);
@@ -791,7 +792,7 @@ fn yield_stmt_gen_gen_code(values : &Vec<Box<Expr>>, ggs : &mut GenGenState, bui
     let mut idx_padding = 0;
     for val in values.iter() {
         println!("{}", start_idx + idx_padding);
-        let slot_ptr = builder.get_obj_property(ggs.context, (start_idx + idx_padding) as int, format!("ret_{}", idx_padding + 2));
+        let slot_ptr = builder.get_obj_property(ggs.context, (start_idx + idx_padding) as int, format!("ret_{}", idx_padding + 2).as_slice());
         let val = val.to_gen_value(builder, ggs.context);
 
         builder.store(val, slot_ptr);

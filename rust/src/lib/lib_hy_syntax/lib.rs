@@ -1,4 +1,4 @@
-#![crate_id = "hydra_syntax"]
+#![crate_name = "hydra_syntax"]
 #![comment = "Hydra Tokens, Scanner, Parser, and AST"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
@@ -13,8 +13,7 @@
 #![allow(non_camel_case_types)]
 #![allow(dead_assignment)]
 
-extern crate native;
-extern crate collections;
+extern crate debug;
 
 pub mod token;
 pub mod scanner;

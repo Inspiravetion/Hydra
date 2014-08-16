@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_syntax library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `HydraParser` trait in crate `hydra_syntax`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, HydraParser">
 
     <title>hydra_syntax::parser::HydraParser - Rust</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,10 +22,11 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
-        <p class='location'><a href='../index.html'>hydra_syntax</a>&#8203;::<a href='index.html'>parser</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.AsyncParser.html'>AsyncParser</a><br/><a class='struct ' href='struct.SyncParser.html'>SyncParser</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.HydraBaseParser.html'>HydraBaseParser</a><br/><a class='trait current' href='trait.HydraParser.html'>HydraParser</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.parse_and_stream_file_async.html'>parse_and_stream_file_async</a><br/><a class='fn ' href='fn.parse_and_stream_file_sync.html'>parse_and_stream_file_sync</a><br/><a class='fn ' href='fn.parse_and_stream_str_async.html'>parse_and_stream_str_async</a><br/><a class='fn ' href='fn.parse_and_stream_str_sync.html'>parse_and_stream_str_sync</a><br/><a class='fn ' href='fn.parse_file_async.html'>parse_file_async</a><br/><a class='fn ' href='fn.parse_file_sync.html'>parse_file_sync</a><br/><a class='fn ' href='fn.parse_str_async.html'>parse_str_async</a><br/><a class='fn ' href='fn.parse_str_sync.html'>parse_str_sync</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_syntax</a>&#8203;::<a href='index.html'>parser</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.AsyncParser.html'>AsyncParser</a><a class='struct ' href='struct.SyncParser.html'>SyncParser</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.HydraBaseParser.html'>HydraBaseParser</a><a class='trait current' href='trait.HydraParser.html'>HydraParser</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.parse_and_stream_file_async.html'>parse_and_stream_file_async</a><a class='fn ' href='fn.parse_and_stream_file_sync.html'>parse_and_stream_file_sync</a><a class='fn ' href='fn.parse_and_stream_str_async.html'>parse_and_stream_str_async</a><a class='fn ' href='fn.parse_and_stream_str_sync.html'>parse_and_stream_str_sync</a><a class='fn ' href='fn.parse_file_async.html'>parse_file_async</a><a class='fn ' href='fn.parse_file_sync.html'>parse_file_sync</a><a class='fn ' href='fn.parse_str_async.html'>parse_str_async</a><a class='fn ' href='fn.parse_str_sync.html'>parse_str_sync</a></div>
     </section>
 
     <nav class="sub">
@@ -32,24 +34,31 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='../index.html'>hydra_syntax</a>::<a href='index.html'>parser</a>::<a class='trait' href=''>HydraParser</a><a class='source' href='../../src/hydra_syntax/src/lib/lib_hy_syntax/parser.rs.html#101-117'>[src]</a></h1>
+<h1 class='fqn'><div class='in-band'>Trait <a href='../index.html'>hydra_syntax</a>&#8203;::<a href='index.html'>parser</a>&#8203;::<a class='trait' href=''>HydraParser</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-13425' href='../../src/hydra_syntax/src/lib/lib_hy_syntax/parser.rs.html#99-115'>[src]</a></div></h1>
 <pre class='rust trait'>pub trait HydraParser: <a class='trait' href='../../hydra_syntax/parser/trait.HydraBaseParser.html' title='hydra_syntax::parser::HydraBaseParser'>HydraBaseParser</a> {
-    fn <a href='#method.parse_sync' class='fnname'>parse_sync</a>(&amp;mut self) -&gt; <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='http://static.rust-lang.org/doc/master/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt; { ... }
-    fn <a href='#method.parse_async' class='fnname'>parse_async</a>(&amp;mut self, sendr: <a class='struct' href='http://static.rust-lang.org/doc/master/std/comm/struct.Sender.html' title='std::comm::Sender'>Sender</a>&lt;<a class='struct' href='http://static.rust-lang.org/doc/master/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt;) { ... }
+    fn <a href='#method.parse_sync' class='fnname'>parse_sync</a>(&amp;mut self) -&gt; <a class='struct' href='http://doc.rust-lang.org/master/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='http://doc.rust-lang.org/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt; { ... }
+    fn <a href='#method.parse_async' class='fnname'>parse_async</a>(&amp;mut self, sendr: <a class='struct' href='http://doc.rust-lang.org/master/sync/comm/struct.Sender.html' title='sync::comm::Sender'>Sender</a>&lt;<a class='struct' href='http://doc.rust-lang.org/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt;) { ... }
 }</pre>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.parse_sync' class='method'><code>fn <a href='#method.parse_sync' class='fnname'>parse_sync</a>(&amp;mut self) -&gt; <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='http://static.rust-lang.org/doc/master/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt;</code></h3><h3 id='method.parse_async' class='method'><code>fn <a href='#method.parse_async' class='fnname'>parse_async</a>(&amp;mut self, sendr: <a class='struct' href='http://static.rust-lang.org/doc/master/std/comm/struct.Sender.html' title='std::comm::Sender'>Sender</a>&lt;<a class='struct' href='http://static.rust-lang.org/doc/master/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt;)</code></h3></div>
-                <h2 id='implementors'>Implementors</h2>
-                <ul class='item-list'>
-            <li><code><a class='struct' href='../../hydra_syntax/parser/struct.SyncParser.html' title='hydra_syntax::parser::SyncParser'>SyncParser</a></code></li><li><code><a class='struct' href='../../hydra_syntax/parser/struct.AsyncParser.html' title='hydra_syntax::parser::AsyncParser'>AsyncParser</a></code></li></ul></section>
+        <h3 id='method.parse_sync' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.parse_sync' class='fnname'>parse_sync</a>(&amp;mut self) -&gt; <a class='struct' href='http://doc.rust-lang.org/master/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='http://doc.rust-lang.org/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt;</code></h3><h3 id='method.parse_async' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.parse_async' class='fnname'>parse_async</a>(&amp;mut self, sendr: <a class='struct' href='http://doc.rust-lang.org/master/sync/comm/struct.Sender.html' title='sync::comm::Sender'>Sender</a>&lt;<a class='struct' href='http://doc.rust-lang.org/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../hydra_syntax/ast/struct.Stmt.html' title='hydra_syntax::ast::Stmt'>Stmt</a>&gt;&gt;)</code></h3></div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><a class='stability Unmarked' title='No stability level'></a><code>impl <a class='trait' href='../../hydra_syntax/parser/trait.HydraParser.html' title='hydra_syntax::parser::HydraParser'>HydraParser</a> for <a class='struct' href='../../hydra_syntax/parser/struct.AsyncParser.html' title='hydra_syntax::parser::AsyncParser'>AsyncParser</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl <a class='trait' href='../../hydra_syntax/parser/trait.HydraParser.html' title='hydra_syntax::parser::HydraParser'>HydraParser</a> for <a class='struct' href='../../hydra_syntax/parser/struct.SyncParser.html' title='hydra_syntax::parser::SyncParser'>SyncParser</a></code></li>
+</ul><script type="text/javascript" async
+                              src="../../implementors/hydra_syntax/parser/trait.HydraParser.js">
+                      </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -62,9 +71,9 @@
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -78,19 +87,23 @@
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../";
-        var currentCrate = "hydra_syntax";
+        window.rootPath = "../../";
+        window.currentCrate = "hydra_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
+    
     <script async src="../../search-index.js"></script>
 </body>
 </html>

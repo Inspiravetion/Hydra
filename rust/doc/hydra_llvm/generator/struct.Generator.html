@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_llvm library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Generator` struct in crate `hydra_llvm`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Generator">
 
     <title>hydra_llvm::generator::Generator - Rust</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,10 +22,11 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
-        <p class='location'><a href='../index.html'>hydra_llvm</a>&#8203;::<a href='index.html'>generator</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Generator.html'>Generator</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_llvm</a>&#8203;::<a href='index.html'>generator</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Generator.html'>Generator</a></div>
     </section>
 
     <nav class="sub">
@@ -32,22 +34,25 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='../index.html'>hydra_llvm</a>::<a href='index.html'>generator</a>::<a class='struct' href=''>Generator</a><a class='source' href='../../src/hydra_llvm/src/lib/lib_hy_codegen/generator.rs.html#22-30'>[src]</a></h1>
+<h1 class='fqn'><div class='in-band'>Struct <a href='../index.html'>hydra_llvm</a>&#8203;::<a href='index.html'>generator</a>&#8203;::<a class='struct' href=''>Generator</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-56' href='../../src/hydra_llvm/src/lib/lib_hy_codegen/generator.rs.html#22-30'>[src]</a></div></h1>
 <pre class='rust struct'>pub struct Generator {
     pub typ: <a class='type' href='../../hydra_llvm/lltype/type.Type.html' title='hydra_llvm::lltype::Type'>Type</a>,
     pub gen: <a class='type' href='../../hydra_llvm/lltype/type.Value.html' title='hydra_llvm::lltype::Value'>Value</a>,
-    pub init_args: <a class='struct' href='http://static.rust-lang.org/doc/master/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='type' href='../../hydra_llvm/lltype/type.Value.html' title='hydra_llvm::lltype::Value'>Value</a>&gt;,
-    pub init_func: ~str,
-    pub next_func: ~str,
-    pub var_count: uint,
-    pub ret_count: uint,
+    pub init_args: <a class='struct' href='http://doc.rust-lang.org/master/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../hydra_llvm/lltype/type.Value.html' title='hydra_llvm::lltype::Value'>Value</a>&gt;,
+    pub init_func: <a class='struct' href='http://doc.rust-lang.org/master/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub next_func: <a class='struct' href='http://doc.rust-lang.org/master/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub var_count: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>,
+    pub ret_count: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>,
 }</pre><div class='docblock'><p>All the info needed to create and use a Generator in llvm.
 llvm generator types are structured like this</p>
 
@@ -63,7 +68,7 @@ llvm generator types are structured like this</p>
   ret_val_n,
 }</p>
 </div><h2 class='fields'>Fields</h2>
-<table><tr><td id='structfield.typ'><code>typ</code></td><td></td></tr><tr><td id='structfield.gen'><code>gen</code></td><td></td></tr><tr><td id='structfield.init_args'><code>init_args</code></td><td></td></tr><tr><td id='structfield.init_func'><code>init_func</code></td><td></td></tr><tr><td id='structfield.next_func'><code>next_func</code></td><td></td></tr><tr><td id='structfield.var_count'><code>var_count</code></td><td></td></tr><tr><td id='structfield.ret_count'><code>ret_count</code></td><td></td></tr></table></section>
+<table><tr><td id='structfield.typ'><a class='stability Unmarked' title='No stability level'></a><code>typ</code></td><td></td></tr><tr><td id='structfield.gen'><a class='stability Unmarked' title='No stability level'></a><code>gen</code></td><td></td></tr><tr><td id='structfield.init_args'><a class='stability Unmarked' title='No stability level'></a><code>init_args</code></td><td></td></tr><tr><td id='structfield.init_func'><a class='stability Unmarked' title='No stability level'></a><code>init_func</code></td><td></td></tr><tr><td id='structfield.next_func'><a class='stability Unmarked' title='No stability level'></a><code>next_func</code></td><td></td></tr><tr><td id='structfield.var_count'><a class='stability Unmarked' title='No stability level'></a><code>var_count</code></td><td></td></tr><tr><td id='structfield.ret_count'><a class='stability Unmarked' title='No stability level'></a><code>ret_count</code></td><td></td></tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -76,9 +81,9 @@ llvm generator types are structured like this</p>
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -92,19 +97,23 @@ llvm generator types are structured like this</p>
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../";
-        var currentCrate = "hydra_llvm";
+        window.rootPath = "../../";
+        window.currentCrate = "hydra_llvm";
+        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
+    
     <script async src="../../search-index.js"></script>
 </body>
 </html>

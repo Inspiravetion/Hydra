@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_syntax library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `VarDecl` mod in crate `hydra_syntax`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, VarDecl">
 
     <title>hydra_syntax::ast::VarDecl - Rust</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,10 +22,11 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
-        <p class='location'><a href='../../index.html'>hydra_syntax</a>&#8203;::<a href='../index.html'>ast</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../AssignStmt/index.html'>AssignStmt</a><br/><a class='mod ' href='../BinaryExpr/index.html'>BinaryExpr</a><br/><a class='mod ' href='../ExclusiveRange/index.html'>ExclusiveRange</a><br/><a class='mod ' href='../ExprStmt/index.html'>ExprStmt</a><br/><a class='mod ' href='../ForInLoop/index.html'>ForInLoop</a><br/><a class='mod ' href='../FuncCall/index.html'>FuncCall</a><br/><a class='mod ' href='../FunctionDef/index.html'>FunctionDef</a><br/><a class='mod ' href='../GeneratorDef/index.html'>GeneratorDef</a><br/><a class='mod ' href='../IdentExpr/index.html'>IdentExpr</a><br/><a class='mod ' href='../IfElseStmt/index.html'>IfElseStmt</a><br/><a class='mod ' href='../InclusiveRange/index.html'>InclusiveRange</a><br/><a class='mod ' href='../Int/index.html'>Int</a><br/><a class='mod ' href='../LoopControlStmt/index.html'>LoopControlStmt</a><br/><a class='mod ' href='../PrefixUnaryExpr/index.html'>PrefixUnaryExpr</a><br/><a class='mod ' href='../ReturnStmt/index.html'>ReturnStmt</a><br/><a class='mod ' href='../VarAssign/index.html'>VarAssign</a><br/><a class='mod current' href='../VarDecl/index.html'>VarDecl</a><br/><a class='mod ' href='../WhileLoop/index.html'>WhileLoop</a><br/><a class='mod ' href='../YieldStmt/index.html'>YieldStmt</a><br/></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='../struct.Expr.html'>Expr</a><br/><a class='struct ' href='../struct.IfElseBranch.html'>IfElseBranch</a><br/><a class='struct ' href='../struct.Stmt.html'>Stmt</a><br/></div>
+        <p class='location'><a href='../../index.html'>hydra_syntax</a>&#8203;::<a href='../index.html'>ast</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../AssignStmt/index.html'>AssignStmt</a><a class='mod ' href='../BinaryExpr/index.html'>BinaryExpr</a><a class='mod ' href='../ExclusiveRange/index.html'>ExclusiveRange</a><a class='mod ' href='../ExprStmt/index.html'>ExprStmt</a><a class='mod ' href='../ForInLoop/index.html'>ForInLoop</a><a class='mod ' href='../FuncCall/index.html'>FuncCall</a><a class='mod ' href='../FunctionDef/index.html'>FunctionDef</a><a class='mod ' href='../GeneratorDef/index.html'>GeneratorDef</a><a class='mod ' href='../IdentExpr/index.html'>IdentExpr</a><a class='mod ' href='../IfElseStmt/index.html'>IfElseStmt</a><a class='mod ' href='../InclusiveRange/index.html'>InclusiveRange</a><a class='mod ' href='../Int/index.html'>Int</a><a class='mod ' href='../LoopControlStmt/index.html'>LoopControlStmt</a><a class='mod ' href='../PrefixUnaryExpr/index.html'>PrefixUnaryExpr</a><a class='mod ' href='../ReturnStmt/index.html'>ReturnStmt</a><a class='mod ' href='../VarAssign/index.html'>VarAssign</a><a class='mod current' href='../VarDecl/index.html'>VarDecl</a><a class='mod ' href='../WhileLoop/index.html'>WhileLoop</a><a class='mod ' href='../YieldStmt/index.html'>YieldStmt</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='../struct.Expr.html'>Expr</a><a class='struct ' href='../struct.IfElseBranch.html'>IfElseBranch</a><a class='struct ' href='../struct.Stmt.html'>Stmt</a></div>
     </section>
 
     <nav class="sub">
@@ -32,18 +34,21 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Module <a href='../../index.html'>hydra_syntax</a>::<a href='../index.html'>ast</a>::<a class='mod' href=''>VarDecl</a><a class='source' href='../../../src/hydra_syntax/src/lib/lib_hy_syntax/ast.rs.html#171-179'>[src]</a></h1>
+<h1 class='fqn'><div class='in-band'>Module <a href='../../index.html'>hydra_syntax</a>&#8203;::<a href='../index.html'>ast</a>&#8203;::<a class='mod' href=''>VarDecl</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-12513' href='../../../src/hydra_syntax/src/lib/lib_hy_syntax/ast.rs.html#171-179'>[src]</a></div></h1>
 <h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                     <tr>
-                        <td><a class='fn' href='fn.new.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.new.html'
                                title='hydra_syntax::ast::VarDecl::new'>new</a></td>
                         <td class='docblock short'></td>
                     </tr>
@@ -60,9 +65,9 @@
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -76,19 +81,23 @@
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../../";
-        var currentCrate = "hydra_syntax";
+        window.rootPath = "../../../";
+        window.currentCrate = "hydra_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
+    
     <script async src="../../../search-index.js"></script>
 </body>
 </html>

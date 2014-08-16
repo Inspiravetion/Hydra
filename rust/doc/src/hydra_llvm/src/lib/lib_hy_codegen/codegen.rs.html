@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_llvm library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="Source to the Rust file `src/lib/lib_hy_codegen/codegen.rs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>codegen.rs.html -- source</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../../../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,9 +22,10 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
         
     </section>
 
@@ -32,7 +34,7 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
@@ -852,6 +854,7 @@
 <span id='812'>812</span>
 <span id='813'>813</span>
 <span id='814'>814</span>
+<span id='815'>815</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::<span class='ident'>Receiver</span>;
 
@@ -882,34 +885,10 @@
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>gen_code_from_str_async</span>(<span class='ident'>code</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>out_name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>){
     <span class='kw'>let</span> <span class='ident'>ast</span> <span class='op'>=</span> <span class='ident'>parser</span>::<span class='ident'>parse_and_stream_str_async</span>(<span class='ident'>code</span>);
     <span class='ident'>gen_code_from_ast_async</span>(<span class='ident'>ast</span>, <span class='ident'>out_name</span>);
-}<span class='comment'>
+}
 
-//TODO: Create and initialize builder in this function
-</span><span class='kw'>fn</span> <span class='ident'>gen_code_from_ast_sync</span>(<span class='ident'>ast</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>file_name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>builder</span> <span class='op'>=</span> <span class='ident'>Builder</span>::<span class='ident'>new</span>();
-
-    <span class='ident'>intrinsics</span>::<span class='ident'>gen_intrinsics</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>builder</span>);
-
-    <span class='kw'>let</span> <span class='ident'>int_type</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>int32_type</span>();
-
-    <span class='ident'>builder</span>.<span class='ident'>create_function</span>(<span class='string'>&quot;main&quot;</span>, <span class='ident'>Vec</span>::<span class='ident'>new</span>(), <span class='ident'>int_type</span>,<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
-        <span class='ident'>fb</span>.<span class='ident'>goto_first_block</span>();
-        
-        <span class='kw'>for</span> <span class='ident'>node</span> <span class='kw'>in</span> <span class='ident'>ast</span>.<span class='ident'>iter</span>() {
-            <span class='ident'>node</span>.<span class='ident'>gen_code</span>(<span class='ident'>fb</span>);
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>,<span class='ident'>node</span>);
-        }
-
-        <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int</span>(<span class='number'>0</span>);
-        <span class='ident'>fb</span>.<span class='ident'>ret</span>(<span class='ident'>ret</span>);
-    });
-
-    <span class='ident'>builder</span>.<span class='ident'>print_module</span>(<span class='ident'>file_name</span>);
-}<span class='comment'>
-
-//TODO: Create and initialize builder in this function
-//This use generics to combine this with the sync version...all u need is an Iterator&lt;Box&lt;Stmt&gt;&gt;
-</span><span class='kw'>fn</span> <span class='ident'>gen_code_from_ast_async</span>(<span class='ident'>ast</span> : <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>file_name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+<span class='comment'>//TODO: Create and initialize builder in this function</span>
+<span class='kw'>fn</span> <span class='ident'>gen_code_from_ast_sync</span>(<span class='ident'>ast</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>file_name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>builder</span> <span class='op'>=</span> <span class='ident'>Builder</span>::<span class='ident'>new</span>();
 
     <span class='ident'>intrinsics</span>::<span class='ident'>gen_intrinsics</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>builder</span>);
@@ -931,47 +910,71 @@
     <span class='ident'>builder</span>.<span class='ident'>print_module</span>(<span class='ident'>file_name</span>);
 }
 
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>StmtGenerator</span> {<span class='comment'>
-    //ExprStmt will have to switch over the espressions it gets and generate their code automatically
-    </span><span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>);
+<span class='comment'>//TODO: Create and initialize builder in this function</span>
+<span class='comment'>//This use generics to combine this with the sync version...all u need is an Iterator&lt;Box&lt;Stmt&gt;&gt;</span>
+<span class='kw'>fn</span> <span class='ident'>gen_code_from_ast_async</span>(<span class='ident'>ast</span> : <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>file_name</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>builder</span> <span class='op'>=</span> <span class='ident'>Builder</span>::<span class='ident'>new</span>();
 
-    <span class='doccomment'>///Add declared variable types to vec so that a generator state object can 
-</span>    <span class='doccomment'>///be created...push the number of vars u need in so that you know where to start from on your save restore
-</span>    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
+    <span class='ident'>intrinsics</span>::<span class='ident'>gen_intrinsics</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>builder</span>);
 
-    <span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
-</span>    <span class='doccomment'>///blocks provided to save and restore state variables so this can be done in 
-</span>    <span class='doccomment'>///one pass
-</span>    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>);
+    <span class='kw'>let</span> <span class='ident'>int_type</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>int32_type</span>();
+
+    <span class='ident'>builder</span>.<span class='ident'>create_function</span>(<span class='string'>&quot;main&quot;</span>, <span class='ident'>Vec</span>::<span class='ident'>new</span>(), <span class='ident'>int_type</span>,<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
+        <span class='ident'>fb</span>.<span class='ident'>goto_first_block</span>();
+        
+        <span class='kw'>for</span> <span class='ident'>node</span> <span class='kw'>in</span> <span class='ident'>ast</span>.<span class='ident'>iter</span>() {
+            <span class='ident'>node</span>.<span class='ident'>gen_code</span>(<span class='ident'>fb</span>);
+            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>,<span class='ident'>node</span>);
+        }
+
+        <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int</span>(<span class='number'>0</span>);
+        <span class='ident'>fb</span>.<span class='ident'>ret</span>(<span class='ident'>ret</span>);
+    });
+
+    <span class='ident'>builder</span>.<span class='ident'>print_module</span>(<span class='ident'>file_name</span>);
+}
+
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>StmtGenerator</span> {
+    <span class='comment'>//ExprStmt will have to switch over the espressions it gets and generate their code automatically</span>
+    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>);
+
+    <span class='doccomment'>///Add declared variable types to vec so that a generator state object can </span>
+    <span class='doccomment'>///be created...push the number of vars u need in so that you know where to start from on your save restore</span>
+    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
+
+    <span class='doccomment'>///Generate your regular code but also break to the end of the save and restore</span>
+    <span class='doccomment'>///blocks provided to save and restore state variables so this can be done in </span>
+    <span class='doccomment'>///one pass</span>
+    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>);
 }
 
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>ExprGenerator</span> {
-    <span class='doccomment'>///Return a Generator struct with the params for its llvm init function already
-</span>    <span class='doccomment'>///created
-</span>    <span class='kw'>fn</span> <span class='ident'>to_generator</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span>;
+    <span class='doccomment'>///Return a Generator struct with the params for its llvm init function already</span>
+    <span class='doccomment'>///created</span>
+    <span class='kw'>fn</span> <span class='ident'>to_generator</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span>;
 
     <span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
 
     <span class='kw'>fn</span> <span class='ident'>to_gen_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
-}<span class='comment'>
+}
 
-////////////////////////////////////////////////////////////////////////////////
-//                                                                            //
-//                          Expression Generation                             //                
-//                                                                            //
-////////////////////////////////////////////////////////////////////////////////
+<span class='comment'>////////////////////////////////////////////////////////////////////////////////</span>
+<span class='comment'>//                                                                            //</span>
+<span class='comment'>//                          Expression Generation                             //                </span>
+<span class='comment'>//                                                                            //</span>
+<span class='comment'>////////////////////////////////////////////////////////////////////////////////</span>
 
-</span><span class='kw'>impl</span> <span class='ident'>ExprGenerator</span> <span class='kw'>for</span> <span class='ident'>Expr</span> {
+<span class='kw'>impl</span> <span class='ident'>ExprGenerator</span> <span class='kw'>for</span> <span class='ident'>Expr</span> {
     <span class='kw'>fn</span> <span class='ident'>to_generator</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>InclusiveRange</span>(<span class='kw-2'>ref</span> <span class='ident'>start</span>, <span class='kw-2'>ref</span> <span class='ident'>end</span>) <span class='op'>=&gt;</span> <span class='ident'>incl_range_to_generator</span>(<span class='ident'>start</span>, <span class='ident'>end</span>, <span class='ident'>builder</span>),
             <span class='ident'>ExclusiveRange</span>(<span class='kw-2'>ref</span> <span class='ident'>start</span>, <span class='kw-2'>ref</span> <span class='ident'>end</span>) <span class='op'>=&gt;</span> <span class='ident'>excl_range_to_generator</span>(<span class='ident'>start</span>, <span class='ident'>end</span>, <span class='ident'>builder</span>),
             _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_generator called on non generator type&quot;</span>)
         }
-    }<span class='comment'>
+    }
 
-    //all of these should have a to_gen_value version as well
-    </span><span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+    <span class='comment'>//all of these should have a to_gen_value version as well</span>
+    <span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>FuncCall</span>(<span class='kw-2'>ref</span> <span class='ident'>prop_path</span>, <span class='kw-2'>ref</span> <span class='ident'>params</span>) <span class='op'>=&gt;</span> <span class='ident'>func_call_to_value</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>),
             <span class='ident'>Int</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='ident'>int_to_value</span>(<span class='ident'>num</span>, <span class='ident'>builder</span>),
@@ -990,14 +993,14 @@
             _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;to_gen_value called on type that cannot be resolved to a gen value&quot;</span>)        
         }
     }
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//         FuncCall Generation       //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//         FuncCall Generation       //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-//for exprstmt
-</span><span class='kw'>fn</span> <span class='ident'>func_call_gen_code</span>(<span class='ident'>prop_path</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='comment'>//for exprstmt</span>
+<span class='kw'>fn</span> <span class='ident'>func_call_gen_code</span>(<span class='ident'>prop_path</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='ident'>func_call_to_value</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>);
 }
 
@@ -1005,65 +1008,65 @@
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>param_vals</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
     <span class='kw'>for</span> <span class='ident'>param</span> <span class='kw'>in</span> <span class='ident'>params</span>.<span class='ident'>iter</span>() {
         <span class='ident'>param_vals</span>.<span class='ident'>push</span>(<span class='ident'>param</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>));
-    }<span class='comment'>
+    }
 
-    //getting the function name will change later
-    </span><span class='kw'>let</span> <span class='ident'>func_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>as_slice</span>();
-    <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>func_name</span>, <span class='ident'>param_vals</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>func_name</span>))
+    <span class='comment'>//getting the function name will change later</span>
+    <span class='kw'>let</span> <span class='ident'>func_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>[<span class='number'>0</span>].<span class='ident'>as_slice</span>();
+    <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>func_name</span>, <span class='ident'>param_vals</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>func_name</span>).<span class='ident'>as_slice</span>())
 }
 
 <span class='kw'>fn</span> <span class='ident'>func_call_to_gen_value</span>(<span class='ident'>prop_path</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>ctxt</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>param_vals</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
     <span class='kw'>for</span> <span class='ident'>param</span> <span class='kw'>in</span> <span class='ident'>params</span>.<span class='ident'>iter</span>() {
         <span class='ident'>param_vals</span>.<span class='ident'>push</span>(<span class='ident'>param</span>.<span class='ident'>to_gen_value</span>(<span class='ident'>builder</span>, <span class='ident'>ctxt</span>));
-    }<span class='comment'>
+    }
 
-    //getting the function name will change later
-    </span><span class='kw'>let</span> <span class='ident'>func_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>as_slice</span>();
-    <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>func_name</span>, <span class='ident'>param_vals</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>func_name</span>))
-}<span class='comment'>
+    <span class='comment'>//getting the function name will change later</span>
+    <span class='kw'>let</span> <span class='ident'>func_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>[<span class='number'>0</span>].<span class='ident'>as_slice</span>();
+    <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>func_name</span>, <span class='ident'>param_vals</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>func_name</span>).<span class='ident'>as_slice</span>())
+}
 
-///////////////////////////////////////
-//     Inclusive Range Generation    //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//     Inclusive Range Generation    //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>incl_range_to_generator</span>(<span class='ident'>start</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
+<span class='kw'>fn</span> <span class='ident'>incl_range_to_generator</span>(<span class='ident'>start</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
     <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='ident'>start</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
     <span class='kw'>let</span> <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>end</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
     <span class='kw'>let</span> <span class='ident'>one</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>int</span>(<span class='number'>1</span>);
     <span class='kw'>let</span> <span class='ident'>end_plus_one</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>add_op</span>(<span class='ident'>end</span>, <span class='ident'>one</span>, <span class='string'>&quot;add_tmp&quot;</span>);
     <span class='ident'>builder</span>.<span class='ident'>range_gen</span>(<span class='ident'>start</span>, <span class='ident'>end_plus_one</span>)
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//     Exclusive Range Generation    //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//     Exclusive Range Generation    //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>excl_range_to_generator</span>(<span class='ident'>start</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
+<span class='kw'>fn</span> <span class='ident'>excl_range_to_generator</span>(<span class='ident'>start</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>end</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Generator</span> {
     <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='ident'>start</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
     <span class='kw'>let</span> <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>end</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
     <span class='ident'>builder</span>.<span class='ident'>range_gen</span>(<span class='ident'>start</span>, <span class='ident'>end</span>)
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//            Int Generation         //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//            Int Generation         //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>int_to_value</span>(<span class='ident'>value</span> : <span class='ident'>int</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+<span class='kw'>fn</span> <span class='ident'>int_to_value</span>(<span class='ident'>value</span> : <span class='ident'>int</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='ident'>builder</span>.<span class='ident'>int</span>(<span class='ident'>value</span>)
 }
 
 <span class='kw'>fn</span> <span class='ident'>int_to_gen_value</span>(<span class='ident'>value</span> : <span class='ident'>int</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>, <span class='ident'>ctxt</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='ident'>int_to_value</span>(<span class='ident'>value</span>, <span class='ident'>builder</span>)
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//        Identifier Generation      //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//        Identifier Generation      //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>ident_expr_to_value</span>(<span class='ident'>value</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+<span class='kw'>fn</span> <span class='ident'>ident_expr_to_value</span>(<span class='ident'>value</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>as_slice</span>();
 
     <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_var</span>(<span class='ident'>name</span>) {
@@ -1079,50 +1082,50 @@
         <span class='prelude-val'>Some</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>val</span>, <span class='ident'>name</span>),
         <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;No {} in current scope&quot;</span>, <span class='ident'>value</span>)
     }
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//    Binary Expression Generation   //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//    Binary Expression Generation   //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>bin_expr_to_value</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>op</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>~</span><span class='ident'>str</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+<span class='kw'>fn</span> <span class='ident'>bin_expr_to_value</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>op</span> : <span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='kw'>let</span> <span class='ident'>left_val</span>  <span class='op'>=</span> <span class='ident'>lhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
-    <span class='kw'>let</span> <span class='ident'>right_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);<span class='comment'>
+    <span class='kw'>let</span> <span class='ident'>right_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
-    //TODO: verify that the operator being used is visible in the current scope
-    </span><span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>);
+    <span class='comment'>//TODO: verify that the operator being used is visible in the current scope</span>
+    <span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>left_val</span>, <span class='ident'>right_val</span>);
     <span class='ident'>builder</span>.<span class='ident'>call</span>(
-        <span class='op'>*</span><span class='ident'>op</span>, 
+        <span class='ident'>op</span>.<span class='ident'>as_slice</span>(), 
         <span class='ident'>args</span>, 
-        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='op'>*</span><span class='ident'>op</span>)
+        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='op'>*</span><span class='ident'>op</span>).<span class='ident'>as_slice</span>()
     )
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-// Unary Prfx Expression Generation  //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>// Unary Prfx Expression Generation  //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>prfx_unary_expr_to_value</span>(<span class='ident'>op</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-    <span class='kw'>let</span> <span class='ident'>expr_val</span> <span class='op'>=</span> <span class='ident'>expr</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);<span class='comment'>
+<span class='kw'>fn</span> <span class='ident'>prfx_unary_expr_to_value</span>(<span class='ident'>op</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+    <span class='kw'>let</span> <span class='ident'>expr_val</span> <span class='op'>=</span> <span class='ident'>expr</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
 
-    //TODO: verify that the operator being used is visible in the current scope
-    </span><span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>expr_val</span>);
+    <span class='comment'>//TODO: verify that the operator being used is visible in the current scope</span>
+    <span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>expr_val</span>);
     <span class='ident'>builder</span>.<span class='ident'>call</span>(
-        <span class='op'>*</span><span class='ident'>op</span>, 
+        <span class='ident'>op</span>.<span class='ident'>as_slice</span>(), 
         <span class='ident'>args</span>, 
-        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>op</span>)
+        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}_tmp&quot;</span>, <span class='ident'>op</span>).<span class='ident'>as_slice</span>()
     )
-}<span class='comment'>
+}
 
-////////////////////////////////////////////////////////////////////////////////
-//                                                                            //
-//                           Statement Generation                             //                
-//                                                                            //
-////////////////////////////////////////////////////////////////////////////////
+<span class='comment'>////////////////////////////////////////////////////////////////////////////////</span>
+<span class='comment'>//                                                                            //</span>
+<span class='comment'>//                           Statement Generation                             //                </span>
+<span class='comment'>//                                                                            //</span>
+<span class='comment'>////////////////////////////////////////////////////////////////////////////////</span>
 
-</span><span class='kw'>impl</span> <span class='ident'>StmtGenerator</span> <span class='kw'>for</span> <span class='ident'>Stmt</span> {<span class='comment'>
-    //ExprStmt will have to switch over the espressions it gets and generate their code automatically
-    </span><span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) {
+<span class='kw'>impl</span> <span class='ident'>StmtGenerator</span> <span class='kw'>for</span> <span class='ident'>Stmt</span> {
+    <span class='comment'>//ExprStmt will have to switch over the espressions it gets and generate their code automatically</span>
+    <span class='kw'>fn</span> <span class='ident'>gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>) {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>ExprStmt</span>(<span class='kw-2'>ref</span> <span class='ident'>expr</span>) <span class='op'>=&gt;</span> <span class='ident'>expr_stmt_gen_code</span>(<span class='ident'>expr</span>, <span class='ident'>builder</span>),
             <span class='ident'>VarDecl</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>)  <span class='op'>=&gt;</span> <span class='ident'>var_decl_gen_code</span>(<span class='ident'>vars</span>, <span class='ident'>builder</span>),
@@ -1139,9 +1142,9 @@
         };
     }
 
-    <span class='doccomment'>///Add declared variable types to vec so that a generator state object can 
-</span>    <span class='doccomment'>///be created...push the number of vars u need in so that you know where to start from on your save restore
-</span>    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>gbuilder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
+    <span class='doccomment'>///Add declared variable types to vec so that a generator state object can </span>
+    <span class='doccomment'>///be created...push the number of vars u need in so that you know where to start from on your save restore</span>
+    <span class='kw'>fn</span> <span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>gbuilder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>VarDecl</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>)  <span class='op'>=&gt;</span> <span class='ident'>var_decl_reg_state_vars</span>(<span class='ident'>vars</span>, <span class='ident'>gbuilder</span>),
             <span class='ident'>VarAssign</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>, <span class='kw-2'>ref</span> <span class='ident'>vals</span>) <span class='op'>=&gt;</span> <span class='ident'>var_assign_reg_state_vars</span>(<span class='ident'>vars</span>, <span class='ident'>vals</span>, <span class='ident'>gbuilder</span>),
@@ -1151,10 +1154,10 @@
         }
     }
 
-    <span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
-</span>    <span class='doccomment'>///blocks provided to save and restore state variables so this can be done in 
-</span>    <span class='doccomment'>///one pass
-</span>    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>gstate</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+    <span class='doccomment'>///Generate your regular code but also break to the end of the save and restore</span>
+    <span class='doccomment'>///blocks provided to save and restore state variables so this can be done in </span>
+    <span class='doccomment'>///one pass</span>
+    <span class='kw'>fn</span> <span class='ident'>gen_gen_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>gstate</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>node</span> {
             <span class='ident'>VarDecl</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>)  <span class='op'>=&gt;</span> <span class='ident'>var_decl_gen_gen_code</span>(<span class='ident'>vars</span>, <span class='ident'>gstate</span>, <span class='ident'>builder</span>),
             <span class='ident'>VarAssign</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>, <span class='kw-2'>ref</span> <span class='ident'>vals</span>) <span class='op'>=&gt;</span> <span class='ident'>var_assign_gen_gen_code</span>(<span class='ident'>vars</span>, <span class='ident'>vals</span>, <span class='ident'>gstate</span>, <span class='ident'>builder</span>),
@@ -1163,27 +1166,27 @@
             _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;This type cannot build code for a generator&quot;</span>)
         };
     }
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//  Expression Statement Generation  //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//  Expression Statement Generation  //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>expr_stmt_gen_code</span>(<span class='ident'>expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>expr_stmt_gen_code</span>(<span class='ident'>expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>node</span> {
         <span class='ident'>FuncCall</span>(<span class='kw-2'>ref</span> <span class='ident'>prop_path</span>, <span class='kw-2'>ref</span> <span class='ident'>params</span>) <span class='op'>=&gt;</span> <span class='ident'>func_call_gen_code</span>(<span class='ident'>prop_path</span>, <span class='ident'>params</span>, <span class='ident'>builder</span>),
         _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Tried to generate code for an ExprStmt whos expression cannot be a statement\n\n{}\n\n&quot;</span>, <span class='ident'>expr</span>)
     };
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//    Var Declaration Generation     //
-//ie.                                //
-//  var a                            //
-//  var a, b, c                      //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//    Var Declaration Generation     //</span>
+<span class='comment'>//ie.                                //</span>
+<span class='comment'>//  var a                            //</span>
+<span class='comment'>//  var a, b, c                      //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>var_decl_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>var_decl_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {
         <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
         <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_default_var</span>(<span class='ident'>name</span>);
@@ -1198,42 +1201,42 @@
     <span class='ident'>num_vars</span>
 }
 
-<span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
-</span><span class='doccomment'>///blocks provided to save and restore state variables 
-</span><span class='kw'>fn</span> <span class='ident'>var_decl_gen_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='doccomment'>///Generate your regular code but also break to the end of the save and restore</span>
+<span class='doccomment'>///blocks provided to save and restore state variables </span>
+<span class='kw'>fn</span> <span class='ident'>var_decl_gen_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='kw'>let</span> <span class='ident'>base_state_index</span> <span class='op'>=</span> <span class='ident'>ggs</span>.<span class='ident'>state_index</span>();
 
-    <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {<span class='comment'>
-        //actual code
-        </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>stmts_blk</span>);
+    <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {
+        <span class='comment'>//actual code</span>
+        <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>stmts_blk</span>);
 
         <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>default_value</span>();
-        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();<span class='comment'>
-        //load val into state slot and then set the var to the state slot
-        </span><span class='kw'>let</span> <span class='ident'>var_index</span> <span class='op'>=</span> <span class='ident'>base_state_index</span> <span class='op'>+</span> <span class='ident'>i</span>;
-        <span class='kw'>let</span> <span class='ident'>ptr_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;_{}&quot;</span>, <span class='ident'>name</span>));
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
+        <span class='comment'>//load val into state slot and then set the var to the state slot</span>
+        <span class='kw'>let</span> <span class='ident'>var_index</span> <span class='op'>=</span> <span class='ident'>base_state_index</span> <span class='op'>+</span> <span class='ident'>i</span>;
+        <span class='kw'>let</span> <span class='ident'>ptr_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;_{}&quot;</span>, <span class='ident'>name</span>).<span class='ident'>as_slice</span>());
         <span class='ident'>builder</span>.<span class='ident'>store</span>(<span class='ident'>val</span>, <span class='ident'>ptr_val</span>);
         <span class='ident'>builder</span>.<span class='ident'>set_gen_var</span>(<span class='ident'>name</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>);
 
         <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
     }
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//     Var Assignment Generation     //
-//ie.                                //
-//  var a = 1                        //
-//  var a, b, c = 1, 2, 3            //
-//  var a, b, c = 1, 2               //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//     Var Assignment Generation     //</span>
+<span class='comment'>//ie.                                //</span>
+<span class='comment'>//  var a = 1                        //</span>
+<span class='comment'>//  var a, b, c = 1, 2, 3            //</span>
+<span class='comment'>//  var a, b, c = 1, 2               //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>var_assign_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>vals</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>var_assign_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>vals</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
 
     <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {
         <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>&lt;</span> <span class='ident'>vals</span>.<span class='ident'>len</span>() {
-            <span class='ident'>vals</span>.<span class='ident'>get</span>(<span class='ident'>i</span>).<span class='ident'>to_value</span>(<span class='ident'>builder</span>)
+            <span class='ident'>vals</span>[<span class='ident'>i</span>].<span class='ident'>to_value</span>(<span class='ident'>builder</span>)
         } <span class='kw'>else</span> {
             <span class='ident'>builder</span>.<span class='ident'>default_value</span>()
         };
@@ -1254,52 +1257,52 @@
     <span class='ident'>num_vars</span>
 }
 
-<span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
-</span><span class='doccomment'>///blocks provided to save and restore state variables 
-</span><span class='kw'>fn</span> <span class='ident'>var_assign_gen_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>vals</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='doccomment'>///Generate your regular code but also break to the end of the save and restore</span>
+<span class='doccomment'>///blocks provided to save and restore state variables </span>
+<span class='kw'>fn</span> <span class='ident'>var_assign_gen_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>vals</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='kw'>let</span> <span class='ident'>base_state_index</span> <span class='op'>=</span> <span class='ident'>ggs</span>.<span class='ident'>state_index</span>();
 
-    <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {<span class='comment'>
+    <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {
 
-        //save block
-        //store current values in ctxt slots here...actually...may not have to save
-        //if we store on assignment
-        </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>save_blk</span>);<span class='comment'>
+        <span class='comment'>//save block</span>
+        <span class='comment'>//store current values in ctxt slots here...actually...may not have to save</span>
+        <span class='comment'>//if we store on assignment</span>
+        <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>save_blk</span>);
 
-        //restore block
-        //may not have to do shit here either if we set vars as the pointer slots
-        </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>restore_blk</span>);<span class='comment'>
+        <span class='comment'>//restore block</span>
+        <span class='comment'>//may not have to do shit here either if we set vars as the pointer slots</span>
+        <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>restore_blk</span>);
         
-        //actual code
-        </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>stmts_blk</span>);
+        <span class='comment'>//actual code</span>
+        <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>ggs</span>.<span class='ident'>stmts_blk</span>);
 
         <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>&lt;</span> <span class='ident'>vals</span>.<span class='ident'>len</span>() {
-            <span class='ident'>vals</span>.<span class='ident'>get</span>(<span class='ident'>i</span>).<span class='ident'>to_gen_value</span>(<span class='ident'>builder</span>, <span class='ident'>ggs</span>.<span class='ident'>context</span>)
+            <span class='ident'>vals</span>[<span class='ident'>i</span>].<span class='ident'>to_gen_value</span>(<span class='ident'>builder</span>, <span class='ident'>ggs</span>.<span class='ident'>context</span>)
         } <span class='kw'>else</span> {
             <span class='ident'>builder</span>.<span class='ident'>default_value</span>()
         };
 
         
-        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();<span class='comment'>
-        //load val into state slot and then set the var to the state slot
-        </span><span class='kw'>let</span> <span class='ident'>var_index</span> <span class='op'>=</span> <span class='ident'>base_state_index</span> <span class='op'>+</span> <span class='ident'>i</span>;
-        <span class='kw'>let</span> <span class='ident'>ptr_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;_{}&quot;</span>, <span class='ident'>name</span>));
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
+        <span class='comment'>//load val into state slot and then set the var to the state slot</span>
+        <span class='kw'>let</span> <span class='ident'>var_index</span> <span class='op'>=</span> <span class='ident'>base_state_index</span> <span class='op'>+</span> <span class='ident'>i</span>;
+        <span class='kw'>let</span> <span class='ident'>ptr_val</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;_{}&quot;</span>, <span class='ident'>name</span>).<span class='ident'>as_slice</span>());
         <span class='ident'>builder</span>.<span class='ident'>store</span>(<span class='ident'>val</span>, <span class='ident'>ptr_val</span>);
         <span class='ident'>builder</span>.<span class='ident'>set_gen_var</span>(<span class='ident'>name</span>, <span class='ident'>var_index</span> <span class='kw'>as</span> <span class='ident'>int</span>);
 
         <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
     }
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//        Assign Stmt Generation     //
-//ie.                                //
-//  a = 1                            //
-//  a, b, c = 1, 2, 3                //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//        Assign Stmt Generation     //</span>
+<span class='comment'>//ie.                                //</span>
+<span class='comment'>//  a = 1                            //</span>
+<span class='comment'>//  a, b, c = 1, 2, 3                //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>assign_stmt_gen_code</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>assign_stmt_gen_code</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>if</span> <span class='ident'>lhs</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='ident'>rhs</span>.<span class='ident'>len</span>() {
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;left hand and right hand sides of assignment stmt arent compatible&quot;</span>);
     }
@@ -1307,8 +1310,8 @@
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
 
     <span class='kw'>for</span> <span class='ident'>prop_path</span> <span class='kw'>in</span> <span class='ident'>lhs</span>.<span class='ident'>iter</span>() {
-        <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>as_slice</span>();
-        <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>.<span class='ident'>get</span>(<span class='ident'>i</span>).<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
+        <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>[<span class='number'>0</span>].<span class='ident'>as_slice</span>();
+        <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>[<span class='ident'>i</span>].<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
         <span class='ident'>builder</span>.<span class='ident'>assign_var</span>(<span class='ident'>var_val</span>, <span class='ident'>var_name</span>);
         <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
     }        
@@ -1319,9 +1322,9 @@
     <span class='number'>0</span>
 }
 
-<span class='doccomment'>///Generate your regular code but also break to the end of the save and restore
-</span><span class='doccomment'>///blocks provided to save and restore state variables 
-</span><span class='kw'>fn</span> <span class='ident'>assign_stmt_gen_gen_code</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='doccomment'>///Generate your regular code but also break to the end of the save and restore</span>
+<span class='doccomment'>///blocks provided to save and restore state variables </span>
+<span class='kw'>fn</span> <span class='ident'>assign_stmt_gen_gen_code</span>(<span class='ident'>lhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;&gt;</span>, <span class='ident'>rhs</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>if</span> <span class='ident'>lhs</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='ident'>rhs</span>.<span class='ident'>len</span>() {
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;left hand and right hand sides of assignment stmt arent compatible&quot;</span>);
     }
@@ -1329,21 +1332,21 @@
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
 
     <span class='kw'>for</span> <span class='ident'>prop_path</span> <span class='kw'>in</span> <span class='ident'>lhs</span>.<span class='ident'>iter</span>() {
-        <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>as_slice</span>();
-        <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>.<span class='ident'>get</span>(<span class='ident'>i</span>).<span class='ident'>to_gen_value</span>(<span class='ident'>builder</span>, <span class='ident'>ggs</span>.<span class='ident'>context</span>);
+        <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>prop_path</span>[<span class='number'>0</span>].<span class='ident'>as_slice</span>();
+        <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>rhs</span>[<span class='ident'>i</span>].<span class='ident'>to_gen_value</span>(<span class='ident'>builder</span>, <span class='ident'>ggs</span>.<span class='ident'>context</span>);
         <span class='ident'>builder</span>.<span class='ident'>assign_gen_var</span>(<span class='ident'>var_val</span>, <span class='ident'>ggs</span>.<span class='ident'>context</span>, <span class='ident'>var_name</span>);
         <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
     }        
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//         Loop Control Stmt         //
-//ie.                                //
-//  break                            //
-//  continue                         //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//         Loop Control Stmt         //</span>
+<span class='comment'>//ie.                                //</span>
+<span class='comment'>//  break                            //</span>
+<span class='comment'>//  continue                         //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>loop_ctrl_stmt_gen_code</span>(<span class='ident'>typ</span> : <span class='ident'>TokenType</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>loop_ctrl_stmt_gen_code</span>(<span class='ident'>typ</span> : <span class='ident'>TokenType</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>match</span> <span class='ident'>typ</span> {
         <span class='ident'>Break</span> <span class='op'>=&gt;</span> {
             <span class='kw'>match</span> <span class='ident'>builder</span>.<span class='ident'>get_break_block</span>() {
@@ -1359,14 +1362,14 @@
         },
         _ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Created a LoopControlStmt with an incompatable keyword {:?}&quot;</span>, <span class='ident'>typ</span>)
     }
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//            If Else Stmt           //
-//ie.                                //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//            If Else Stmt           //</span>
+<span class='comment'>//ie.                                //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>if_else_stmt_gen_code</span>(<span class='ident'>branches</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>if_else_stmt_gen_code</span>(<span class='ident'>branches</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>IfElseBranch</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>next_cond</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;if_cond&quot;</span>);
     <span class='kw'>let</span> <span class='ident'>if_else_exit</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;if_else_exit&quot;</span>);
 
@@ -1410,56 +1413,57 @@
     }
 
     <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>if_else_exit</span>);
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//       For In Loop Generation      //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//       For In Loop Generation      //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>for_in_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>gen</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>for_in_gen_code</span>(<span class='ident'>vars</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>gen</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='ident'>builder</span>.<span class='ident'>open_scope</span>();
 
-    <span class='kw'>let</span> <span class='ident'>gen</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>to_generator</span>(<span class='ident'>builder</span>);<span class='comment'>
+    <span class='kw'>let</span> <span class='ident'>gen</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>to_generator</span>(<span class='ident'>builder</span>);
 
-    //init generator
-    </span><span class='kw'>let</span> <span class='ident'>loop_init</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_init&quot;</span>);<span class='comment'>
-    //call next on generator and validate it is not done
-    </span><span class='kw'>let</span> <span class='ident'>loop_check</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_check&quot;</span>);<span class='comment'>
-    //bind variables to the generator return and evaluate stmts
-    </span><span class='kw'>let</span> <span class='ident'>loop_stmts</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_stmts&quot;</span>);<span class='comment'>
-    //jump out of the loop to the next stmt
-    </span><span class='kw'>let</span> <span class='ident'>loop_exit</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_exit&quot;</span>);<span class='comment'>
+    <span class='comment'>//init generator</span>
+    <span class='kw'>let</span> <span class='ident'>loop_init</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_init&quot;</span>);
+    <span class='comment'>//call next on generator and validate it is not done</span>
+    <span class='kw'>let</span> <span class='ident'>loop_check</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_check&quot;</span>);
+    <span class='comment'>//bind variables to the generator return and evaluate stmts</span>
+    <span class='kw'>let</span> <span class='ident'>loop_stmts</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_stmts&quot;</span>);
+    <span class='comment'>//jump out of the loop to the next stmt</span>
+    <span class='kw'>let</span> <span class='ident'>loop_exit</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;for_loop_exit&quot;</span>);
 
-    //setup loop scope for break and continue
-    </span><span class='ident'>builder</span>.<span class='ident'>open_loop_scope</span>(<span class='ident'>loop_check</span>, <span class='ident'>loop_exit</span>);<span class='comment'>
+    <span class='comment'>//setup loop scope for break and continue</span>
+    <span class='ident'>builder</span>.<span class='ident'>open_loop_scope</span>(<span class='ident'>loop_check</span>, <span class='ident'>loop_exit</span>);
 
-    //make sure previous block runs loop code after it
-    </span><span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_init</span>);<span class='comment'>
+    <span class='comment'>//make sure previous block runs loop code after it</span>
+    <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_init</span>);
 
-    //initialize generator
-    </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_init</span>);
-    <span class='kw'>let</span> <span class='ident'>init_fn</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>init_func</span>.<span class='ident'>clone</span>();
+    <span class='comment'>//initialize generator</span>
+    <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_init</span>);
+    <span class='comment'>// let init_fn = gen.init_func.clone();</span>
     <span class='kw'>let</span> <span class='ident'>init_args</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>init_args</span>.<span class='ident'>clone</span>();
-    <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>init_fn</span>, <span class='ident'>init_args</span>, <span class='string'>&quot;&quot;</span>);<span class='comment'>
+    <span class='comment'>// builder.call(init_fn, init_args, &quot;&quot;);</span>
+    <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>gen</span>.<span class='ident'>init_func</span>.<span class='ident'>as_slice</span>(), <span class='ident'>init_args</span>, <span class='string'>&quot;&quot;</span>);
 
-    //create variables 
-    </span><span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>(){
+    <span class='comment'>//create variables </span>
+    <span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>(){
         <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>as_slice</span>();
         <span class='kw'>let</span> <span class='ident'>undefined</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_default_var</span>(<span class='ident'>var_name</span>);
         <span class='ident'>builder</span>.<span class='ident'>set_var</span>(<span class='ident'>var_name</span>, <span class='ident'>undefined</span>);
     }
 
-    <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_check</span>);<span class='comment'>
+    <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_check</span>);
 
-    //check to see if generator is done or not
-    </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_check</span>);
-    <span class='kw'>let</span> <span class='ident'>done</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>gen</span>.<span class='ident'>next_func</span>, <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>gen</span>.<span class='ident'>gen</span>), <span class='string'>&quot;done&quot;</span>);
+    <span class='comment'>//check to see if generator is done or not</span>
+    <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_check</span>);
+    <span class='kw'>let</span> <span class='ident'>done</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>call</span>(<span class='ident'>gen</span>.<span class='ident'>next_func</span>.<span class='ident'>as_slice</span>(), <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>gen</span>.<span class='ident'>gen</span>), <span class='string'>&quot;done&quot;</span>);
     <span class='kw'>let</span> <span class='ident'>done_value</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>int</span>(<span class='number'>0</span>);
     <span class='kw'>let</span> <span class='ident'>cmp</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>cmp_eq</span>(<span class='ident'>done</span>, <span class='ident'>done_value</span>, <span class='string'>&quot;done_cmp&quot;</span>);
-    <span class='ident'>builder</span>.<span class='ident'>conditional_break</span>(<span class='ident'>cmp</span>, <span class='ident'>loop_exit</span>, <span class='ident'>loop_stmts</span>);<span class='comment'>
+    <span class='ident'>builder</span>.<span class='ident'>conditional_break</span>(<span class='ident'>cmp</span>, <span class='ident'>loop_exit</span>, <span class='ident'>loop_stmts</span>);
 
-    //run loop stmts...but first bind yielded values to loop local vars
-    </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_stmts</span>);
+    <span class='comment'>//run loop stmts...but first bind yielded values to loop local vars</span>
+    <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_stmts</span>);
 
     <span class='kw'>if</span> <span class='ident'>vars</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='ident'>gen</span>.<span class='ident'>ret_count</span> {
         <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Trying to bind to more variables than the generator returns&quot;</span>);
@@ -1467,18 +1471,18 @@
 
     <span class='kw'>let</span> <span class='ident'>start_pos</span> <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>var_count</span> <span class='op'>+</span> <span class='number'>1</span>;
     <span class='kw'>let</span> <span class='ident'>end_pos</span>   <span class='op'>=</span> <span class='ident'>gen</span>.<span class='ident'>var_count</span> <span class='op'>+</span> <span class='ident'>gen</span>.<span class='ident'>ret_count</span> <span class='op'>+</span> <span class='number'>1</span>;
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vars</span>  <span class='op'>=</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>();<span class='comment'>
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vars</span>  <span class='op'>=</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>();
 
-    //bind variables from generator call
-    </span><span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='ident'>start_pos</span>, <span class='ident'>end_pos</span>) {
-        <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>vars</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>();<span class='comment'>
+    <span class='comment'>//bind variables from generator call</span>
+    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='ident'>start_pos</span>, <span class='ident'>end_pos</span>) {
+        <span class='kw'>let</span> <span class='ident'>var_name</span> <span class='op'>=</span> <span class='ident'>vars</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>();
 
-        //get opaque return value from generator
-        </span><span class='kw'>let</span> <span class='ident'>ret_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen</span>.<span class='ident'>gen</span>, <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='string'>&quot;ctx_ret&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>var_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>ret_val</span>, <span class='ident'>var_name</span>);<span class='comment'>
+        <span class='comment'>//get opaque return value from generator</span>
+        <span class='kw'>let</span> <span class='ident'>ret_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>gen</span>.<span class='ident'>gen</span>, <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='string'>&quot;ctx_ret&quot;</span>);
+        <span class='kw'>let</span> <span class='ident'>var_val</span>  <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>load</span>(<span class='ident'>ret_val</span>, <span class='ident'>var_name</span>);
 
-        //change the bound variable
-        </span><span class='ident'>builder</span>.<span class='ident'>assign_var</span>(<span class='ident'>var_val</span>, <span class='ident'>var_name</span>);
+        <span class='comment'>//change the bound variable</span>
+        <span class='ident'>builder</span>.<span class='ident'>assign_var</span>(<span class='ident'>var_val</span>, <span class='ident'>var_name</span>);
     }
 
     <span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='ident'>stmts</span>.<span class='ident'>iter</span>(){
@@ -1487,18 +1491,18 @@
     <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>loop_check</span>);
 
     <span class='ident'>builder</span>.<span class='ident'>close_loop_scope</span>();
-    <span class='ident'>builder</span>.<span class='ident'>close_scope</span>();<span class='comment'>
+    <span class='ident'>builder</span>.<span class='ident'>close_scope</span>();
 
-    //make sure following stmts start from the loop exit block
-    </span><span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_exit</span>);
+    <span class='comment'>//make sure following stmts start from the loop exit block</span>
+    <span class='ident'>builder</span>.<span class='ident'>goto_block</span>(<span class='ident'>loop_exit</span>);
 
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//        While Loop Generation      //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//        While Loop Generation      //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>while_loop_gen_code</span>(<span class='ident'>cond</span>  : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>while_loop_gen_code</span>(<span class='ident'>cond</span>  : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='ident'>builder</span>.<span class='ident'>open_scope</span>();
 
     <span class='kw'>let</span> <span class='ident'>loop_check</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;while_loop_check&quot;</span>);
@@ -1525,32 +1529,32 @@
 
     <span class='ident'>builder</span>.<span class='ident'>close_loop_scope</span>();
     <span class='ident'>builder</span>.<span class='ident'>close_scope</span>();
-}<span class='comment'>
+}
 
 
-///////////////////////////////////////
-//   Function Definition Generation  //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//   Function Definition Generation  //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>func_def_gen_code</span>(<span class='ident'>name</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>func_def_gen_code</span>(<span class='ident'>name</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='ident'>saved_block</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;function_def_bridge&quot;</span>);
     <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>saved_block</span>);
 
-    <span class='ident'>builder</span>.<span class='ident'>with_fresh_scope</span>(<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{<span class='comment'>
-        //This will end up being some general HyObj type or sumthn
-        </span><span class='kw'>let</span> <span class='ident'>int_type</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int32_type</span>();
+    <span class='ident'>builder</span>.<span class='ident'>with_fresh_scope</span>(<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
+        <span class='comment'>//This will end up being some general HyObj type or sumthn</span>
+        <span class='kw'>let</span> <span class='ident'>int_type</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>int32_type</span>();
 
         <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>name</span>.<span class='ident'>as_slice</span>();
         <span class='kw'>let</span> <span class='ident'>param_types</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>from_elem</span>(<span class='ident'>params</span>.<span class='ident'>len</span>(), <span class='ident'>int_type</span>);
 
         <span class='ident'>fb</span>.<span class='ident'>create_function</span>(<span class='ident'>name</span>, <span class='ident'>param_types</span>, <span class='ident'>int_type</span>,<span class='op'>|</span><span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
-            <span class='ident'>fb</span>.<span class='ident'>goto_first_block</span>();<span class='comment'>
+            <span class='ident'>fb</span>.<span class='ident'>goto_first_block</span>();
             
-            //bind params to local vars
-            </span><span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
-            <span class='kw'>for</span> <span class='ident'>param</span> <span class='kw'>in</span> <span class='ident'>params</span>.<span class='ident'>iter</span>() {<span class='comment'>
-                //right now this is pass by value...not by ref
-                </span><span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>param</span>.<span class='ident'>as_slice</span>();
+            <span class='comment'>//bind params to local vars</span>
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
+            <span class='kw'>for</span> <span class='ident'>param</span> <span class='kw'>in</span> <span class='ident'>params</span>.<span class='ident'>iter</span>() {
+                <span class='comment'>//right now this is pass by value...not by ref</span>
+                <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>param</span>.<span class='ident'>as_slice</span>();
                 <span class='kw'>let</span> <span class='ident'>param_val</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>get_param</span>(<span class='ident'>i</span>);
                 <span class='kw'>let</span> <span class='ident'>var_val</span> <span class='op'>=</span> <span class='ident'>fb</span>.<span class='ident'>new_var</span>(<span class='ident'>param_val</span>, <span class='ident'>name</span>);
                 <span class='ident'>fb</span>.<span class='ident'>set_var</span>(<span class='ident'>name</span>, <span class='ident'>var_val</span>);
@@ -1565,22 +1569,22 @@
             <span class='ident'>fb</span>.<span class='ident'>goto_block</span>(<span class='ident'>saved_block</span>);
         });
     });
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//       Return Stmt Generation      //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//       Return Stmt Generation      //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>return_stmt_gen_code</span>(<span class='ident'>ret_expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>return_stmt_gen_code</span>(<span class='ident'>ret_expr</span> : <span class='kw-2'>&amp;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='ident'>ret_expr</span>.<span class='ident'>to_value</span>(<span class='ident'>builder</span>);
     <span class='ident'>builder</span>.<span class='ident'>ret</span>(<span class='ident'>val</span>);
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//       Generator Definition        //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//       Generator Definition        //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>gen_def_gen_code</span>(<span class='ident'>name</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+<span class='kw'>fn</span> <span class='ident'>gen_def_gen_code</span>(<span class='ident'>name</span> : <span class='kw-2'>&amp;</span><span class='ident'>Ident</span>, <span class='ident'>params</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ident</span><span class='op'>&gt;</span>, <span class='ident'>stmts</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Stmt</span><span class='op'>&gt;&gt;</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
     <span class='kw'>let</span> <span class='ident'>saved_block</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>new_block</span>(<span class='string'>&quot;gen_def_bridge&quot;</span>);
     <span class='ident'>builder</span>.<span class='ident'>break_to</span>(<span class='ident'>saved_block</span>);
 
@@ -1588,41 +1592,41 @@
         
         <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>name</span>.<span class='ident'>as_slice</span>();
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gen_builder</span> <span class='op'>=</span> <span class='ident'>GenBuilder</span>::<span class='ident'>new</span>(<span class='ident'>name</span>, <span class='ident'>params</span>, <span class='ident'>fb</span>.<span class='ident'>int32_type</span>(), <span class='ident'>fb</span>.<span class='ident'>string_type</span>());<span class='comment'>            
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gen_builder</span> <span class='op'>=</span> <span class='ident'>GenBuilder</span>::<span class='ident'>new</span>(<span class='ident'>name</span>, <span class='ident'>params</span>, <span class='ident'>fb</span>.<span class='ident'>int32_type</span>(), <span class='ident'>fb</span>.<span class='ident'>string_type</span>());            
 
-        //Add Space for stmts state
-        </span><span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vars_registered</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class='comment'>//Add Space for stmts state</span>
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vars_registered</span> <span class='op'>=</span> <span class='number'>0</span>;
         <span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='ident'>stmts</span>.<span class='ident'>iter</span>() {
             <span class='ident'>vars_registered</span> <span class='op'>=</span> <span class='ident'>stmt</span>.<span class='ident'>register_state_vars</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>gen_builder</span>);
-        }<span class='comment'>
+        }
 
-        //add space for yield stmts
-        </span><span class='kw'>let</span> <span class='ident'>max_num_yield</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>gen_builder</span>.<span class='ident'>num_ret</span> {
+        <span class='comment'>//add space for yield stmts</span>
+        <span class='kw'>let</span> <span class='ident'>max_num_yield</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>gen_builder</span>.<span class='ident'>num_ret</span> {
             <span class='prelude-val'>Some</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='ident'>num</span>,
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='number'>0</span>
         };
-        <span class='ident'>gen_builder</span>.<span class='ident'>register_n_variables</span>(<span class='ident'>max_num_yield</span>);<span class='comment'>
+        <span class='ident'>gen_builder</span>.<span class='ident'>register_n_variables</span>(<span class='ident'>max_num_yield</span>);
 
-        //fix index vec to record where return slots start
-        </span><span class='ident'>gen_builder</span>.<span class='ident'>state_indxs</span>.<span class='ident'>pop</span>();
+        <span class='comment'>//fix index vec to record where return slots start</span>
+        <span class='ident'>gen_builder</span>.<span class='ident'>state_indxs</span>.<span class='ident'>pop</span>();
 
         <span class='ident'>gen_builder</span>.<span class='ident'>create_next_function</span>(<span class='ident'>fb</span>, <span class='op'>|</span><span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>fb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span><span class='op'>|</span>{
-            <span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='ident'>stmts</span>.<span class='ident'>iter</span>() {<span class='comment'>
-            //pass in gen_ctx here?
-                </span><span class='ident'>stmt</span>.<span class='ident'>gen_gen_code</span>(<span class='ident'>ggs</span>, <span class='ident'>fb</span>);
+            <span class='kw'>for</span> <span class='ident'>stmt</span> <span class='kw'>in</span> <span class='ident'>stmts</span>.<span class='ident'>iter</span>() {
+            <span class='comment'>//pass in gen_ctx here?</span>
+                <span class='ident'>stmt</span>.<span class='ident'>gen_gen_code</span>(<span class='ident'>ggs</span>, <span class='ident'>fb</span>);
                 <span class='ident'>ggs</span>.<span class='ident'>next_stmt</span>();
             }
         });
 
         <span class='ident'>gen_builder</span>.<span class='ident'>create_init_function</span>(<span class='ident'>fb</span>, <span class='ident'>saved_block</span>);
     });
-}<span class='comment'>
+}
 
-///////////////////////////////////////
-//          Yield Definition         //
-///////////////////////////////////////
+<span class='comment'>///////////////////////////////////////</span>
+<span class='comment'>//          Yield Definition         //</span>
+<span class='comment'>///////////////////////////////////////</span>
 
-</span><span class='kw'>fn</span> <span class='ident'>yield_stmt_reg_state_vars</span>(<span class='ident'>values</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>gb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
+<span class='kw'>fn</span> <span class='ident'>yield_stmt_reg_state_vars</span>(<span class='ident'>values</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>gb</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenBuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
     <span class='kw'>match</span> <span class='ident'>gb</span>.<span class='ident'>num_ret</span> {
         <span class='prelude-val'>Some</span>(<span class='ident'>last_ret</span>) <span class='op'>=&gt;</span> {
             <span class='kw'>if</span> <span class='ident'>last_ret</span> <span class='op'>!=</span> <span class='ident'>values</span>.<span class='ident'>len</span>() {
@@ -1636,17 +1640,17 @@
 
     <span class='ident'>gb</span>.<span class='ident'>register_n_variables</span>(<span class='number'>0</span>);
     <span class='number'>0</span>
-}<span class='comment'>
+}
 
-//all yield stmts must be the same size ATM
-</span><span class='kw'>fn</span> <span class='ident'>yield_stmt_gen_gen_code</span>(<span class='ident'>values</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){<span class='comment'>
-    //save the values into their proper return slots and return 1 to signal that the generator isn&#39;t done
-    //Get the index of the return slots of the gen_type
-    </span><span class='kw'>let</span> <span class='ident'>start_idx</span> <span class='op'>=</span> <span class='ident'>ggs</span>.<span class='ident'>state_idxs</span>.<span class='ident'>last</span>().<span class='ident'>unwrap</span>();
+<span class='comment'>//all yield stmts must be the same size ATM</span>
+<span class='kw'>fn</span> <span class='ident'>yield_stmt_gen_gen_code</span>(<span class='ident'>values</span> : <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>, <span class='ident'>ggs</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>GenGenState</span>, <span class='ident'>builder</span> : <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span>){
+    <span class='comment'>//save the values into their proper return slots and return 1 to signal that the generator isn&#39;t done</span>
+    <span class='comment'>//Get the index of the return slots of the gen_type</span>
+    <span class='kw'>let</span> <span class='ident'>start_idx</span> <span class='op'>=</span> <span class='ident'>ggs</span>.<span class='ident'>state_idxs</span>.<span class='ident'>last</span>().<span class='ident'>unwrap</span>();
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx_padding</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='kw'>for</span> <span class='ident'>val</span> <span class='kw'>in</span> <span class='ident'>values</span>.<span class='ident'>iter</span>() {
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>start_idx</span> <span class='op'>+</span> <span class='ident'>idx_padding</span>);
-        <span class='kw'>let</span> <span class='ident'>slot_ptr</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, (<span class='ident'>start_idx</span> <span class='op'>+</span> <span class='ident'>idx_padding</span>) <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;ret_{}&quot;</span>, <span class='ident'>idx_padding</span> <span class='op'>+</span> <span class='number'>2</span>));
+        <span class='kw'>let</span> <span class='ident'>slot_ptr</span> <span class='op'>=</span> <span class='ident'>builder</span>.<span class='ident'>get_obj_property</span>(<span class='ident'>ggs</span>.<span class='ident'>context</span>, (<span class='ident'>start_idx</span> <span class='op'>+</span> <span class='ident'>idx_padding</span>) <span class='kw'>as</span> <span class='ident'>int</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;ret_{}&quot;</span>, <span class='ident'>idx_padding</span> <span class='op'>+</span> <span class='number'>2</span>).<span class='ident'>as_slice</span>());
         <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='ident'>val</span>.<span class='ident'>to_gen_value</span>(<span class='ident'>builder</span>, <span class='ident'>ggs</span>.<span class='ident'>context</span>);
 
         <span class='ident'>builder</span>.<span class='ident'>store</span>(<span class='ident'>val</span>, <span class='ident'>slot_ptr</span>);
@@ -1681,9 +1685,9 @@
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -1697,19 +1701,23 @@
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../../../../";
-        var currentCrate = "hydra_llvm";
+        window.rootPath = "../../../../../";
+        window.currentCrate = "hydra_llvm";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../../../jquery.js"></script>
     <script src="../../../../../main.js"></script>
+    
     <script async src="../../../../../search-index.js"></script>
 </body>
 </html>

@@ -1,13 +1,10 @@
 use std::io::{BufReader, BufferedReader, Buffer, File, EndOfFile};
 use std::comm::{channel, Sender, Receiver};
-use std::strbuf::StrBuf;
 use std::vec::Vec;
 use std::char;
 
 use token::Token;
 use token;
-
-use native::task::spawn;
 
 pub fn tokenize_str(code : &str) -> Vec<Token> {
     let reader = BufReader::new(code.as_bytes());
@@ -33,7 +30,7 @@ pub fn tokenize_file(path_str : &str) -> Vec<Token> {
 
 pub fn stream_from_str(code : &str) -> Receiver<Token> {
     let (sendr, recvr) = channel();
-    let code = code.to_owned();
+    let code = code.to_string();
 
     spawn(proc(){
         let reader = BufReader::new(code.as_bytes());
@@ -49,7 +46,7 @@ pub fn stream_from_str(code : &str) -> Receiver<Token> {
 
 pub fn stream_from_file(path_str : &str) -> Receiver<Token> {
     let (sendr, recvr) = channel();
-    let path_str = path_str.to_owned();
+    let path_str = path_str.to_string();
 
     spawn(proc(){
         let path = &Path::new(path_str);
@@ -69,8 +66,8 @@ pub fn stream_from_file(path_str : &str) -> Receiver<Token> {
 
 struct Scanner<B> {
     input      : B,
-    peek_buff  : StrBuf,
-    text_buff  : StrBuf,
+    peek_buff  : String,
+    text_buff  : String,
     line       : uint,
     col        : uint,
     buf_offset : uint
@@ -80,8 +77,8 @@ impl<B: Buffer> Scanner<B> {
 
     pub fn new(input : B) -> Scanner<B>{
         Scanner { 
-            peek_buff  : StrBuf::new(),
-            text_buff  : StrBuf::new(),
+            peek_buff  : String::new(),
+            text_buff  : String::new(),
             input      : input, 
             line       : 1,
             col        : 1,
@@ -90,10 +87,10 @@ impl<B: Buffer> Scanner<B> {
     }
 
     fn tok(&mut self) -> Token {
-        let text   = self.text_buff.as_slice().to_owned();
+        let text   = self.text_buff.as_slice().to_string();
         let l      = self.col - text.len();
         let offset = self.buf_offset - text.as_bytes().len();
-        let typ    = token::str_to_type(text);
+        let typ    = token::str_to_type(text.as_slice());
 
         self.text_buff.clear();
 

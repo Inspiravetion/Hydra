@@ -1,4 +1,4 @@
-#![crate_id = "hydra_llvm"]
+#![crate_name = "hydra_llvm"]
 #![comment = "Hydra LLVM Code Generation and Jit"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
@@ -18,6 +18,7 @@ extern crate rustc;
 extern crate libc;
 extern crate collections;
 extern crate syntax = "hydra_syntax";
+extern crate debug;
 
 macro_rules! u (
     ($e:expr) => ( unsafe { $e }; )

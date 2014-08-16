@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_syntax library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `parser` mod in crate `hydra_syntax`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, parser">
 
     <title>hydra_syntax::parser - Rust</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,10 +22,11 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
-        <p class='location'><a href='../index.html'>hydra_syntax</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../ast/index.html'>ast</a><br/><a class='mod current' href='../parser/index.html'>parser</a><br/><a class='mod ' href='../scanner/index.html'>scanner</a><br/><a class='mod ' href='../token/index.html'>token</a><br/></div>
+        <p class='location'><a href='../index.html'>hydra_syntax</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../ast/index.html'>ast</a><a class='mod current' href='../parser/index.html'>parser</a><a class='mod ' href='../scanner/index.html'>scanner</a><a class='mod ' href='../token/index.html'>token</a></div>
     </section>
 
     <nav class="sub">
@@ -32,93 +34,96 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Module <a href='../index.html'>hydra_syntax</a>::<a class='mod' href=''>parser</a><a class='source' href='../../src/hydra_syntax/src/lib/lib_hy_syntax/parser.rs.html#1-1515'>[src]</a></h1>
+<h1 class='fqn'><div class='in-band'>Module <a href='../index.html'>hydra_syntax</a>&#8203;::<a class='mod' href=''>parser</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-13074' href='../../src/hydra_syntax/src/lib/lib_hy_syntax/parser.rs.html#1-1513'>[src]</a></div></h1>
 <h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr>
-                        <td><a class='struct' href='struct.AsyncParser.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.AsyncParser.html'
                                title='hydra_syntax::parser::AsyncParser'>AsyncParser</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
-                        <td><a class='struct' href='struct.SyncParser.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.SyncParser.html'
                                title='hydra_syntax::parser::SyncParser'>SyncParser</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                     <tr>
-                        <td><a class='trait' href='trait.HydraBaseParser.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.HydraBaseParser.html'
                                title='hydra_syntax::parser::HydraBaseParser'>HydraBaseParser</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
-                        <td><a class='trait' href='trait.HydraParser.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.HydraParser.html'
                                title='hydra_syntax::parser::HydraParser'>HydraParser</a></td>
                         <td class='docblock short'></td>
                     </tr>
                 </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                     <tr>
-                        <td><a class='fn' href='fn.parse_and_stream_file_async.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_and_stream_file_async.html'
                                title='hydra_syntax::parser::parse_and_stream_file_async'>parse_and_stream_file_async</a></td>
                         <td class='docblock short'><p>Scan and Parse a file in parallel producing a stream of top level AST nodes</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_and_stream_file_sync.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_and_stream_file_sync.html'
                                title='hydra_syntax::parser::parse_and_stream_file_sync'>parse_and_stream_file_sync</a></td>
                         <td class='docblock short'><p>Scan and then Parse a file producing a stream of top level AST nodes</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_and_stream_str_async.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_and_stream_str_async.html'
                                title='hydra_syntax::parser::parse_and_stream_str_async'>parse_and_stream_str_async</a></td>
                         <td class='docblock short'><p>Scan and Parse a string in parallel producing a stream of top level AST nodes</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_and_stream_str_sync.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_and_stream_str_sync.html'
                                title='hydra_syntax::parser::parse_and_stream_str_sync'>parse_and_stream_str_sync</a></td>
                         <td class='docblock short'><p>Scan and then Parse a string producing a stream of top level AST nodes</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_file_async.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_file_async.html'
                                title='hydra_syntax::parser::parse_file_async'>parse_file_async</a></td>
                         <td class='docblock short'><p>Scan and Parse a file in parallel producing an AST</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_file_sync.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_file_sync.html'
                                title='hydra_syntax::parser::parse_file_sync'>parse_file_sync</a></td>
                         <td class='docblock short'><p>Scan and then Parse a file producing an AST</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_str_async.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_str_async.html'
                                title='hydra_syntax::parser::parse_str_async'>parse_str_async</a></td>
                         <td class='docblock short'><p>Scan and Parse a string in parallel producing an AST</p>
 </td>
                     </tr>
                 
                     <tr>
-                        <td><a class='fn' href='fn.parse_str_sync.html'
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.parse_str_sync.html'
                                title='hydra_syntax::parser::parse_str_sync'>parse_str_sync</a></td>
                         <td class='docblock short'><p>Scan and then Parse a string producing an AST</p>
 </td>
@@ -136,9 +141,9 @@
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -152,19 +157,23 @@
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../";
-        var currentCrate = "hydra_syntax";
+        window.rootPath = "../../";
+        window.currentCrate = "hydra_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
+    
     <script async src="../../search-index.js"></script>
 </body>
 </html>

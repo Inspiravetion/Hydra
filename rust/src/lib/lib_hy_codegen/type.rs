@@ -4,7 +4,7 @@ use builder::Builder;
 type TypeId  = uint;
 
 struct TypeMap {
-    types    : HashMap<~str, TypeId>,
+    types    : HashMap<String, TypeId>,
     id_count : uint
 }
 
@@ -18,7 +18,7 @@ impl TypeMap {
 
     pub fn add_type(type_name : &str) {
         let type_id = self.id_count;
-        self.types.insert(type_name.to_owned(), type_id);
+        self.types.insert(type_name.to_string(), type_id);
 
         self.id_count += 1;
     }

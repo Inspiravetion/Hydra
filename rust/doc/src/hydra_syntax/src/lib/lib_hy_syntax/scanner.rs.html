@@ -3,17 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The hydra_syntax library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="Source to the Rust file `src/lib/lib_hy_syntax/scanner.rs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>scanner.rs.html -- source</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
-          rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="../../../../../main.css">
 
     
+    
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -21,9 +22,10 @@
     </div>
     <![endif]-->
 
+    
+
     <section class="sidebar">
         
-
         
     </section>
 
@@ -32,7 +34,7 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Search documentation..."
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
@@ -639,20 +641,14 @@
 <span id='599'>599</span>
 <span id='600'>600</span>
 <span id='601'>601</span>
-<span id='602'>602</span>
-<span id='603'>603</span>
-<span id='604'>604</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufReader</span>, <span class='ident'>BufferedReader</span>, <span class='ident'>Buffer</span>, <span class='ident'>File</span>, <span class='ident'>EndOfFile</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>comm</span>::{<span class='ident'>channel</span>, <span class='ident'>Sender</span>, <span class='ident'>Receiver</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>strbuf</span>::<span class='ident'>StrBuf</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>::<span class='ident'>Vec</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>char</span>;
 
 <span class='kw'>use</span> <span class='ident'>token</span>::<span class='ident'>Token</span>;
 <span class='kw'>use</span> <span class='ident'>token</span>;
-
-<span class='kw'>use</span> <span class='ident'>native</span>::<span class='ident'>task</span>::<span class='ident'>spawn</span>;
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>tokenize_str</span>(<span class='ident'>code</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>reader</span> <span class='op'>=</span> <span class='ident'>BufReader</span>::<span class='ident'>new</span>(<span class='ident'>code</span>.<span class='ident'>as_bytes</span>());
@@ -678,7 +674,7 @@
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>stream_from_str</span>(<span class='ident'>code</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> (<span class='ident'>sendr</span>, <span class='ident'>recvr</span>) <span class='op'>=</span> <span class='ident'>channel</span>();
-    <span class='kw'>let</span> <span class='ident'>code</span> <span class='op'>=</span> <span class='ident'>code</span>.<span class='ident'>to_owned</span>();
+    <span class='kw'>let</span> <span class='ident'>code</span> <span class='op'>=</span> <span class='ident'>code</span>.<span class='ident'>to_string</span>();
 
     <span class='ident'>spawn</span>(<span class='kw'>proc</span>(){
         <span class='kw'>let</span> <span class='ident'>reader</span> <span class='op'>=</span> <span class='ident'>BufReader</span>::<span class='ident'>new</span>(<span class='ident'>code</span>.<span class='ident'>as_bytes</span>());
@@ -694,7 +690,7 @@
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>stream_from_file</span>(<span class='ident'>path_str</span> : <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> (<span class='ident'>sendr</span>, <span class='ident'>recvr</span>) <span class='op'>=</span> <span class='ident'>channel</span>();
-    <span class='kw'>let</span> <span class='ident'>path_str</span> <span class='op'>=</span> <span class='ident'>path_str</span>.<span class='ident'>to_owned</span>();
+    <span class='kw'>let</span> <span class='ident'>path_str</span> <span class='op'>=</span> <span class='ident'>path_str</span>.<span class='ident'>to_string</span>();
 
     <span class='ident'>spawn</span>(<span class='kw'>proc</span>(){
         <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='ident'>path_str</span>);
@@ -714,8 +710,8 @@
 
 <span class='kw'>struct</span> <span class='ident'>Scanner</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
     <span class='ident'>input</span>      : <span class='ident'>B</span>,
-    <span class='ident'>peek_buff</span>  : <span class='ident'>StrBuf</span>,
-    <span class='ident'>text_buff</span>  : <span class='ident'>StrBuf</span>,
+    <span class='ident'>peek_buff</span>  : <span class='ident'>String</span>,
+    <span class='ident'>text_buff</span>  : <span class='ident'>String</span>,
     <span class='ident'>line</span>       : <span class='ident'>uint</span>,
     <span class='ident'>col</span>        : <span class='ident'>uint</span>,
     <span class='ident'>buf_offset</span> : <span class='ident'>uint</span>
@@ -725,8 +721,8 @@
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>input</span> : <span class='ident'>B</span>) <span class='op'>-&gt;</span> <span class='ident'>Scanner</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>{
         <span class='ident'>Scanner</span> { 
-            <span class='ident'>peek_buff</span>  : <span class='ident'>StrBuf</span>::<span class='ident'>new</span>(),
-            <span class='ident'>text_buff</span>  : <span class='ident'>StrBuf</span>::<span class='ident'>new</span>(),
+            <span class='ident'>peek_buff</span>  : <span class='ident'>String</span>::<span class='ident'>new</span>(),
+            <span class='ident'>text_buff</span>  : <span class='ident'>String</span>::<span class='ident'>new</span>(),
             <span class='ident'>input</span>      : <span class='ident'>input</span>, 
             <span class='ident'>line</span>       : <span class='number'>1</span>,
             <span class='ident'>col</span>        : <span class='number'>1</span>,
@@ -735,10 +731,10 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>tok</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Token</span> {
-        <span class='kw'>let</span> <span class='ident'>text</span>   <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>text_buff</span>.<span class='ident'>as_slice</span>().<span class='ident'>to_owned</span>();
+        <span class='kw'>let</span> <span class='ident'>text</span>   <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>text_buff</span>.<span class='ident'>as_slice</span>().<span class='ident'>to_string</span>();
         <span class='kw'>let</span> <span class='ident'>l</span>      <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>col</span> <span class='op'>-</span> <span class='ident'>text</span>.<span class='ident'>len</span>();
         <span class='kw'>let</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buf_offset</span> <span class='op'>-</span> <span class='ident'>text</span>.<span class='ident'>as_bytes</span>().<span class='ident'>len</span>();
-        <span class='kw'>let</span> <span class='ident'>typ</span>    <span class='op'>=</span> <span class='ident'>token</span>::<span class='ident'>str_to_type</span>(<span class='ident'>text</span>);
+        <span class='kw'>let</span> <span class='ident'>typ</span>    <span class='op'>=</span> <span class='ident'>token</span>::<span class='ident'>str_to_type</span>(<span class='ident'>text</span>.<span class='ident'>as_slice</span>());
 
         <span class='self'>self</span>.<span class='ident'>text_buff</span>.<span class='ident'>clear</span>();
 
@@ -994,9 +990,9 @@
     <span class='kw'>fn</span> <span class='ident'>backslash_token</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>c</span> : <span class='ident'>char</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>consume</span>(<span class='ident'>c</span>);
 
-        <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;=&#39;</span>){<span class='comment'>
-            //TODO: validate escaped strings
-            </span><span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;*&#39;</span>){
+        <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;=&#39;</span>){
+            <span class='comment'>//TODO: validate escaped strings</span>
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;*&#39;</span>){
                 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>last_char</span> <span class='op'>=</span> <span class='string'>&#39; &#39;</span>;
                 
                 <span class='self'>self</span>.<span class='ident'>consume_while</span>(<span class='op'>|</span><span class='ident'>c</span> : <span class='ident'>char</span><span class='op'>|</span> <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
@@ -1035,45 +1031,45 @@
                         <span class='self'>self</span>.<span class='ident'>consume</span>(<span class='ident'>c</span>);
                         <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>tok</span>())
                     },
-                    <span class='string'>&#39;.&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //., .., ...
-                        </span><span class='self'>self</span>.<span class='ident'>period_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;.&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//., .., ...</span>
+                        <span class='self'>self</span>.<span class='ident'>period_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;*&#39;</span> <span class='op'>|</span> <span class='string'>&#39;%&#39;</span> <span class='op'>|</span> <span class='string'>&#39;^&#39;</span> <span class='op'>|</span> <span class='string'>&#39;!&#39;</span> <span class='op'>|</span> <span class='string'>&#39;=&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //*, *=, %, %=, /, /=, !, != ...etc
-                        </span><span class='self'>self</span>.<span class='ident'>equal_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;*&#39;</span> <span class='op'>|</span> <span class='string'>&#39;%&#39;</span> <span class='op'>|</span> <span class='string'>&#39;^&#39;</span> <span class='op'>|</span> <span class='string'>&#39;!&#39;</span> <span class='op'>|</span> <span class='string'>&#39;=&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//*, *=, %, %=, /, /=, !, != ...etc</span>
+                        <span class='self'>self</span>.<span class='ident'>equal_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;|&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //|, ||, |=, ||=
-                        </span><span class='self'>self</span>.<span class='ident'>pipe_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;|&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//|, ||, |=, ||=</span>
+                        <span class='self'>self</span>.<span class='ident'>pipe_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;+&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&amp;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&gt;&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //++, +=, +, &amp;&amp;, &amp;=, &amp;
-                        </span><span class='self'>self</span>.<span class='ident'>double_or_equal_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;+&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&amp;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&gt;&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//++, +=, +, &amp;&amp;, &amp;=, &amp;</span>
+                        <span class='self'>self</span>.<span class='ident'>double_or_equal_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;-&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //-, -=, -&gt;, --
-                        </span><span class='self'>self</span>.<span class='ident'>dash_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;-&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//-, -=, -&gt;, --</span>
+                        <span class='self'>self</span>.<span class='ident'>dash_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;&lt;&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //&lt;, &lt;&lt;, &lt;=, &lt;-
-                        </span><span class='self'>self</span>.<span class='ident'>less_than_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;&lt;&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//&lt;, &lt;&lt;, &lt;=, &lt;-</span>
+                        <span class='self'>self</span>.<span class='ident'>less_than_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;@&#39;</span> <span class='op'>|</span> <span class='string'>&#39;#&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //@, @_, #, #_
-                        </span><span class='self'>self</span>.<span class='ident'>class_inst_var_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;@&#39;</span> <span class='op'>|</span> <span class='string'>&#39;#&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//@, @_, #, #_</span>
+                        <span class='self'>self</span>.<span class='ident'>class_inst_var_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&quot;&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //&#39;myString&#39;, &quot;myString&quot;
-                        </span><span class='self'>self</span>.<span class='ident'>string_lit_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&quot;&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//&#39;myString&#39;, &quot;myString&quot;</span>
+                        <span class='self'>self</span>.<span class='ident'>string_lit_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;/&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        // /, /=, //, /*
-                        </span><span class='self'>self</span>.<span class='ident'>backslash_token</span>(<span class='ident'>c</span>)
+                    <span class='string'>&#39;/&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>// /, /=, //, /*</span>
+                        <span class='self'>self</span>.<span class='ident'>backslash_token</span>(<span class='ident'>c</span>)
                     },
-                    <span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> {<span class='comment'>
-                        //0b10110, 0B101001, 0xdeadBeef, 0XDeadBEEf
-                        </span><span class='self'>self</span>.<span class='ident'>consume</span>(<span class='ident'>c</span>);
+                    <span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>//0b10110, 0B101001, 0xdeadBeef, 0XDeadBEEf</span>
+                        <span class='self'>self</span>.<span class='ident'>consume</span>(<span class='ident'>c</span>);
                         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;b&#39;</span>) <span class='op'>||</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;B&#39;</span>) {
                             <span class='self'>self</span>.<span class='ident'>binary_token</span>()
                         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;x&#39;</span>) <span class='op'>||</span> <span class='self'>self</span>.<span class='ident'>next_char_is</span>(<span class='string'>&#39;X&#39;</span>) {
@@ -1091,9 +1087,9 @@
                     _ <span class='kw'>if</span> <span class='ident'>char</span>::<span class='ident'>is_alphabetic</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> {
                         <span class='self'>self</span>.<span class='ident'>ident_or_keyword_token</span>(<span class='ident'>c</span>)
                     },
-                    _ <span class='kw'>if</span> <span class='ident'>char</span>::<span class='ident'>is_whitespace</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> {<span class='comment'>
-                        //may not want to skip...
-                        </span><span class='kw'>if</span> <span class='ident'>c</span> <span class='op'>==</span> <span class='string'>&#39;\n&#39;</span> {
+                    _ <span class='kw'>if</span> <span class='ident'>char</span>::<span class='ident'>is_whitespace</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> {
+                        <span class='comment'>//may not want to skip...</span>
+                        <span class='kw'>if</span> <span class='ident'>c</span> <span class='op'>==</span> <span class='string'>&#39;\n&#39;</span> {
                             <span class='self'>self</span>.<span class='ident'>consume</span>(<span class='ident'>c</span>);
                             <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>tok</span>())
                         } <span class='kw'>else</span> {
@@ -1107,13 +1103,13 @@
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
         }
     }
-}<span class='comment'>
+}
 
-////////////////////////////////////////////////////////////////////////////////
-//                                    Tests                                   //
-////////////////////////////////////////////////////////////////////////////////
+<span class='comment'>////////////////////////////////////////////////////////////////////////////////</span>
+<span class='comment'>//                                    Tests                                   //</span>
+<span class='comment'>////////////////////////////////////////////////////////////////////////////////</span>
 
-</span><span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>test_types</span>(
+<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>test_types</span>(
     (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>code</span>:<span class='ident'>expr</span> <span class='op'>-&gt;</span> [ $(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tok_typ</span>:<span class='ident'>ident</span>),<span class='op'>+</span> ]) <span class='op'>=&gt;</span> (
         {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
@@ -1261,9 +1257,9 @@
                 <dd>Show this help dialog</dd>
                 <dt>S</dt>
                 <dd>Focus the search field</dd>
-                <dt>&uarr;</dt>
+                <dt>&larrb;</dt>
                 <dd>Move up in search results</dd>
-                <dt>&darr;</dt>
+                <dt>&rarrb;</dt>
                 <dd>Move down in search results</dd>
                 <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
@@ -1277,19 +1273,23 @@
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
         </div>
     </div>
 
+    
+
     <script>
-        var rootPath = "../../../../../";
-        var currentCrate = "hydra_syntax";
+        window.rootPath = "../../../../../";
+        window.currentCrate = "hydra_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../../../jquery.js"></script>
     <script src="../../../../../main.js"></script>
+    
     <script async src="../../../../../search-index.js"></script>
 </body>
 </html>

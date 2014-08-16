@@ -1,5 +1,6 @@
-use rustc::lib::llvm::{llvm, Bool, False, True, IntEQ, IntNE, IntSGT, IntSGE, IntSLT, IntSLE};
-use collections::hashmap::HashMap;
+use rustc::lib::llvm::{Bool, False, True, IntEQ, IntNE, IntSGT, IntSGE, IntSLT, IntSLE};
+use rustc::lib::llvm;
+use std::collections::hashmap::HashMap;
 use libc::{c_uint, c_ulonglong, puts};
 use generator::{Generator, RANGE_GEN_ID, RANGE_GEN_INIT, RANGE_GEN_NEXT};
 use generator;
@@ -9,8 +10,8 @@ use std::owned::Box;
 pub struct Builder {
     builder    : LLVMBuilder,
     ctx        : Context,
-    types      : HashMap<~str, Type>,
-    pkgs       : HashMap<~str, Package>,
+    types      : HashMap<String, Type>,
+    pkgs       : HashMap<String, Package>,
     curr_pkg   : Option<Package>,
     pub curr_func  : Option<Value>,
     curr_scope : Box<Scope>,
@@ -19,8 +20,8 @@ pub struct Builder {
 
 #[deriving(Clone)]
 enum Scope {
-    GlobalScope(HashMap<~str, Variable>),
-    InnerScope(HashMap<~str, Variable>, Box<Scope>)
+    GlobalScope(HashMap<String, Variable>),
+    InnerScope(HashMap<String, Variable>, Box<Scope>)
 }
 
 #[deriving(Clone)]
@@ -41,7 +42,7 @@ impl Scope {
     pub fn get(&mut self, var_ident : &str) -> Option<Value> {
         match *self {
             GlobalScope(ref mut vars) => {
-                match vars.find(&var_ident.to_owned()) {
+                match vars.find(&var_ident.to_string()) {
                     Some(var) => {
                         match *var {
                             RegVar(val) => Some(val),
@@ -52,7 +53,7 @@ impl Scope {
                 }
             },
             InnerScope(ref mut vars, ref mut parent) => {
-                match vars.find(&var_ident.to_owned()) {
+                match vars.find(&var_ident.to_string()) {
                     Some(var) => {
                         match *var {
                             RegVar(val) => Some(val),
@@ -68,10 +69,10 @@ impl Scope {
     pub fn put(&mut self, var_ident : &str, val : Value) {
         match *self {
             GlobalScope(ref mut vars) => {
-                vars.insert(var_ident.to_owned(), RegVar(val));
+                vars.insert(var_ident.to_string(), RegVar(val));
             },
             InnerScope(ref mut vars, _) => {
-                vars.insert(var_ident.to_owned(), RegVar(val));                
+                vars.insert(var_ident.to_string(), RegVar(val));                
             }
         };
     }
@@ -79,7 +80,7 @@ impl Scope {
     pub fn get_gen(&mut self, var_ident : &str) -> Option<Variable> {
         match *self {
             GlobalScope(ref mut vars) => {
-                match vars.find(&var_ident.to_owned()) {
+                match vars.find(&var_ident.to_string()) {
                     Some(var) => {
                         match *var {
                             GenVar(_) => Some(*var),
@@ -90,7 +91,7 @@ impl Scope {
                 }
             },
             InnerScope(ref mut vars, ref mut parent) => {
-                match vars.find(&var_ident.to_owned()) {
+                match vars.find(&var_ident.to_string()) {
                     Some(var) => {
                         match *var {
                             GenVar(_) => Some(*var),
@@ -106,10 +107,10 @@ impl Scope {
     pub fn put_gen(&mut self, var_ident : &str, idx : int) {
         match *self {
             GlobalScope(ref mut vars) => {
-                vars.insert(var_ident.to_owned(), GenVar(idx));
+                vars.insert(var_ident.to_string(), GenVar(idx));
             },
             InnerScope(ref mut vars, _) => {
-                vars.insert(var_ident.to_owned(), GenVar(idx));                
+                vars.insert(var_ident.to_string(), GenVar(idx));                
             }
         };
     }
@@ -225,7 +226,7 @@ impl Builder {
             Some(var) => {
                 match var {
                     GenVar(idx) => {
-                        Some(self.get_obj_property(ctxt, idx, format!("_{}", name)))
+                        Some(self.get_obj_property(ctxt, idx, format!("_{}", name).as_slice()))
                     },
                     _ => None
                 }
@@ -295,7 +296,7 @@ impl Builder {
         let fields = vec!(string_type, int_type, int_type, int_type);
         let range_gen_typ = self.create_type(&fields, RANGE_GEN_ID);
 
-        self.types.insert(RANGE_GEN_ID.to_owned(), range_gen_typ);
+        self.types.insert(RANGE_GEN_ID.to_string(), range_gen_typ);
 
         let struct_ptr_typ = self.to_ptr_type(range_gen_typ);
         let next_args = vec!(struct_ptr_typ);
@@ -396,7 +397,7 @@ impl Builder {
         ));
 
         self.curr_pkg = Some(pkg);
-        self.pkgs.insert(pkg_name.to_owned(), pkg);
+        self.pkgs.insert(pkg_name.to_string(), pkg);
         pkg
     }
 
@@ -663,7 +664,7 @@ impl Builder {
     }
 
     pub fn get_type(&mut self, id : &str) -> Type {
-        *self.types.get(&id.to_owned())
+        self.types[id.to_string()]
     }
 
     pub fn get_range_gen_type(&mut self) -> Type {
@@ -679,8 +680,8 @@ impl Builder {
             typ       : range_type,
             gen       : gen,
             init_args : args,
-            init_func : RANGE_GEN_INIT.to_owned(),
-            next_func : RANGE_GEN_NEXT.to_owned(),
+            init_func : RANGE_GEN_INIT.to_string(),
+            next_func : RANGE_GEN_NEXT.to_string(),
             var_count : 2,
             ret_count : 1
         }
@@ -743,7 +744,7 @@ impl Builder {
         let global = u!(llvm::LLVMBuildGlobalString(
             self.builder,
             chars(literal),
-            chars(format!("global_{}", variable_name))
+            chars(format!("global_{}", variable_name).as_slice())
         ));
 
         let v = Vec::from_elem(2, self.int(0));
@@ -777,7 +778,7 @@ impl Builder {
 
 pub struct GenBuilder<'a> {
     name        : &'a str,
-    params      : &'a Vec<~str>,
+    params      : &'a Vec<String>,
     obj_type    : Type,
     gen_types   : Vec<Type>,
     pub state_indxs : Vec<uint>,
@@ -789,7 +790,7 @@ pub struct GenBuilder<'a> {
 
 impl<'a> GenBuilder<'a> {
     
-    pub fn new(name : &'a str, params : &'a Vec<~str>, obj_type : Type, string_type : Type) -> GenBuilder<'a> {
+    pub fn new(name : &'a str, params : &'a Vec<String>, obj_type : Type, string_type : Type) -> GenBuilder<'a> {
         let type_buffer = vec!(string_type);
 
         let mut gb = GenBuilder { 
@@ -833,11 +834,11 @@ impl<'a> GenBuilder<'a> {
         gen_type
     }
 
-    fn init_name(&mut self) -> ~str {
+    fn init_name(&mut self) -> String {
         format!("!{}_gen_init", self.name)
     }
 
-    fn next_name(&mut self) -> ~str {
+    fn next_name(&mut self) -> String {
         format!("!{}_gen_next", self.name)
     }
 
@@ -846,7 +847,7 @@ impl<'a> GenBuilder<'a> {
         let next_params = vec!(self.to_type(builder));
         let int_type = builder.int32_type();
 
-        builder.create_function(next_name, next_params, int_type,|fb : &mut Builder|{
+        builder.create_function(next_name.as_slice(), next_params, int_type,|fb : &mut Builder|{
             fb.goto_first_block();
             
             let gen_ctx = fb.get_param(0);
@@ -905,14 +906,14 @@ impl<'a> GenBuilder<'a> {
 
         let void_type = builder.void_type();
 
-        builder.create_function(init_name, init_params, void_type,|fb : &mut Builder|{
+        builder.create_function(init_name.as_slice(), init_params, void_type,|fb : &mut Builder|{
             fb.goto_first_block();
             
             let gen_ctx = fb.get_param(0);
             let ctx_state = fb.get_obj_property(gen_ctx, 0, "ctx_state");
 
             //setup entry block
-            let next_func = fb.get_function(self.next_name());
+            let next_func = fb.get_function(self.next_name().as_slice());
             let entry_block = fb.block_address(next_func , self.entry_block.unwrap());
 
             fb.store(entry_block, ctx_state);
@@ -922,7 +923,7 @@ impl<'a> GenBuilder<'a> {
             for param in self.params.iter() {
                 //right now this is pass by value...not by ref
                 let param_val = fb.get_param(i + 1);
-                let state_var_slot = fb.get_obj_property(gen_ctx, i + 1, format!("param{}", i));
+                let state_var_slot = fb.get_obj_property(gen_ctx, i + 1, format!("param{}", i).as_slice());
                 fb.store(param_val, state_var_slot);
 
                 i += 1;
@@ -968,7 +969,7 @@ impl<'a> GenGenState<'a> {
     }
 
     pub fn state_index(&mut self) -> uint {
-        self.state_idxs.get(self.stmt_idx).clone()
+        self.state_idxs[self.stmt_idx].clone()
     }
 
     pub fn next_stmt(&mut self) {
@@ -976,6 +977,6 @@ impl<'a> GenGenState<'a> {
     }
 }
 
- fn chars(string : &str) -> *i8 {
+ fn chars(string : &str) -> *const i8 {
     u!(string.to_c_str().unwrap())
 }

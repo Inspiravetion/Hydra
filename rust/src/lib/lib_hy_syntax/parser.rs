@@ -3,9 +3,7 @@ use token::*;
 use ast::*;
 use std::from_str::from_str;
 use scanner;
-use collections::hashmap::HashMap;
-
-use native::task::spawn;
+use std::collections::hashmap::HashMap;
 
 ///Scan and Parse a file in parallel producing an AST
 pub fn parse_file_async(path : &str) -> Vec<Box<Stmt>> {
@@ -34,10 +32,10 @@ pub fn parse_str_sync(code : &str) -> Vec<Box<Stmt>> {
 ///Scan and Parse a file in parallel producing a stream of top level AST nodes
 pub fn parse_and_stream_file_async(path : &str) -> Receiver<Box<Stmt>> {
     let (sendr, recvr) = channel();
-    let path = path.to_owned();
+    let path = path.to_string();
 
     spawn(proc(){
-        let tokens = scanner::stream_from_file(path);
+        let tokens = scanner::stream_from_file(path.as_slice());
         AsyncParser::new(tokens).parse_async(sendr);
     });
 
@@ -47,10 +45,10 @@ pub fn parse_and_stream_file_async(path : &str) -> Receiver<Box<Stmt>> {
 ///Scan and then Parse a file producing a stream of top level AST nodes
 pub fn parse_and_stream_file_sync(path : &str) -> Receiver<Box<Stmt>> {
     let (sendr, recvr) = channel();
-    let path = path.to_owned();
+    let path = path.to_string();
 
     spawn(proc(){
-        let tokens = scanner::tokenize_file(path);
+        let tokens = scanner::tokenize_file(path.as_slice());
         SyncParser::new(tokens).parse_async(sendr);
     });
 
@@ -60,10 +58,10 @@ pub fn parse_and_stream_file_sync(path : &str) -> Receiver<Box<Stmt>> {
 ///Scan and Parse a string in parallel producing a stream of top level AST nodes
 pub fn parse_and_stream_str_async(path : &str) -> Receiver<Box<Stmt>> {
     let (sendr, recvr) = channel();
-    let path = path.to_owned();
+    let path = path.to_string();
 
     spawn(proc(){
-        let tokens = scanner::stream_from_str(path);
+        let tokens = scanner::stream_from_str(path.as_slice());
         AsyncParser::new(tokens).parse_async(sendr);
     });
 
@@ -73,10 +71,10 @@ pub fn parse_and_stream_str_async(path : &str) -> Receiver<Box<Stmt>> {
 ///Scan and then Parse a string producing a stream of top level AST nodes
 pub fn parse_and_stream_str_sync(path : &str) -> Receiver<Box<Stmt>> {
     let (sendr, recvr) = channel();
-    let path = path.to_owned();
+    let path = path.to_string();
 
     spawn(proc(){
-        let tokens = scanner::tokenize_str(path);
+        let tokens = scanner::tokenize_str(path.as_slice());
         SyncParser::new(tokens).parse_async(sendr);
     });
 
@@ -260,7 +258,7 @@ trait HydraBaseParser {
 
     fn function_def(&mut self) -> Box<Stmt> {
         self.expect(Identifier);
-        let func_name = self.tok().text.to_owned();
+        let func_name = self.tok().text.to_string();
 
         self.expect(Lparen);
         //TODO: this should be opt_idents();
@@ -284,7 +282,7 @@ trait HydraBaseParser {
             fail!("Expected Int for operator presidence");
         }
 
-        let pres = from_str::<int>(self.tok().text).unwrap();
+        let pres = from_str::<int>(self.tok().text.as_slice()).unwrap();
 
         self.expect(Rbracket);
 
@@ -403,7 +401,7 @@ trait HydraBaseParser {
             MultiIdentList(prop_paths)
         } else {
             if first.len() == 1 {
-                SingleIdent(first.get(0).to_owned())
+                SingleIdent(first[0].to_string())
             } else {
                 SingleIdentList(first)
             }
@@ -414,7 +412,7 @@ trait HydraBaseParser {
         let prefix = self.ident_prefix();
 
         if prefix.len() == 1 {
-            SingleIdent(prefix.get(0).to_owned())
+            SingleIdent(prefix[0].to_string())
         } else {
             SingleIdentList(prefix)
         }
@@ -576,7 +574,7 @@ trait HydraBaseParser {
         ExclusiveRange::new(start, end)
     }
 
-    fn is_binary_op(&mut self, typ : TokenType) -> bool {
+    fn is_binary_op(&self, typ : TokenType) -> bool {
         match typ {
             Add_Op | Min_Op | Mult_Op | Div_Op | Mod_Op | Power_Op | 
             Less_Than | Greater_Than | Less_Than_Eq | Greater_Than_Eq | Equal | Bang_Eq => true,
@@ -633,7 +631,7 @@ trait HydraBaseParser {
                 match tok.typ {
                     Int_Literal => {
                         self.next();
-                        let num = from_str::<int>(self.tok().text).unwrap();
+                        let num = from_str::<int>(self.tok().text.as_slice()).unwrap();
                         Some(Int::new(num))
                     },
                     Identifier => {
@@ -659,7 +657,7 @@ trait HydraBaseParser {
                             //TODO this will change when objects get support
                             //this will actually never get called until i have things like
                             //myobj.prop.name as valid expressions
-                            IdentExpr::new(path.get(0).to_owned())
+                            IdentExpr::new(path[0].to_string())
                         }
                     },
                     None => {
@@ -878,7 +876,7 @@ impl HydraBaseParser for AsyncParser {
     }
 
     fn set_presidence(&mut self, tok : &Token, pres : int) {
-        self.presidences.insert(tok.text.to_owned(), pres);
+        self.presidences.insert(tok.text.to_string(), pres);
     }
 
     fn parsing_generator(&self) -> bool {
@@ -928,7 +926,7 @@ impl HydraBaseParser for SyncParser {
             None
         } else {
             let peek_idx = (self.tok_idx + 1) as uint;
-            Some(self.tokens.get(peek_idx).clone())
+            Some(self.tokens[peek_idx].clone())
         }
     }
 
@@ -939,7 +937,7 @@ impl HydraBaseParser for SyncParser {
             fail!("Tried to get token before advancing");
         }
 
-        self.tokens.get(idx as uint).clone()
+        self.tokens[idx as uint].clone()
     }
 
     fn get_presidence(&mut self, tok : &Token) -> int {
@@ -950,7 +948,7 @@ impl HydraBaseParser for SyncParser {
     }
 
     fn set_presidence(&mut self, tok : &Token, pres : int) {
-        self.presidences.insert(tok.text.to_owned(), pres);
+        self.presidences.insert(tok.text.to_string(), pres);
     }
 
     fn parsing_generator(&self) -> bool {
@@ -969,15 +967,15 @@ impl HydraBaseParser for SyncParser {
 fn new_presidence_map() -> HashMap<Ident, int> {
     let mut map = HashMap::new();
 
-    map.insert("%".to_owned(), 1);
+    map.insert("%".to_string(), 1);
 
-    map.insert("+".to_owned(), 2);
-    map.insert("-".to_owned(), 2);
+    map.insert("+".to_string(), 2);
+    map.insert("-".to_string(), 2);
     
-    map.insert("*".to_owned(), 3);
-    map.insert("/".to_owned(), 3);
+    map.insert("*".to_string(), 3);
+    map.insert("/".to_string(), 3);
     
-    map.insert("^".to_owned(), 4);
+    map.insert("^".to_string(), 4);
 
     map
 }
@@ -1005,19 +1003,19 @@ fn int_expr(){
 
 #[test]
 fn ident_expr(){
-    check_expr!("abc" -> IdentExpr::new("abc".to_owned()));
+    check_expr!("abc" -> IdentExpr::new("abc".to_string()));
 }
 
 #[test]
 fn basic_func_call_expr(){
-    check_expr!("abc()" -> FuncCall::new(vec!("abc".to_owned()), vec!()));
+    check_expr!("abc()" -> FuncCall::new(vec!("abc".to_string()), vec!()));
 }
 
 #[test]
 fn func_call_expr_with_params(){
     check_expr!("abc(1, def)" -> FuncCall::new(
-        vec!("abc".to_owned()), 
-        vec!(Int::new(1), IdentExpr::new("def".to_owned()))
+        vec!("abc".to_string()), 
+        vec!(Int::new(1), IdentExpr::new("def".to_string()))
     ));
 }
 
@@ -1045,8 +1043,8 @@ fn dotted_exclusive_range_expr(){
 fn basic_bin_expr(){
     check_expr!("1 + ten" -> BinaryExpr::new(
         Int::new(1),
-        "+".to_owned(),
-        IdentExpr::new("ten".to_owned())
+        "+".to_string(),
+        IdentExpr::new("ten".to_string())
     ));
 }
 
@@ -1055,17 +1053,17 @@ fn complex_bin_expr(){
     check_expr!("1 + 2 * 3 - 4 / 5" -> 
         BinaryExpr::new(
             Int::new(1),
-            "+".to_owned(),
+            "+".to_string(),
             BinaryExpr::new(
                 BinaryExpr::new(
                     Int::new(2),
-                    "*".to_owned(),
+                    "*".to_string(),
                     Int::new(3)
                 ),
-                "-".to_owned(),
+                "-".to_string(),
                 BinaryExpr::new(
                     Int::new(4),
-                    "/".to_owned(),
+                    "/".to_string(),
                     Int::new(5)
                 ),
             )
@@ -1076,10 +1074,10 @@ fn complex_bin_expr(){
 #[test]
 fn prefix_unary_expr(){
     check_expr!("double 1 + 1" -> PrefixUnaryExpr::new(
-        "double".to_owned(),
+        "double".to_string(),
         BinaryExpr::new(
             Int::new(1),
-            "+".to_owned(),
+            "+".to_string(),
             Int::new(1)            
         )
     ));
@@ -1092,7 +1090,7 @@ fn prefix_unary_expr(){
 macro_rules! check_stmt(
     ($code:expr -> $stmt_lit:expr) => ({
         let tokens = scanner::stream_from_str($code);
-        let stmts  = AsyncParser::new(tokens).parse();
+        let stmts  = AsyncParser::new(tokens).parse_sync();
         assert!(stmts.get(0) == &$stmt_lit);        
     });
 )
@@ -1101,10 +1099,10 @@ macro_rules! check_stmt(
 fn expr_stmt(){
     check_stmt!("abc(1, def);" -> ExprStmt::new(
         FuncCall::new(
-            vec!("abc".to_owned()), 
+            vec!("abc".to_string()), 
             vec!(
                 Int::new(1), 
-                IdentExpr::new("def".to_owned())
+                IdentExpr::new("def".to_string())
             )
         )
     ));
@@ -1114,7 +1112,7 @@ fn expr_stmt(){
 fn single_var_decl(){
     check_stmt!("var a;" -> VarDecl::new(
         vec!(
-            "a".to_owned()
+            "a".to_string()
         )
     ));
 }
@@ -1123,9 +1121,9 @@ fn single_var_decl(){
 fn multi_var_decl(){
     check_stmt!("var a, b, c;" -> VarDecl::new(
         vec!(
-            "a".to_owned(),
-            "b".to_owned(),
-            "c".to_owned()
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string()
         )
     ));
 }
@@ -1134,7 +1132,7 @@ fn multi_var_decl(){
 fn single_var_assign(){
     check_stmt!("var a = 1;" -> VarAssign::new(
         vec!(
-            "a".to_owned()
+            "a".to_string()
         ),
         vec!(
             Int::new(1)
@@ -1146,15 +1144,15 @@ fn single_var_assign(){
 fn multi_var_assign(){
     check_stmt!("var a, b, c = 1, hy, dra();" -> VarAssign::new(
         vec!(
-            "a".to_owned(),
-            "b".to_owned(),
-            "c".to_owned()
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string()
         ),
         vec!(
             Int::new(1),
-            IdentExpr::new("hy".to_owned()),
+            IdentExpr::new("hy".to_string()),
             FuncCall::new(
-                vec!("dra".to_owned()),
+                vec!("dra".to_string()),
                 vec!()
             )
         )
@@ -1165,9 +1163,9 @@ fn multi_var_assign(){
 fn uneven_var_assign(){
     check_stmt!("var a, b, c = 1;" -> VarAssign::new(
         vec!(
-            "a".to_owned(),
-            "b".to_owned(),
-            "c".to_owned()
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string()
         ),
         vec!(
             Int::new(1)
@@ -1178,7 +1176,7 @@ fn uneven_var_assign(){
 #[test]
 fn single_assign(){
     check_stmt!("a = 1;" -> AssignStmt::new(
-        vec!(vec!("a".to_owned())),
+        vec!(vec!("a".to_string())),
         vec!(Int::new(1))
     ));
 }
@@ -1188,8 +1186,8 @@ fn single_assign(){
 fn multiple_assign(){
     check_stmt!("a, b = 1, 2;" -> AssignStmt::new(
         vec!(
-            vec!("a".to_owned()), 
-            vec!("b".to_owned())
+            vec!("a".to_string()), 
+            vec!("b".to_string())
         ),
         vec!(
             Int::new(1),
@@ -1203,11 +1201,11 @@ fn if_branch(){
     check_stmt!("if cond then something(); end" -> IfElseStmt::new(
         vec!(
             IfElseBranch::new(
-                Some(IdentExpr::new("cond".to_owned())),
+                Some(IdentExpr::new("cond".to_string())),
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something".to_owned()),
+                            vec!("something".to_string()),
                             vec!()
                         )
                     )
@@ -1222,11 +1220,11 @@ fn if_else_branch(){
     check_stmt!("if cond then something(); else something_else(); end" -> IfElseStmt::new(
         vec!(
             IfElseBranch::new(
-                Some(IdentExpr::new("cond".to_owned())),
+                Some(IdentExpr::new("cond".to_string())),
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something".to_owned()),
+                            vec!("something".to_string()),
                             vec!()
                         )
                     )
@@ -1237,7 +1235,7 @@ fn if_else_branch(){
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something_else".to_owned()),
+                            vec!("something_else".to_string()),
                             vec!()
                         )
                     )
@@ -1252,22 +1250,22 @@ fn if_elseif_branch(){
     check_stmt!("if cond then something(); else if cond2 then something_else(); end" -> IfElseStmt::new(
         vec!(
             IfElseBranch::new(
-                Some(IdentExpr::new("cond".to_owned())),
+                Some(IdentExpr::new("cond".to_string())),
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something".to_owned()),
+                            vec!("something".to_string()),
                             vec!()
                         )
                     )
                 )
             ),
             IfElseBranch::new(
-                Some(IdentExpr::new("cond2".to_owned())),
+                Some(IdentExpr::new("cond2".to_string())),
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something_else".to_owned()),
+                            vec!("something_else".to_string()),
                             vec!()
                         )
                     )
@@ -1282,22 +1280,22 @@ fn if_elseif_else_branch(){
     check_stmt!("if cond then something(); else if cond2 then something_else(); else nothing(); end" -> IfElseStmt::new(
         vec!(
             IfElseBranch::new(
-                Some(IdentExpr::new("cond".to_owned())),
+                Some(IdentExpr::new("cond".to_string())),
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something".to_owned()),
+                            vec!("something".to_string()),
                             vec!()
                         )
                     )
                 )
             ),
             IfElseBranch::new(
-                Some(IdentExpr::new("cond2".to_owned())),
+                Some(IdentExpr::new("cond2".to_string())),
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("something_else".to_owned()),
+                            vec!("something_else".to_string()),
                             vec!()
                         )
                     )
@@ -1308,7 +1306,7 @@ fn if_elseif_else_branch(){
                 vec!(
                     ExprStmt::new(
                         FuncCall::new(
-                            vec!("nothing".to_owned()),
+                            vec!("nothing".to_string()),
                             vec!()
                         )
                     )
@@ -1322,7 +1320,7 @@ fn if_elseif_else_branch(){
 fn for_in_loop_single_var(){
     check_stmt!("for i in 0..10 do break; end" -> ForInLoop::new(
         vec!(
-            "i".to_owned()
+            "i".to_string()
         ),
         ExclusiveRange::new(
             Int::new(0),
@@ -1338,10 +1336,10 @@ fn for_in_loop_single_var(){
 fn for_in_loop_multi_var(){
     check_stmt!("for i, j in positions do continue; end" -> ForInLoop::new(
         vec!(
-            "i".to_owned(),
-            "j".to_owned()
+            "i".to_string(),
+            "j".to_string()
         ),
-        IdentExpr::new("positions".to_owned()),
+        IdentExpr::new("positions".to_string()),
         vec!(
             LoopControlStmt::new(Continue)
         )
@@ -1351,7 +1349,7 @@ fn for_in_loop_multi_var(){
 #[test]
 fn while_loop(){
     check_stmt!("while cond do break; continue; end" -> WhileLoop::new(
-        IdentExpr::new("cond".to_owned()),
+        IdentExpr::new("cond".to_string()),
         vec!(
             LoopControlStmt::new(Break),
             LoopControlStmt::new(Continue)
@@ -1363,12 +1361,12 @@ fn while_loop(){
 fn func_def_no_params(){
     //CURRENTLY FAILS AS PARAMS AREN'T OPTIONAL
     check_stmt!("function abc(){ stuff(); }" -> FunctionDef::new(
-            "abc".to_owned(),
+            "abc".to_string(),
             vec!(),
             vec!(
                 ExprStmt::new(    
                     FuncCall::new(
-                        vec!("stuff".to_owned()),
+                        vec!("stuff".to_string()),
                         vec!()
                     )
                 )
@@ -1380,14 +1378,14 @@ fn func_def_no_params(){
 #[test]
 fn func_def_single_param(){
     check_stmt!("function abc(a){ stuff(); }" -> FunctionDef::new(
-            "abc".to_owned(),
+            "abc".to_string(),
             vec!(
-                "a".to_owned()
+                "a".to_string()
             ),
             vec!(
                 ExprStmt::new(    
                     FuncCall::new(
-                        vec!("stuff".to_owned()),
+                        vec!("stuff".to_string()),
                         vec!()
                     )
                 )
@@ -1399,15 +1397,15 @@ fn func_def_single_param(){
 #[test]
 fn func_def_multi_param(){
     check_stmt!("function abc(a, b, c){ return a; }" -> FunctionDef::new(
-            "abc".to_owned(),
+            "abc".to_string(),
             vec!(
-                "a".to_owned(),
-                "b".to_owned(),
-                "c".to_owned()
+                "a".to_string(),
+                "b".to_string(),
+                "c".to_string()
             ),
             vec!(
                 ReturnStmt::new(
-                    IdentExpr::new("a".to_owned())      
+                    IdentExpr::new("a".to_string())      
                 )
             )
         )
@@ -1418,12 +1416,12 @@ fn func_def_multi_param(){
 fn gen_func_def_no_params(){
     //CURRENTLY FAILS AS PARAMS AREN'T OPTIONAL
     check_stmt!("gen function abc(){ stuff(); }" -> GeneratorDef::new(
-            "abc".to_owned(),
+            "abc".to_string(),
             vec!(),
             vec!(
                 ExprStmt::new(    
                     FuncCall::new(
-                        vec!("stuff".to_owned()),
+                        vec!("stuff".to_string()),
                         vec!()
                     )
                 )
@@ -1435,14 +1433,14 @@ fn gen_func_def_no_params(){
 #[test]
 fn gen_func_def_single_param(){
     check_stmt!("gen function abc(a){ yield a; }" -> GeneratorDef::new(
-            "abc".to_owned(),
+            "abc".to_string(),
             vec!(
-                "a".to_owned()
+                "a".to_string()
             ),
             vec!(
                 YieldStmt::new(
                     vec!(
-                        IdentExpr::new("a".to_owned())
+                        IdentExpr::new("a".to_string())
                     )
                 )
             )
@@ -1453,18 +1451,18 @@ fn gen_func_def_single_param(){
 #[test]
 fn gen_func_def_multi_param(){
     check_stmt!("gen function abc(a, b, c){ yield a, b, c; }" -> GeneratorDef::new(
-            "abc".to_owned(),
+            "abc".to_string(),
             vec!(
-                "a".to_owned(),
-                "b".to_owned(),
-                "c".to_owned()
+                "a".to_string(),
+                "b".to_string(),
+                "c".to_string()
             ),
             vec!(
                 YieldStmt::new(
                     vec!(
-                        IdentExpr::new("a".to_owned()),
-                        IdentExpr::new("b".to_owned()),
-                        IdentExpr::new("c".to_owned())
+                        IdentExpr::new("a".to_string()),
+                        IdentExpr::new("b".to_string()),
+                        IdentExpr::new("c".to_string())
                     )
                 )
             )
@@ -1476,40 +1474,40 @@ fn gen_func_def_multi_param(){
 #[should_fail]
 fn func_def_yield_fail() {
     let tokens = scanner::stream_from_str("function abc(a, b, c){ yield a; }");
-    AsyncParser::new(tokens).parse();
+    AsyncParser::new(tokens).parse_sync();
 }
 
 #[test]
 #[should_fail]
 fn gen_func_def_yield_fail() {
     let tokens = scanner::stream_from_str("gen function abc(a, b, c){ return a; }");
-    AsyncParser::new(tokens).parse();
+    AsyncParser::new(tokens).parse_sync();
 }
 
 #[test]
 #[should_fail]
 fn break_top_level_fail() {
     let tokens = scanner::stream_from_str("break");
-    AsyncParser::new(tokens).parse();
+    AsyncParser::new(tokens).parse_sync();
 }
 
 #[test]
 #[should_fail]
 fn continue_top_level_fail() {
     let tokens = scanner::stream_from_str("continue");
-    AsyncParser::new(tokens).parse();
+    AsyncParser::new(tokens).parse_sync();
 }
 
 #[test]
 #[should_fail]
 fn return_top_level_fail() {
     let tokens = scanner::stream_from_str("return");
-    AsyncParser::new(tokens).parse();
+    AsyncParser::new(tokens).parse_sync();
 }
 
 #[test]
 #[should_fail]
 fn yield_top_level_fail() {
     let tokens = scanner::stream_from_str("yield");
-    AsyncParser::new(tokens).parse();
+    AsyncParser::new(tokens).parse_sync();
 }

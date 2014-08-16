@@ -1,7 +1,7 @@
 use std::fmt::{Show, Formatter, Result};
 use std::char;
 
-#[deriving(Clone, Eq, Show)]
+#[deriving(Clone, PartialEq, Show)]
 pub enum TokenType {
     Identifier,
     Period,
@@ -105,9 +105,9 @@ pub enum TokenType {
     NewLine
 }
 
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 pub struct Token {
-    pub text       : ~str,
+    pub text       : String,
     pub typ        : TokenType,
     pub line       : uint,
     pub col        : uint,
@@ -127,7 +127,7 @@ impl Token {
 impl Show for Token {
     fn fmt(&self, f: &mut Formatter) -> Result {
         let info = format!("{:?} at {}:{}", self.typ, self.line, self.col);
-        write!(f, "\\{\n  {}\n  text: '{}'\n\\}", info, self.text)
+        write!(f, "{{\n  {}\n  text: '{}'\n}}", info, self.text)
     }
 }
 

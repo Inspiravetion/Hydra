@@ -1,9 +1,9 @@
 use std::fmt::{Show, Formatter, Result};
 use token::*;
 
-pub type Ident = ~str;
+pub type Ident = String;
 
-#[deriving(Eq)]
+#[deriving(PartialEq)]
 pub struct Expr {
     pub node : Expr_ 
 }
@@ -14,7 +14,7 @@ impl Show for Expr {
     }
 }
 
-#[deriving(Eq)]
+#[deriving(PartialEq)]
 pub struct Stmt {
     pub node : Stmt_ 
 }
@@ -25,7 +25,7 @@ impl Show for Stmt {
     }
 }
 
-#[deriving(Show, Eq)]
+#[deriving(Show, PartialEq)]
 pub enum Expr_ {
     //1.prop_path, 2.params
     FuncCall(Vec<Ident>, Vec<Box<Expr>>),
@@ -43,7 +43,7 @@ pub enum Expr_ {
     IdentExpr(Ident),
 
     //1.lhs, 2.op, 3.rhs
-    BinaryExpr(Box<Expr>, ~str, Box<Expr>),
+    BinaryExpr(Box<Expr>, String, Box<Expr>),
 
     //1.op, 2.expr
     PrefixUnaryExpr(Ident, Box<Expr>)
@@ -102,7 +102,7 @@ pub mod IdentExpr {
 pub mod BinaryExpr {
     use self::super::{Expr, BinaryExpr};
 
-    pub fn new(lhs : Box<Expr>, op : ~str, rhs : Box<Expr>) -> Box<Expr> {
+    pub fn new(lhs : Box<Expr>, op : String, rhs : Box<Expr>) -> Box<Expr> {
         box Expr {
             node : BinaryExpr(lhs, op, rhs)
         }
@@ -119,7 +119,7 @@ pub mod PrefixUnaryExpr {
     }
 }
 
-#[deriving(Show, Eq)]
+#[deriving(Show, PartialEq)]
 pub enum Stmt_ {
     //1.expr
     ExprStmt(Box<Expr>),
@@ -209,7 +209,7 @@ pub mod LoopControlStmt {
     }
 }
 
-#[deriving(Eq)]
+#[deriving(PartialEq)]
 pub struct IfElseBranch {
     pub cond  : Option<Box<Expr>>,
     pub stmts : Vec<Box<Stmt>>
@@ -226,7 +226,7 @@ impl IfElseBranch {
 
 impl Show for IfElseBranch {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "If/Else {}\\{ {}\\}", self.cond, self.stmts)
+        write!(f, "If/Else {}{{ {} }}", self.cond, self.stmts)
     }
 }
 
