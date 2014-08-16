@@ -1,0 +1,5 @@
+[package]
+
+name    = "hy_syntax" 
+version = "0.0.1"
+authors = [ "Charlie Lipford <charlie.lipford.code@gmail.com>" ]

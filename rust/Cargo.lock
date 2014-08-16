@@ -1,0 +1,19 @@
+[root]
+name = "hydra"
+version = "0.0.1"
+dependencies = [
+ "hy_ll 0.0.1",
+ "hy_syntax 0.0.1",
+]
+
+[[package]]
+name = "hy_ll"
+version = "0.0.1"
+dependencies = [
+ "hy_syntax 0.0.1",
+]
+
+[[package]]
+name = "hy_syntax"
+version = "0.0.1"
+
