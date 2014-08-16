@@ -1,0 +1,13 @@
+[package]
+
+name    = "hydra" 
+version = "0.0.1"
+authors = [ "Charlie Lipford <charlie.lipford.code@gmail.com>" ]
+
+[dependencies.hy_syntax]
+
+path = "src/lib/lib_hy_syntax"
+
+[dependencies.hy_ll]
+
+path = "src/lib/lib_hy_ll"

@@ -1,0 +1,9 @@
+[package]
+
+name    = "hy_ll" 
+version = "0.0.1"
+authors = [ "Charlie Lipford <charlie.lipford.code@gmail.com>" ]
+
+[dependencies.hy_syntax]
+
+path = "../lib_hy_syntax"
