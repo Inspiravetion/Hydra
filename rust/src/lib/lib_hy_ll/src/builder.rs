@@ -6,6 +6,8 @@ use generator::{Generator, RANGE_GEN_ID, RANGE_GEN_INIT, RANGE_GEN_NEXT};
 use generator;
 use lltype::*;
 use std::owned::Box;
+use std::io::{File};
+
 
 pub struct Builder {
     builder    : LLVMBuilder,
@@ -164,8 +166,39 @@ impl Builder {
 
         b.create_package("hydra");
         b.add_builtin_types();
+        b.link_in_std();
 
         b
+    }
+
+    pub fn link_in_std(&mut self) {
+        match self.curr_pkg {
+            Some(module) => {
+                //this path is relative to where the executable is run from
+                //not where the file is on disk
+                let path = &Path::new("hy_obj.bc");
+
+                let mut file = match File::open(path) {
+                    Ok(f) => f,
+                    Err(msg) => fail!(msg) 
+                };
+
+                let contents_vec = match file.read_to_end() {
+                    Ok(vec) => vec,
+                    Err(msg) => fail!(msg)
+                };
+
+                let len = contents_vec.len();
+                let bc = contents_vec.as_ptr();
+
+                u!(llvm::LLVMRustLinkInExternalBitcode(
+                    module,
+                    bc as *const i8,
+                    len as u64
+                ));
+            },
+            None => fail!("Tried to link in std before creating package")
+        };
     }
 
     pub fn open_loop_scope(&mut self, continu : Block, brk : Block) {
