@@ -6,13 +6,17 @@ $(LIBS):
 test: $(LIBS)
 
 hy_obj:
-	rustc --emit ir ./src/lib/lib_hy_obj_types/lib/lib_hy_obj/src/HyObj.rs
+	rustc --emit ir,bc ./src/lib/lib_hy_obj_types/lib/lib_hy_obj/src/HyObj.rs
 	rustc ./src/lib/lib_hy_obj_types/lib/lib_hy_obj/src/HyObj.rs
 
 hy_obj_types: hy_obj
 	rustc --emit ir,bc ./src/lib/lib_hy_obj_types/src/HyObjTypes.rs -L .
 
-run: hy_obj_types
+hydra:
+	cargo build
+	./target/hydra
+
+run: hy_obj_types hydra
 	llvm-as hydra.ll
 	llc hydra.bc
 	clang -o hydra-llvm hydra.s libhy_obj.a -lSystem -lpthread -lc -lm

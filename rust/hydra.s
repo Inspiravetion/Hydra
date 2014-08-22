@@ -210,35 +210,19 @@ Ltmp9:
 	pushq	%r15
 	pushq	%r14
 	pushq	%rbx
-	subq	$104, %rsp
+	subq	$40, %rsp
 Ltmp10:
 	.cfi_offset %rbx, -40
 Ltmp11:
 	.cfi_offset %r14, -32
 Ltmp12:
 	.cfi_offset %r15, -24
-	leaq	-56(%rbp), %r14
-	movq	%r14, %rdi
-	callq	_new_hy_map
-	movq	%r14, %rdi
-	callq	_hy_obj_to_str
-	movq	%rax, %rdi
-	callq	_puts
-	leaq	-88(%rbp), %rbx
-	movq	%rbx, %rdi
-	movq	%r14, %rsi
-	movq	%rbx, %rdx
-	callq	_hy_map_contains
-	movq	%rbx, %rdi
-	callq	_hy_obj_to_str
-	movq	%rax, %rdi
-	callq	_puts
 	movl	$2, %edi
 	movl	$2, %esi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_double
-	movl	%eax, -92(%rbp)
+	movl	%eax, -28(%rbp)
 	movl	%eax, %edi
 	callq	_print_int
 	movl	$2, %edi
@@ -258,19 +242,19 @@ Ltmp12:
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
-	leaq	-120(%rbp), %r14
+	leaq	-56(%rbp), %r14
 	xorl	%esi, %esi
 	movl	$3, %edx
 	movq	%r14, %rdi
 	callq	"_!range_gen_init"
-	movl	$-1, -124(%rbp)
+	movl	$-1, -60(%rbp)
 	jmp	LBB14_1
 	.align	4, 0x90
 LBB14_3:                                ## %for_loop_stmts11
                                         ##   in Loop: Header=BB14_1 Depth=1
 	movl	16(%rbx), %eax
 	movl	%eax, (%r15)
-	movl	-124(%rbp), %edi
+	movl	-60(%rbp), %edi
 	callq	_print_int
 LBB14_1:                                ## %for_loop_check
                                         ## =>This Inner Loop Header: Depth=1
@@ -280,13 +264,13 @@ LBB14_1:                                ## %for_loop_check
 	je	LBB14_4
 ## BB#2:                                ## %for_loop_check10
                                         ##   in Loop: Header=BB14_1 Depth=1
-	movl	-104(%rbp), %eax
-	movl	%eax, -124(%rbp)
+	movl	-40(%rbp), %eax
+	movl	%eax, -60(%rbp)
 	movq	%rsp, %rax
 	leaq	-16(%rax), %rcx
 	movq	%rcx, %rsp
 	movl	$10, -16(%rax)
-	movl	-124(%rbp), %edx
+	movl	-60(%rbp), %edx
 	incl	%edx
 	movq	%rsp, %rbx
 	addq	$-32, %rbx

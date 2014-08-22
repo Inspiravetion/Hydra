@@ -51,14 +51,6 @@ declare i32 @puts(i8*)
 
 declare i32 @sprintf(i8*, i8*, ...)
 
-%"struct.HyObj<[]>" = type { %"enum.HyObjType<[]>" }
-%"enum.HyObjType<[]>" = type { i8, [7 x i8], [3 x i64] }
-
-declare void @new_hy_map(%"struct.HyObj<[]>"*)
-declare void @hy_obj_print(%"struct.HyObj<[]>"*)
-declare i8* @hy_obj_to_str(%"struct.HyObj<[]>"*)
-declare void @hy_map_contains(%"struct.HyObj<[]>"*, %"struct.HyObj<[]>"*, %"struct.HyObj<[]>"*)
-
 define i32 @print_int(i32) {
   %buf = tail call i8* @malloc(i32 mul (i32 ptrtoint (i8* getelementptr (i8* null, i32 1) to i32), i32 20))
   %fmtd = call i32 (i8*, i8*, ...)* @sprintf(i8* %buf, i8* getelementptr inbounds ([3 x i8]* @global_gen_fmt, i32 0, i32 0), i32 %0)
@@ -132,24 +124,7 @@ define i32 @"!="(i32, i32) {
 define i32 @main() {
   br label %function_def_bridge
 
-function_def_bridge:  
-
-  ;All objects are stack allocated...for now  
-  %real_hy_map = alloca %"struct.HyObj<[]>"
-  call void @new_hy_map(%"struct.HyObj<[]>"*  %real_hy_map)
-  
-
-  %array_str = call i8* @hy_obj_to_str(%"struct.HyObj<[]>"* %real_hy_map)
-  %putsres = call i32 @puts(i8* %array_str)
-  
-  ;All objects are stack allocated...for now  
-  %real_hy_bool = alloca %"struct.HyObj<[]>"
-  ;The first arg is the return val...the regular params follow...idk why they did it like this
-  call void @hy_map_contains(%"struct.HyObj<[]>"* %real_hy_bool, %"struct.HyObj<[]>"* %real_hy_map, %"struct.HyObj<[]>"* %real_hy_bool)
-
-  %bool_str = call i8* @hy_obj_to_str(%"struct.HyObj<[]>"* %real_hy_bool)
-  %putsres2 = call i32 @puts(i8* %bool_str)
-                            ; preds = %0
+function_def_bridge:                              ; preds = %0
   %"+_tmp" = call i32 @"+"(i32 2, i32 2)
   %double_tmp = call i32 @double(i32 %"+_tmp")
   %a = alloca i32

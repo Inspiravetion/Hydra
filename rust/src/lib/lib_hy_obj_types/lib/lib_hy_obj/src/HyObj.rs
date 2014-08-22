@@ -72,7 +72,7 @@ impl HyObj {
     ///////////////////////////////////////
 
     #[no_mangle]
-    pub fn new_hy_map() -> HyObj {
+    pub fn hy_new_map() -> HyObj {
         HyObj {
             typ : HyMap(TreeMap::new())
         }
@@ -80,7 +80,7 @@ impl HyObj {
 
     //Call String::to_c_str() -> CString::unwrap() to get this pointer
     #[no_mangle]
-    pub fn new_hy_string(buf : *const i8) -> HyObj {
+    pub fn hy_new_string(buf : *const i8) -> HyObj {
         let mut s = String::new();
         unsafe {
             let c_str = CString::new(buf, true);
@@ -92,28 +92,28 @@ impl HyObj {
     }
 
     #[no_mangle]
-    pub fn new_hy_int(i : int) -> HyObj {
+    pub fn hy_new_int(i : int) -> HyObj {
         HyObj {
             typ : HyInt(i)
         }
     }
 
     #[no_mangle]
-    pub fn new_hy_float(f : f64) -> HyObj {
+    pub fn hy_new_float(f : f64) -> HyObj {
         HyObj {
             typ : HyFloat(f)
         }
     }
 
     #[no_mangle]
-    pub fn new_hy_array() -> HyObj {
+    pub fn hy_new_array() -> HyObj {
         HyObj {
             typ : HyArray(Vec::new())
         }
     }
 
     #[no_mangle]
-    pub fn new_hy_bool(b : bool) -> HyObj {
+    pub fn hy_new_bool(b : bool) -> HyObj {
         HyObj {
             typ : HyBool(b)
         }
@@ -129,7 +129,7 @@ impl HyObj {
             HyMap(ref mut m) => {
                 match key.typ {
                     HyString(ref s) => {
-                       HyObj::new_hy_bool(m.insert(s.clone(), val))
+                       HyObj::hy_new_bool(m.insert(s.clone(), val))
                     },
                     _ => fail!("Maps only take string keys")
                 }
@@ -144,7 +144,7 @@ impl HyObj {
             HyMap(ref mut m) => {
                 match key.typ {
                     HyString(ref s) => {
-                       HyObj::new_hy_bool(m.remove(s))
+                       HyObj::hy_new_bool(m.remove(s))
                     },
                     _ => fail!("Maps only take string keys")
                 }
@@ -159,9 +159,9 @@ impl HyObj {
             HyMap(ref mut m) => {
                 match key.typ {
                     HyString(ref s) => {
-                       HyObj::new_hy_bool(m.contains_key(s))
+                       HyObj::hy_new_bool(m.contains_key(s))
                     },
-                    _ => HyObj::new_hy_bool(false)
+                    _ => HyObj::hy_new_bool(false)
                 }
             },
             _ => fail!("Called hy_map_contains on an object that is not a Map")

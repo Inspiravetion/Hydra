@@ -6,7 +6,7 @@ use generator::{Generator, RANGE_GEN_ID, RANGE_GEN_INIT, RANGE_GEN_NEXT};
 use generator;
 use lltype::*;
 use std::owned::Box;
-use std::io::{File};
+use std::io::{File, BufferedReader};
 
 
 pub struct Builder {
@@ -166,7 +166,7 @@ impl Builder {
 
         b.create_package("hydra");
         b.add_builtin_types();
-        // b.link_in_std();
+        b.link_in_std();
 
         b
     }
@@ -176,26 +176,46 @@ impl Builder {
             Some(module) => {
                 //this path is relative to where the executable is run from
                 //not where the file is on disk
-                let path = &Path::new("hy_obj.bc");
+                let path = &Path::new("/Users/Charlie/Projects/Hydra/rust/hy_obj.ll");
 
                 let mut file = match File::open(path) {
-                    Ok(f) => f,
+                    Ok(f) => BufferedReader::new(f),
                     Err(msg) => fail!(msg) 
                 };
 
-                let contents_vec = match file.read_to_end() {
-                    Ok(vec) => vec,
-                    Err(msg) => fail!(msg)
-                };
+                let mut ll_string = String::new();
 
-                let len = contents_vec.len();
-                let bc = contents_vec.as_ptr();
+                for poss_line in file.lines() {
+                    let line_string = match poss_line {
+                        Ok(string) => string,
+                        Err(err) => fail!(err)
+                    };
 
-                u!(llvm::LLVMRustLinkInExternalBitcode(
-                    module,
-                    bc as *const i8,
-                    len as u64
-                ));
+                    let line = line_string.as_slice();
+
+                    if line.starts_with("%") {
+                        let sections : Vec<&str> = line.split('.').collect();
+                        if sections.len() > 1 && sections[1].starts_with("HyObj") {
+                            ll_string.push_str(line);
+                        }
+                    } else if line.starts_with("define") {
+                        let sections : Vec<&str> = line.split('@').collect();
+                        if sections.len() > 1 &&  sections[1].starts_with("hy_") {
+                            ll_string.push_str(line);
+                        } 
+                    }
+                }     
+
+                println!("\n\n{}\n\n", ll_string);           
+
+                // let len = contents_vec.len();
+                // let bc = contents_vec.as_ptr();
+
+                // u!(llvm::LLVMRustLinkInExternalBitcode(
+                //     module,
+                //     bc as *const i8,
+                //     len as u64
+                // ));
             },
             None => fail!("Tried to link in std before creating package")
         };
