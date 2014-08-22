@@ -56,6 +56,13 @@ impl HyObj {
             HyMap(ref map) => {
                 unsafe{ "Map : {}".to_string().to_c_str().unwrap() }  
             },
+            HyBool(ref b) => {
+                if *b {
+                    unsafe{ "bool : true".to_string().to_c_str().unwrap() }  
+                } else {
+                    unsafe{ "bool : false".to_string().to_c_str().unwrap() }  
+                }
+            }
             _ => unsafe{ "Called print on an object that is not an Array".to_string().to_c_str().unwrap() }
         }
     }
@@ -154,7 +161,7 @@ impl HyObj {
                     HyString(ref s) => {
                        HyObj::new_hy_bool(m.contains_key(s))
                     },
-                    _ => fail!("Maps only take string keys")
+                    _ => HyObj::new_hy_bool(false)
                 }
             },
             _ => fail!("Called hy_map_contains on an object that is not a Map")

@@ -57,6 +57,7 @@ declare i32 @sprintf(i8*, i8*, ...)
 declare void @new_hy_map(%"struct.HyObj<[]>"*)
 declare void @hy_obj_print(%"struct.HyObj<[]>"*)
 declare i8* @hy_obj_to_str(%"struct.HyObj<[]>"*)
+declare void @hy_map_contains(%"struct.HyObj<[]>"*, %"struct.HyObj<[]>"*, %"struct.HyObj<[]>"*)
 
 define i32 @print_int(i32) {
   %buf = tail call i8* @malloc(i32 mul (i32 ptrtoint (i8* getelementptr (i8* null, i32 1) to i32), i32 20))
@@ -132,10 +133,22 @@ define i32 @main() {
   br label %function_def_bridge
 
 function_def_bridge:  
-  %real_hy_array = alloca %"struct.HyObj<[]>"
-  call void @new_hy_map(%"struct.HyObj<[]>"*  %real_hy_array)
-  %array_str = call i8* @hy_obj_to_str(%"struct.HyObj<[]>"* %real_hy_array)
+
+  ;All objects are stack allocated...for now  
+  %real_hy_map = alloca %"struct.HyObj<[]>"
+  call void @new_hy_map(%"struct.HyObj<[]>"*  %real_hy_map)
+  
+
+  %array_str = call i8* @hy_obj_to_str(%"struct.HyObj<[]>"* %real_hy_map)
   %putsres = call i32 @puts(i8* %array_str)
+  
+  ;All objects are stack allocated...for now  
+  %real_hy_bool = alloca %"struct.HyObj<[]>"
+  ;The first arg is the return val...the regular params follow...idk why they did it like this
+  call void @hy_map_contains(%"struct.HyObj<[]>"* %real_hy_bool, %"struct.HyObj<[]>"* %real_hy_map, %"struct.HyObj<[]>"* %real_hy_bool)
+
+  %bool_str = call i8* @hy_obj_to_str(%"struct.HyObj<[]>"* %real_hy_bool)
+  %putsres2 = call i32 @puts(i8* %bool_str)
                             ; preds = %0
   %"+_tmp" = call i32 @"+"(i32 2, i32 2)
   %double_tmp = call i32 @double(i32 %"+_tmp")
