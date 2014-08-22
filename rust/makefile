@@ -5,9 +5,15 @@ $(LIBS):
 
 test: $(LIBS)
 
-run:
-	./target/hydra
-	llvm-as-mp-3.4 hydra.ll
-	llc-mp-3.4 hydra.bc
-	clang -o hydra-llvm hydra.s
+hy_obj:
+	rustc --emit ir ./src/lib/lib_hy_obj_types/lib/lib_hy_obj/src/HyObj.rs
+	rustc ./src/lib/lib_hy_obj_types/lib/lib_hy_obj/src/HyObj.rs
+
+hy_obj_types: hy_obj
+	rustc --emit ir,bc ./src/lib/lib_hy_obj_types/src/HyObjTypes.rs -L .
+
+run: hy_obj_types
+	llvm-as hydra.ll
+	llc hydra.bc
+	clang -o hydra-llvm hydra.s libhy_obj.a -lSystem -lpthread -lc -lm
 	./hydra-llvm	

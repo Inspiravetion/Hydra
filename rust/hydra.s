@@ -1,4 +1,5 @@
 	.section	__TEXT,__text,regular,pure_instructions
+	.macosx_version_min 12, 5
 	.globl	"_!range_gen_next"
 	.align	4, 0x90
 "_!range_gen_next":                     ## @"!range_gen_next"
@@ -19,10 +20,10 @@ LBB0_2:                                 ## %cond
 	movl	8(%rdi), %eax
 	movl	%eax, 16(%rdi)
 	movl	$1, %eax
-	ret
+	retq
 LBB0_4:                                 ## %exit
 	xorl	%eax, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_!range_gen_init"
@@ -34,7 +35,7 @@ LBB0_4:                                 ## %exit
 	movq	%rax, (%rdi)
 	movl	%esi, 8(%rdi)
 	movl	%edx, 12(%rdi)
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	_print_int
@@ -43,17 +44,17 @@ _print_int:                             ## @print_int
 	.cfi_startproc
 ## BB#0:
 	pushq	%rbp
-Ltmp5:
+Ltmp2:
 	.cfi_def_cfa_offset 16
 	pushq	%rbx
-Ltmp6:
+Ltmp3:
 	.cfi_def_cfa_offset 24
 	pushq	%rax
-Ltmp7:
+Ltmp4:
 	.cfi_def_cfa_offset 32
-Ltmp8:
+Ltmp5:
 	.cfi_offset %rbx, -24
-Ltmp9:
+Ltmp6:
 	.cfi_offset %rbp, -16
 	movl	%edi, %ebp
 	movl	$20, %edi
@@ -70,7 +71,7 @@ Ltmp9:
 	addq	$8, %rsp
 	popq	%rbx
 	popq	%rbp
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_+"
@@ -81,7 +82,7 @@ Ltmp9:
                                         ## kill: ESI<def> ESI<kill> RSI<def>
                                         ## kill: EDI<def> EDI<kill> RDI<def>
 	leal	(%rdi,%rsi), %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_-"
@@ -91,7 +92,7 @@ Ltmp9:
 ## BB#0:
 	subl	%esi, %edi
 	movl	%edi, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_*"
@@ -101,7 +102,7 @@ Ltmp9:
 ## BB#0:
 	imull	%esi, %edi
 	movl	%edi, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_/"
@@ -112,7 +113,7 @@ Ltmp9:
 	movl	%edi, %eax
 	cltd
 	idivl	%esi
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_%"
@@ -124,7 +125,7 @@ Ltmp9:
 	cltd
 	idivl	%esi
 	movl	%edx, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_<"
@@ -135,7 +136,7 @@ Ltmp9:
 	cmpl	%esi, %edi
 	setl	%al
 	movzbl	%al, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_>"
@@ -146,7 +147,7 @@ Ltmp9:
 	cmpl	%esi, %edi
 	setg	%al
 	movzbl	%al, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_<="
@@ -157,7 +158,7 @@ Ltmp9:
 	cmpl	%esi, %edi
 	setle	%al
 	movzbl	%al, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_>="
@@ -168,7 +169,7 @@ Ltmp9:
 	cmpl	%esi, %edi
 	setge	%al
 	movzbl	%al, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_=="
@@ -179,7 +180,7 @@ Ltmp9:
 	cmpl	%esi, %edi
 	sete	%al
 	movzbl	%al, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_!="
@@ -190,7 +191,7 @@ Ltmp9:
 	cmpl	%esi, %edi
 	setne	%al
 	movzbl	%al, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	_main
@@ -199,29 +200,36 @@ _main:                                  ## @main
 	.cfi_startproc
 ## BB#0:                                ## %for_loop_init
 	pushq	%rbp
-Ltmp13:
+Ltmp7:
 	.cfi_def_cfa_offset 16
-Ltmp14:
+Ltmp8:
 	.cfi_offset %rbp, -16
 	movq	%rsp, %rbp
-Ltmp15:
+Ltmp9:
 	.cfi_def_cfa_register %rbp
 	pushq	%r15
 	pushq	%r14
 	pushq	%rbx
-	subq	$40, %rsp
-Ltmp16:
+	subq	$72, %rsp
+Ltmp10:
 	.cfi_offset %rbx, -40
-Ltmp17:
+Ltmp11:
 	.cfi_offset %r14, -32
-Ltmp18:
+Ltmp12:
 	.cfi_offset %r15, -24
+	leaq	-56(%rbp), %rbx
+	movq	%rbx, %rdi
+	callq	_new_hy_map
+	movq	%rbx, %rdi
+	callq	_hy_obj_to_str
+	movq	%rax, %rdi
+	callq	_puts
 	movl	$2, %edi
 	movl	$2, %esi
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_double
-	movl	%eax, -28(%rbp)
+	movl	%eax, -60(%rbp)
 	movl	%eax, %edi
 	callq	_print_int
 	movl	$2, %edi
@@ -241,19 +249,19 @@ Ltmp18:
 	callq	"_+"
 	movl	%eax, %edi
 	callq	_print_int
-	leaq	-56(%rbp), %r14
+	leaq	-88(%rbp), %r14
 	xorl	%esi, %esi
 	movl	$3, %edx
 	movq	%r14, %rdi
 	callq	"_!range_gen_init"
-	movl	$-1, -60(%rbp)
+	movl	$-1, -92(%rbp)
 	jmp	LBB14_1
 	.align	4, 0x90
 LBB14_3:                                ## %for_loop_stmts11
                                         ##   in Loop: Header=BB14_1 Depth=1
 	movl	16(%rbx), %eax
 	movl	%eax, (%r15)
-	movl	-60(%rbp), %edi
+	movl	-92(%rbp), %edi
 	callq	_print_int
 LBB14_1:                                ## %for_loop_check
                                         ## =>This Inner Loop Header: Depth=1
@@ -263,13 +271,13 @@ LBB14_1:                                ## %for_loop_check
 	je	LBB14_4
 ## BB#2:                                ## %for_loop_check10
                                         ##   in Loop: Header=BB14_1 Depth=1
-	movl	-40(%rbp), %eax
-	movl	%eax, -60(%rbp)
+	movl	-72(%rbp), %eax
+	movl	%eax, -92(%rbp)
 	movq	%rsp, %rax
 	leaq	-16(%rax), %rcx
 	movq	%rcx, %rsp
 	movl	$10, -16(%rax)
-	movl	-60(%rbp), %edx
+	movl	-92(%rbp), %edx
 	incl	%edx
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
@@ -377,7 +385,7 @@ LBB14_11:                               ## %if_else_exit
 	popq	%r14
 	popq	%r15
 	popq	%rbp
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	_double
@@ -386,13 +394,13 @@ _double:                                ## @double
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp20:
+Ltmp13:
 	.cfi_def_cfa_offset 16
 	movl	%edi, 4(%rsp)
 	movl	$2, %esi
 	callq	"_*"
 	popq	%rdx
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	_minus
@@ -401,14 +409,14 @@ _minus:                                 ## @minus
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp22:
+Ltmp14:
 	.cfi_def_cfa_offset 16
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
 	movl	4(%rsp), %edi
 	callq	"_-"
 	popq	%rdx
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_!squares_gen_next"
@@ -419,21 +427,22 @@ Ltmp22:
 	jmpq	*(%rdi)
 LBB17_1:                                ## %gen_state_save
 	movl	$1, %eax
-	ret
-Ltmp23:                                 ## Block address taken
+	retq
+Ltmp15:                                 ## Block address taken
 LBB17_2:                                ## %gen_state_entry
-	movabsq	$12884901887, %rax      ## imm = 0x2FFFFFFFF
+	movabsq	$8589934591, %rax       ## imm = 0x1FFFFFFFF
 	movq	%rax, 12(%rdi)
-	movabsq	$-4294967295, %rcx      ## imm = 0xFFFFFFFF00000001
-	movq	%rcx, 16(%rdi)
+	movabsq	$-4294967294, %rax      ## imm = 0xFFFFFFFF00000002
+	movq	%rax, 16(%rdi)
+	movabsq	$12884901887, %rax      ## imm = 0x2FFFFFFFF
 	movq	%rax, 24(%rdi)
 	movl	12(%rdi), %eax
 	movl	%eax, 32(%rdi)
 	movl	20(%rdi), %eax
 	movl	%eax, 36(%rdi)
-	leaq	Ltmp24(%rip), %rax
+	leaq	Ltmp16(%rip), %rax
 	jmp	LBB17_4
-Ltmp24:                                 ## Block address taken
+Ltmp16:                                 ## Block address taken
 LBB17_3:                                ## %post_yield
 	movl	20(%rdi), %eax
 	movl	%eax, 28(%rdi)
@@ -441,17 +450,17 @@ LBB17_3:                                ## %post_yield
 	movl	%eax, 32(%rdi)
 	movl	16(%rdi), %eax
 	movl	%eax, 36(%rdi)
-	leaq	Ltmp25(%rip), %rax
+	leaq	Ltmp17(%rip), %rax
 LBB17_4:                                ## %post_yield
 	movq	%rax, (%rdi)
 	movl	$1, %eax
-	ret
-Ltmp25:                                 ## Block address taken
+	retq
+Ltmp17:                                 ## Block address taken
 LBB17_5:                                ## %post_yield13
 	movl	$2, 20(%rdi)
 LBB17_6:                                ## %gen_exit
 	xorl	%eax, %eax
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	"_!squares_gen_init"
@@ -459,10 +468,10 @@ LBB17_6:                                ## %gen_exit
 "_!squares_gen_init":                   ## @"!squares_gen_init"
 	.cfi_startproc
 ## BB#0:
-	leaq	Ltmp23(%rip), %rax
+	leaq	Ltmp15(%rip), %rax
 	movq	%rax, (%rdi)
 	movl	%esi, 8(%rdi)
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	_times
@@ -471,14 +480,14 @@ _times:                                 ## @times
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp27:
+Ltmp18:
 	.cfi_def_cfa_offset 16
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
 	movl	4(%rsp), %edi
 	callq	"_*"
 	popq	%rdx
-	ret
+	retq
 	.cfi_endproc
 
 	.globl	_plus
@@ -487,14 +496,14 @@ _plus:                                  ## @plus
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp29:
+Ltmp19:
 	.cfi_def_cfa_offset 16
 	movl	%edi, 4(%rsp)
 	movl	%esi, (%rsp)
 	movl	4(%rsp), %edi
 	callq	"_+"
 	popq	%rdx
-	ret
+	retq
 	.cfi_endproc
 
 	.section	__TEXT,__cstring,cstring_literals
