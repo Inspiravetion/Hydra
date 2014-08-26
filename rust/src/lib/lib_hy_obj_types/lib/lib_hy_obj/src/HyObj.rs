@@ -3,28 +3,99 @@
 #![license = "MIT"]
 #![crate_type = "staticlib"]
 
+extern crate regex;
+extern crate alloc;
+
+use alloc::heap;
+
+use std::comm::{channel, Sender, Receiver};
 use std::collections::TreeMap;
 use std::c_str::CString;
+use std::mem;
+use std::ptr;
+// use std::gc::{Gc, GC};
 
-#[no_mangle]
-use std::gc::{Gc, GC};
+use regex::Regex;
 
 pub enum HyObjType {
-    HyMap(TreeMap<String, HyObj>),
-    HyString(String),
-    HyInt(int),
-    HyFloat(f64),
+    HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
+    HyChannel(Sender<HyObj>, Receiver<HyObj>),
+    HyMap(TreeMap<String, Box<HyObj>>),
     HyArray(Vec<HyObj>),
-    HyBool(bool)
-    // HyRegex()
-    // HyChannel
+    HyString(String),
+    HyRegex(Regex),
+    HyFloat(f64),
+    HyBool(bool),
+    HyInt(int),
+    HyUndefined,
+    HyNull
 }
 
 pub struct HyObj {
     pub typ : HyObjType
 }
 
-// pub type HyObj = HyObj;
+pub struct HyObjSlice {
+    pub objs : *const *const HyObj,
+    pub len  : uint,
+    pub cap  : uint
+}
+
+#[no_mangle]
+pub fn hy_new_obj_slice(cap : uint) -> HyObjSlice {
+    let mem_sz = mem::size_of::<*const HyObj>();
+    let alignment = mem::min_align_of::<*const HyObj>();
+    let ptr = unsafe { heap::allocate(mem_sz * cap, alignment) as *const *const HyObj };
+
+    HyObjSlice {
+        objs : ptr,
+        cap  : cap,
+        len  : 0
+    }
+}
+
+//fail if full because this should never get called when its full
+#[no_mangle]
+pub fn hy_obj_slice_push(this : *const HyObjSlice, obj : *const HyObj) {
+    let ptr = unsafe { 
+        let len = (*this).len;
+        let cap = (*this).cap;
+
+        if cap == len {
+            fail!("Tried to push too many HyObjs into the HyObjSlice");
+        }
+
+        (*this).objs.offset(len as int)
+    };
+
+    unsafe{ ptr::write(mem::transmute(ptr), obj) };
+}
+
+
+pub struct HyGenCtxt {
+    pub block  : *const i8,
+    pub params : HyObjSlice,
+    pub state  : HyObjSlice,
+    pub yields : HyObjSlice
+}
+
+impl HyGenCtxt {
+    pub fn new(block : *const i8, params : HyObjSlice, num_state : uint, num_yields : uint) -> *const HyGenCtxt {
+        let mem_sz = mem::size_of::<HyGenCtxt>();
+        let alignment = mem::min_align_of::<HyGenCtxt>();
+        
+        unsafe {
+            let ctxt = heap::allocate(mem_sz, alignment) as *mut HyGenCtxt;
+
+            (*ctxt).block  = block;
+            (*ctxt).params = params;
+            (*ctxt).state  = hy_new_obj_slice(num_state);
+            (*ctxt).yields = hy_new_obj_slice(num_yields);    
+        
+            ctxt as *const HyGenCtxt
+        }
+    }
+}
 
 impl HyObj {
 
@@ -72,50 +143,124 @@ impl HyObj {
     ///////////////////////////////////////
 
     #[no_mangle]
-    pub fn hy_new_map() -> HyObj {
-        HyObj {
+    pub fn hy_new_map() -> Box<HyObj> {
+        box HyObj {
             typ : HyMap(TreeMap::new())
         }
     }
 
     //Call String::to_c_str() -> CString::unwrap() to get this pointer
     #[no_mangle]
-    pub fn hy_new_string(buf : *const i8) -> HyObj {
+    pub fn hy_new_string(buf : *const i8) -> Box<HyObj> {
         let mut s = String::new();
         unsafe {
             let c_str = CString::new(buf, true);
             s.push_bytes(c_str.as_bytes());
         };
-        HyObj {
+        box HyObj {
             typ : HyString(s)
         }
     }
 
     #[no_mangle]
-    pub fn hy_new_int(i : int) -> HyObj {
-        HyObj {
+    pub fn hy_new_int(i : int) -> Box<HyObj> {
+        box HyObj {
             typ : HyInt(i)
         }
     }
 
     #[no_mangle]
-    pub fn hy_new_float(f : f64) -> HyObj {
-        HyObj {
+    pub fn hy_new_float(f : f64) -> Box<HyObj> {
+        box HyObj {
             typ : HyFloat(f)
         }
     }
 
     #[no_mangle]
-    pub fn hy_new_array() -> HyObj {
-        HyObj {
+    pub fn hy_new_array() -> Box<HyObj> {
+        box HyObj {
             typ : HyArray(Vec::new())
         }
     }
 
     #[no_mangle]
-    pub fn hy_new_bool(b : bool) -> HyObj {
-        HyObj {
+    pub fn hy_new_bool(b : bool) -> Box<HyObj> {
+        box HyObj {
             typ : HyBool(b)
+        }
+    }
+
+    #[no_mangle]
+    pub fn hy_new_regex(pattern : HyObj) -> Box<HyObj> {
+        let regex = match pattern.typ {
+            HyString(pattern) => { 
+                match Regex::new(pattern.as_slice()) {
+                    Ok(r) => r,
+                    Err(e) => fail!(e)
+                }
+            },
+            _ => fail!("Regular expression constructors take a string pattern")
+        };
+
+        box HyObj {
+            typ : HyRegex(regex)
+        }
+    }
+
+    #[no_mangle]
+    pub fn hy_new_chan() -> Box<HyObj> {
+        let (sendr, recvr) = channel();
+
+        box HyObj {
+            typ : HyChannel(sendr, recvr)
+        }
+    }   
+
+    //clone init params using 'hy_obj_clone' (to take care of semantics) into
+    //the contexts param array...this should actually be done by the caller
+    //...instead of iterating to put them in the array and then again to clone them,
+    //clone them the first time
+
+    #[no_mangle]
+    pub fn hy_new_gen(
+        start_block : *const i8,
+        init_params : HyObjSlice,
+        next        : proc(HyObjSlice, *const HyGenCtxt) : Send -> bool,
+        num_state   : uint, 
+        num_yields  : uint) -> Box<HyObj> {
+
+        //create new context with the start block, params, and space for everything else        
+        let ctxt = HyGenCtxt::new(start_block, init_params, num_state, num_yields);
+
+        box HyObj {
+            typ : HyGenerator(next, ctxt)
+        }
+    }       
+
+    #[no_mangle]
+    pub fn hy_new_undefined() -> Box<HyObj> {
+        box HyObj { typ : HyUndefined }
+    }
+
+    #[no_mangle]
+    pub fn hy_new_null() -> Box<HyObj> {
+        box HyObj { typ : HyNull }
+    }
+
+    ///////////////////////////////////////
+    //            Clone Function         //
+    //  This handles reference vs value  //
+    //  semantics                        //
+    ///////////////////////////////////////
+
+    #[no_mangle]
+    pub fn hy_obj_clone(this : Box<HyObj>) -> Box<HyObj> {
+        match this.typ {
+            HyInt(i) => HyObj::hy_new_int(i),
+            HyFloat(f) => HyObj::hy_new_float(f),
+            HyString(s) => unsafe { HyObj::hy_new_string(s.clone().to_c_str().unwrap()) },
+            HyBool(b) => HyObj::hy_new_bool(b),
+            _ => this
         }
     }
 
@@ -124,7 +269,7 @@ impl HyObj {
     ///////////////////////////////////////
 
     #[no_mangle]
-    pub fn hy_map_insert(&mut self, key : HyObj, val : HyObj) -> HyObj {
+    pub fn hy_map_insert(&mut self, key : Box<HyObj>, val : Box<HyObj>) -> Box<HyObj> {
         match self.typ {
             HyMap(ref mut m) => {
                 match key.typ {
@@ -139,7 +284,7 @@ impl HyObj {
     }
 
     #[no_mangle]
-    pub fn hy_map_delete(&mut self, key : HyObj) -> HyObj {
+    pub fn hy_map_delete(&mut self, key : Box<HyObj>) -> Box<HyObj> {
         match self.typ {
             HyMap(ref mut m) => {
                 match key.typ {
@@ -154,7 +299,7 @@ impl HyObj {
     }
 
     #[no_mangle]
-    pub fn hy_map_contains(&mut self, key : HyObj) -> HyObj {
+    pub fn hy_map_contains(&mut self, key : Box<HyObj>) -> Box<HyObj> {
         match self.typ {
             HyMap(ref mut m) => {
                 match key.typ {

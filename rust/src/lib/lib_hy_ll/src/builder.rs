@@ -7,6 +7,7 @@ use generator;
 use lltype::*;
 use std::owned::Box;
 use std::io::{File, BufferedReader};
+use std::str;
 
 
 pub struct Builder {
@@ -201,7 +202,8 @@ impl Builder {
                     } else if line.starts_with("define") {
                         let sections : Vec<&str> = line.split('@').collect();
                         if sections.len() > 1 &&  sections[1].starts_with("hy_") {
-                            ll_string.push_str(line);
+                            let line = line.trim_right_chars(|c: char| c != ')');
+                            ll_string.push_str(str::replace(line, "define", "\ndeclare").as_slice());
                         } 
                     }
                 }     
