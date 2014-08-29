@@ -167,7 +167,7 @@ impl Builder {
 
         b.create_package("hydra");
         b.add_builtin_types();
-        b.link_in_std();
+        // b.link_in_std();
 
         b
     }
@@ -339,7 +339,7 @@ impl Builder {
 
     pub fn default_value(&mut self) -> Value {
         //TODO this should return the undefined sentinal
-        self.int(-1)
+        self.int32(-1)
     }
 
     pub fn define_range_gen_builtin_type(&mut self) {
@@ -388,7 +388,7 @@ impl Builder {
             //incr index and break to cond
             fb.goto_block(incr);
             let idx = fb.load(ctx_index, "index");
-            let one = fb.int(1);
+            let one = fb.int32(1);
             let add_tmp = fb.add_op(idx, one, "add_tmp");
             fb.store(add_tmp, ctx_index);
             fb.break_to(cond);
@@ -402,11 +402,11 @@ impl Builder {
             let ret_val = fb.load(ctx_index, "ret1");
             fb.store(ret_val, ctx_ret);
 
-            let done = fb.int(1);
+            let done = fb.int32(1);
             fb.ret(done);
             
             fb.goto_block(exit);
-            let done = fb.int(0);
+            let done = fb.int32(0);
             fb.ret(done);
         });
 
@@ -511,6 +511,17 @@ impl Builder {
         u!(llvm::LLVMBuildRetVoid(self.builder));
     }
 
+    pub fn func_returns_void(&mut self, func_name : &str) -> bool {
+        println!("1");
+        let func = self.get_function(func_name);
+        println!("2");
+        let func_type = u!(llvm::LLVMTypeOf(func));
+        println!("3");
+        let ret_type = u!(llvm::LLVMGetReturnType(func_type));
+        println!("4");
+        ret_type == self.void_type()
+    }
+
     /*
         CONTROL STATEMENTS
     */
@@ -611,7 +622,7 @@ impl Builder {
         u!(llvm::LLVMBuildArrayMalloc(
             self.builder,
             typ,
-            self.int(20),
+            self.int32(20),
             chars(variable_name)
         ))
     }
@@ -691,12 +702,15 @@ impl Builder {
      */
     pub fn create_type(&mut self, field_typs : &Vec<Type>, typ_name : &str) -> Type {
         let typ = u!(llvm::LLVMStructCreateNamed(self.ctx, chars(typ_name)));
+        
         u!(llvm::LLVMStructSetBody(
             typ,
             field_typs.as_ptr(), 
             field_typs.len() as c_uint, 
             False
         ));
+
+        self.add_type(typ_name, typ);
 
         typ
     }
@@ -720,6 +734,10 @@ impl Builder {
 
     pub fn get_type(&mut self, id : &str) -> Type {
         self.types[id.to_string()]
+    }
+
+    pub fn add_type(&mut self, id : &str, typ : Type) {
+        self.types.insert(id.to_string(), typ);
     }
 
     pub fn get_range_gen_type(&mut self) -> Type {
@@ -761,6 +779,14 @@ impl Builder {
         u!(llvm::LLVMInt32TypeInContext(self.ctx))
     }
 
+    pub fn int64_type(&mut self) -> Type {
+        u!(llvm::LLVMInt64TypeInContext(self.ctx))
+    }
+
+    pub fn float64_type(&mut self) -> Type {
+        u!(llvm::LLVMFloatTypeInContext(self.ctx))
+    }
+
     pub fn string_type(&mut self) -> Type {
         let char_typ = self.char_type();
         self.to_ptr_type(char_typ)
@@ -778,6 +804,10 @@ impl Builder {
         u!(llvm::LLVMPointerType(typ, 0))
     }
 
+    pub fn array_type(&mut self, typ : Type, len : u64) -> Type {
+        u!(llvm::LLVMRustArrayType(typ, len))
+    }
+
     pub fn type_of(&mut self, val : Value) -> Type {
         u!(llvm::LLVMTypeOf(val))
     }
@@ -791,7 +821,11 @@ impl Builder {
         VALUES
      */
     
-    pub fn int(&mut self, num : int) -> Value {
+    pub fn int64(&mut self, num : int) -> Value {
+        u!(llvm::LLVMConstInt(self.int64_type(), num as c_ulonglong, False))
+    }
+
+    pub fn int32(&mut self, num : int) -> Value {
         u!(llvm::LLVMConstInt(self.int32_type(), num as c_ulonglong, False))
     }
 
@@ -802,7 +836,7 @@ impl Builder {
             chars(format!("global_{}", variable_name).as_slice())
         ));
 
-        let v = Vec::from_elem(2, self.int(0));
+        let v = Vec::from_elem(2, self.int32(0));
         u!(llvm::LLVMBuildInBoundsGEP(
             self.builder,
             global,
@@ -943,11 +977,11 @@ impl<'a> GenBuilder<'a> {
             fb.indirect_break(label, possible_labels);
 
             fb.goto_block(state_save);
-            let continue_val = fb.int(1);
+            let continue_val = fb.int32(1);
             fb.ret(continue_val);
 
             fb.goto_block(exit);
-            let done_val = fb.int(0);
+            let done_val = fb.int32(0);
             fb.ret(done_val);
         });
 

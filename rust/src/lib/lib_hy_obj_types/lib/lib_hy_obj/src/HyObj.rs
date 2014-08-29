@@ -42,14 +42,14 @@ pub struct HyObjSlice {
 }
 
 #[no_mangle]
-pub fn hy_new_obj_slice(cap : uint) -> HyObjSlice {
+pub fn hy_new_obj_slice(cap : int) -> HyObjSlice {
     let mem_sz = mem::size_of::<*const HyObj>();
     let alignment = mem::min_align_of::<*const HyObj>();
-    let ptr = unsafe { heap::allocate(mem_sz * cap, alignment) as *const *const HyObj };
+    let ptr = unsafe { heap::allocate(mem_sz * (cap as uint), alignment) as *const *const HyObj };
 
     HyObjSlice {
         objs : ptr,
-        cap  : cap,
+        cap  : cap as uint,
         len  : 0
     }
 }
@@ -80,7 +80,7 @@ pub struct HyGenCtxt {
 }
 
 impl HyGenCtxt {
-    pub fn new(block : *const i8, params : HyObjSlice, num_state : uint, num_yields : uint) -> *const HyGenCtxt {
+    pub fn new(block : *const i8, params : HyObjSlice, num_state : int, num_yields : int) -> *const HyGenCtxt {
         let mem_sz = mem::size_of::<HyGenCtxt>();
         let alignment = mem::min_align_of::<HyGenCtxt>();
         
@@ -116,6 +116,24 @@ impl HyObj {
     #[no_mangle]
     pub fn hy_obj_to_str(&self) -> *const i8 {
         match self.typ {
+            HyUndefined => {
+                unsafe { "undefined".to_string().to_c_str().unwrap() }
+            },
+            HyNull => {
+                unsafe { "null".to_string().to_c_str().unwrap() }
+            },
+            HyInt(i) => {
+                unsafe { (format!("int : {}", i)).to_c_str().unwrap() }
+            },
+            HyFloat(f) => {
+                unsafe { (format!("float : {}", f)).to_c_str().unwrap() }
+            },
+            HyString(ref s) => {
+                unsafe { s.clone().to_c_str().unwrap() }
+            },
+            HyRegex(ref r) => {
+                unsafe { (format!("regex : {}", r)).to_c_str().unwrap() }
+            },
             HyArray(ref vec) => {
                 // print!("[");
                 // for obj in vec.iter() {
@@ -133,8 +151,8 @@ impl HyObj {
                 } else {
                     unsafe{ "bool : false".to_string().to_c_str().unwrap() }  
                 }
-            }
-            _ => unsafe{ "Called print on an object that is not an Array".to_string().to_c_str().unwrap() }
+            },
+            _ => unsafe{ "Called print on an object that is not an Array, Map, or bool".to_string().to_c_str().unwrap() }
         }
     }
 
@@ -226,8 +244,8 @@ impl HyObj {
         start_block : *const i8,
         init_params : HyObjSlice,
         next        : proc(HyObjSlice, *const HyGenCtxt) : Send -> bool,
-        num_state   : uint, 
-        num_yields  : uint) -> Box<HyObj> {
+        num_state   : int, 
+        num_yields  : int) -> Box<HyObj> {
 
         //create new context with the start block, params, and space for everything else        
         let ctxt = HyGenCtxt::new(start_block, init_params, num_state, num_yields);
@@ -245,6 +263,75 @@ impl HyObj {
     #[no_mangle]
     pub fn hy_new_null() -> Box<HyObj> {
         box HyObj { typ : HyNull }
+    }
+
+    ///////////////////////////////////////
+    //          Operator Functions       //
+    ///////////////////////////////////////
+
+    #[no_mangle]
+    pub fn hy_add_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_int(i + j)
+                    }
+                    _ => fail!("+ only defined for ints atm")
+                }
+            },
+            _ => fail!("+ only defined for ints atm")
+        }
+    }
+
+    #[no_mangle]
+    pub fn hy_sub_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_mul_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_div_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_mod_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+
+    #[no_mangle]
+    pub fn hy_lt_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_gt_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_lt_eq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_gt_eq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_eq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
+    }
+    
+    #[no_mangle]
+    pub fn hy_neq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+        other
     }
 
     ///////////////////////////////////////

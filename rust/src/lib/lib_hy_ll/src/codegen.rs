@@ -41,11 +41,11 @@ fn gen_code_from_ast_sync(ast : &Vec<Box<Stmt>>, file_name : &str) {
         fb.goto_first_block();
         
         for node in ast.iter() {
-            node.gen_code(fb);
             println!("{}",node);
+            node.gen_code(fb);
         }
 
-        let ret = fb.int(0);
+        let ret = fb.int32(0);
         fb.ret(ret);
     });
 
@@ -65,11 +65,11 @@ fn gen_code_from_ast_async(ast : Receiver<Box<Stmt>>, file_name : &str) {
         fb.goto_first_block();
         
         for node in ast.iter() {
-            node.gen_code(fb);
             println!("{}",node);
+            node.gen_code(fb);
         }
 
-        let ret = fb.int(0);
+        let ret = fb.int32(0);
         fb.ret(ret);
     });
 
@@ -176,7 +176,7 @@ fn incl_range_to_generator(start : &Box<Expr>, end : &Box<Expr>, builder : &mut 
     let start = start.to_value(builder);
     let end = end.to_value(builder);
 
-    let one = builder.int(1);
+    let one = builder.int32(1);
     let end_plus_one = builder.add_op(end, one, "add_tmp");
     builder.range_gen(start, end_plus_one)
 }
@@ -197,7 +197,8 @@ fn excl_range_to_generator(start : &Box<Expr>, end : &Box<Expr>, builder : &mut 
 ///////////////////////////////////////
 
 fn int_to_value(value : int, builder : &mut Builder) -> Value {
-    builder.int(value)
+    let val = builder.int64(value);
+    builder.call("hy_new_int", vec![val], "hy_int")
 }
 
 fn int_to_gen_value(value : int, builder : &mut Builder, ctxt : Value) -> Value {
@@ -523,7 +524,7 @@ fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Buil
             builder.goto_block(next_cond);
 
             let cond = expr.to_value(builder);
-            let false_value = builder.int(0);
+            let false_value = builder.int32(0);
             let cmp = builder.cmp_eq(cond, false_value, "if_cmp");
 
             next_cond = builder.new_block("if_else_cond");
@@ -600,7 +601,7 @@ fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &Vec<Box<Stmt>>
     //check to see if generator is done or not
     builder.goto_block(loop_check);
     let done = builder.call(gen.next_func.as_slice(), vec!(gen.gen), "done");
-    let done_value = builder.int(0);
+    let done_value = builder.int32(0);
     let cmp = builder.cmp_eq(done, done_value, "done_cmp");
     builder.conditional_break(cmp, loop_exit, loop_stmts);
 
@@ -657,7 +658,7 @@ fn while_loop_gen_code(cond  : &Box<Expr>, stmts : &Vec<Box<Stmt>>, builder : &m
 
     builder.goto_block(loop_check);
     let cond = cond.to_value(builder);
-    let fals = builder.int(0);
+    let fals = builder.int32(0);
     let cmp = builder.cmp_eq(fals, cond, "while_cmp");
     builder.conditional_break(cmp, loop_exit, loop_stmts);
 
@@ -808,7 +809,7 @@ fn yield_stmt_gen_gen_code(values : &Vec<Box<Expr>>, ggs : &mut GenGenState, bui
     let resume_block_slot = builder.get_obj_property(ggs.context, 0, "resume_block_slot");
     builder.store(address, resume_block_slot);
 
-    let ret = builder.int(1);
+    let ret = builder.int32(1);
     builder.ret(ret);
 
     builder.goto_block(post_yield_block);
