@@ -212,10 +212,12 @@ fn int_to_gen_value(value : int, builder : &mut Builder, ctxt : Value) -> Value 
 fn ident_expr_to_value(value : &Ident, builder : &mut Builder) -> Value {
     let name = value.as_slice();
 
-    match builder.get_var(name) {
-        Some(val) => builder.load(val, name),
+    let val = match builder.get_var(name) {
+        Some(v) => v,
         None => fail!("No {} in current scope", value)
-    }
+    };
+
+    builder.load(val, name)
 }
 
 fn ident_expr_to_gen_value(value : &Ident, builder : &mut Builder, ctxt : Value) -> Value {
@@ -332,8 +334,10 @@ fn expr_stmt_gen_code(expr : &Box<Expr>, builder : &mut Builder){
 fn var_decl_gen_code(vars : &Vec<Ident>, builder : &mut Builder){
     for var in vars.iter() {
         let name = var.as_slice();
-        let val = builder.new_default_var(name);
-        builder.set_var(name, val);
+        let val = builder.call("hy_new_undefined", vec![], format!("_{}", name).as_slice());
+        let boxed_val = builder.new_var(val, name);
+
+        builder.set_var(name, boxed_val);
     }
 }
 
@@ -378,16 +382,16 @@ fn var_assign_gen_code(vars : &Vec<Ident>, vals : &Vec<Box<Expr>>, builder : &mu
     let mut i = 0;
 
     for var in vars.iter() {
+        let name = var.as_slice();
+
         let val = if i < vals.len() {
             vals[i].to_value(builder)
         } else {
-            builder.default_value()
+            builder.call("hy_new_undefined", vec![], format!("_{}", name).as_slice())
         };
 
-        
-        let name = var.as_slice();
-        let var_val = builder.new_var(val, name);
-        builder.set_var(name, var_val);
+        let boxed_val = builder.new_var(val, name);
+        builder.set_var(name, boxed_val);
 
         i += 1;
     }
@@ -592,7 +596,7 @@ fn for_in_gen_code(vars : &Vec<Ident>, gen : &Box<Expr>, stmts : &Vec<Box<Stmt>>
     //create variables 
     for var in vars.iter(){
         let var_name = var.as_slice();
-        let undefined = builder.new_default_var(var_name);
+        let undefined = builder.call("hy_new_undefined", vec![], format!("_{}", var_name).as_slice());
         builder.set_var(var_name, undefined);
     }
 

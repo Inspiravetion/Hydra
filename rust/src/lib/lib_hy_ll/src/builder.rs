@@ -316,17 +316,12 @@ impl Builder {
         self.store(var_val, var_ptr);
     }
 
-    pub fn new_default_var(&mut self, name : &str) -> Value {
-        let default = self.default_value();
-        self.alloca_and_store(default, name)
-    }
-
     pub fn new_var(&mut self, val : Value, name : &str) -> Value {
         self.alloca_and_store(val, name)
     }
 
     fn alloca_and_store(&mut self, val : Value, name : &str) -> Value {
-        let typ = self.int32_type();
+        let typ = self.type_of(val);
         let pointer = self.alloca(typ, name);
 
         self.store(val, pointer);
@@ -512,13 +507,10 @@ impl Builder {
     }
 
     pub fn func_returns_void(&mut self, func_name : &str) -> bool {
-        println!("1");
         let func = self.get_function(func_name);
-        println!("2");
         let func_type = u!(llvm::LLVMTypeOf(func));
-        println!("3");
+        //sumthn wrong with this call
         let ret_type = u!(llvm::LLVMGetReturnType(func_type));
-        println!("4");
         ret_type == self.void_type()
     }
 

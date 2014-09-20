@@ -178,5 +178,79 @@ define i32 @main() {
   %hy_int1 = call %HyObj* @hy_new_int(i64 2)
   %"+_tmp" = call %HyObj* @"+"(%HyObj* %hy_int, %HyObj* %hy_int1)
   %print_tmp = call %HyObj* @print(%HyObj* %"+_tmp")
+  %hy_int2 = call %HyObj* @hy_new_int(i64 6)
+  %hy_int3 = call %HyObj* @hy_new_int(i64 3)
+  %-_tmp = call %HyObj* @-(%HyObj* %hy_int2, %HyObj* %hy_int3)
+  %print_tmp4 = call %HyObj* @print(%HyObj* %-_tmp)
+  %hy_int5 = call %HyObj* @hy_new_int(i64 2)
+  %hy_int6 = call %HyObj* @hy_new_int(i64 3)
+  %"*_tmp" = call %HyObj* @"*"(%HyObj* %hy_int5, %HyObj* %hy_int6)
+  %hy_int7 = call %HyObj* @hy_new_int(i64 2)
+  %"/_tmp" = call %HyObj* @"/"(%HyObj* %"*_tmp", %HyObj* %hy_int7)
+  %print_tmp8 = call %HyObj* @print(%HyObj* %"/_tmp")
+  %hy_int9 = call %HyObj* @hy_new_int(i64 9)
+  %hy_int10 = call %HyObj* @hy_new_int(i64 6)
+  %"%_tmp" = call %HyObj* @"%"(%HyObj* %hy_int9, %HyObj* %hy_int10)
+  %print_tmp11 = call %HyObj* @print(%HyObj* %"%_tmp")
+  %hy_int12 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int13 = call %HyObj* @hy_new_int(i64 2)
+  %"<_tmp" = call %HyObj* @"<"(%HyObj* %hy_int12, %HyObj* %hy_int13)
+  %print_tmp14 = call %HyObj* @print(%HyObj* %"<_tmp")
+  %hy_int15 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int16 = call %HyObj* @hy_new_int(i64 2)
+  %">_tmp" = call %HyObj* @">"(%HyObj* %hy_int15, %HyObj* %hy_int16)
+  %print_tmp17 = call %HyObj* @print(%HyObj* %">_tmp")
+  %hy_int18 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int19 = call %HyObj* @hy_new_int(i64 2)
+  %"<=_tmp" = call %HyObj* @"<="(%HyObj* %hy_int18, %HyObj* %hy_int19)
+  %print_tmp20 = call %HyObj* @print(%HyObj* %"<=_tmp")
+  %hy_int21 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int22 = call %HyObj* @hy_new_int(i64 2)
+  %">=_tmp" = call %HyObj* @">="(%HyObj* %hy_int21, %HyObj* %hy_int22)
+  %print_tmp23 = call %HyObj* @print(%HyObj* %">=_tmp")
+  %hy_int24 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int25 = call %HyObj* @hy_new_int(i64 1)
+  %"==_tmp" = call %HyObj* @"=="(%HyObj* %hy_int24, %HyObj* %hy_int25)
+  %print_tmp26 = call %HyObj* @print(%HyObj* %"==_tmp")
+  %hy_int27 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int28 = call %HyObj* @hy_new_int(i64 2)
+  %"==_tmp29" = call %HyObj* @"=="(%HyObj* %hy_int27, %HyObj* %hy_int28)
+  %print_tmp30 = call %HyObj* @print(%HyObj* %"==_tmp29")
+  %hy_int31 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int32 = call %HyObj* @hy_new_int(i64 1)
+  %"!=_tmp" = call %HyObj* @"!="(%HyObj* %hy_int31, %HyObj* %hy_int32)
+  %print_tmp33 = call %HyObj* @print(%HyObj* %"!=_tmp")
+  %hy_int34 = call %HyObj* @hy_new_int(i64 1)
+  %hy_int35 = call %HyObj* @hy_new_int(i64 2)
+  %"!=_tmp36" = call %HyObj* @"!="(%HyObj* %hy_int34, %HyObj* %hy_int35)
+  %print_tmp37 = call %HyObj* @print(%HyObj* %"!=_tmp36")
+  %hy_int38 = call %HyObj* @hy_new_int(i64 15)
+  %a = alloca %HyObj*
+  store %HyObj* %hy_int38, %HyObj** %a
+  %_b = call %HyObj* @hy_new_undefined()
+  %b = alloca %HyObj*
+  store %HyObj* %_b, %HyObj** %b
+  %a39 = load %HyObj** %a
+  %print_tmp40 = call %HyObj* @print(%HyObj* %a39)
+  %b41 = load %HyObj** %b
+  %print_tmp42 = call %HyObj* @print(%HyObj* %b41)
+  %a43 = load %HyObj** %a
+  %print_tmp44 = call %HyObj* @print(%HyObj* %a43)
+  %a45 = load %HyObj** %a
+  %a46 = load %HyObj** %a
+  %"+_tmp47" = call %HyObj* @"+"(%HyObj* %a45, %HyObj* %a46)
+  %print_tmp48 = call %HyObj* @print(%HyObj* %"+_tmp47")
+  %a49 = load %HyObj** %a
+  %print_tmp50 = call %HyObj* @print(%HyObj* %a49)
+  %hy_int51 = call %HyObj* @hy_new_int(i64 4)
+  store %HyObj* %hy_int51, %HyObj** %b
+  %b52 = load %HyObj** %b
+  %print_tmp53 = call %HyObj* @print(%HyObj* %b52)
+  %a54 = load %HyObj** %a
+  %print_tmp55 = call %HyObj* @print(%HyObj* %a54)
+  %a56 = load %HyObj** %a
+  %b57 = load %HyObj** %b
+  %"+_tmp58" = call %HyObj* @"+"(%HyObj* %a56, %HyObj* %b57)
+  %print_tmp59 = call %HyObj* @print(%HyObj* %"+_tmp58")
   ret i32 0
 }

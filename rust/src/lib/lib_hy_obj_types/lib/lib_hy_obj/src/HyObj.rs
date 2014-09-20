@@ -71,6 +71,19 @@ pub fn hy_obj_slice_push(this : *const HyObjSlice, obj : *const HyObj) {
     unsafe{ ptr::write(mem::transmute(ptr), obj) };
 }
 
+#[no_mangle]
+pub fn hy_obj_slice_get(this : *const HyObjSlice, index : uint) -> *const HyObj {
+    unsafe { 
+        let len = (*this).len;
+
+        if index >= len {
+            fail!("Tried to get an invalid index out of a HyObjSlice");
+        }
+
+        let ptr = (*this).objs.offset(index as int);
+        *ptr
+    }
+}
 
 pub struct HyGenCtxt {
     pub block  : *const i8,
@@ -270,68 +283,172 @@ impl HyObj {
     ///////////////////////////////////////
 
     #[no_mangle]
-    pub fn hy_add_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
+    pub fn hy_add_op(&mut self, other : &HyObj) -> Box<HyObj> {
         match self.typ {
             HyInt(i) => {
                 match other.typ {
                     HyInt(j) => {
                         HyObj::hy_new_int(i + j)
                     }
-                    _ => fail!("+ only defined for ints atm")
+                    _ => {
+                        fail!("+ only defined for ints atm")
+                    }
                 }
             },
-            _ => fail!("+ only defined for ints atm")
+            _ => {
+                fail!("+ only defined for ints atm")
+            }
         }
     }
 
     #[no_mangle]
-    pub fn hy_sub_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_sub_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_int(i - j)
+                    }
+                    _ => fail!("- only defined for ints atm")
+                }
+            },
+            _ => fail!("- only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_mul_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_mul_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_int(i * j)
+                    }
+                    _ => fail!("* only defined for ints atm")
+                }
+            },
+            _ => fail!("* only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_div_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_div_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_int(i / j)
+                    }
+                    _ => fail!("/ only defined for ints atm")
+                }
+            },
+            _ => fail!("/ only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_mod_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_mod_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_int(i % j)
+                    }
+                    _ => fail!("% only defined for ints atm")
+                }
+            },
+            _ => fail!("% only defined for ints atm")
+        }
     }
 
     #[no_mangle]
-    pub fn hy_lt_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_lt_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_bool(i < j)
+                    }
+                    _ => fail!("< only defined for ints atm")
+                }
+            },
+            _ => fail!("< only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_gt_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_gt_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_bool(i > j)
+                    }
+                    _ => fail!("> only defined for ints atm")
+                }
+            },
+            _ => fail!("> only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_lt_eq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_lt_eq_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_bool(i <= j)
+                    }
+                    _ => fail!("<= only defined for ints atm")
+                }
+            },
+            _ => fail!("<= only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_gt_eq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_gt_eq_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_bool(i >= j)
+                    }
+                    _ => fail!(">= only defined for ints atm")
+                }
+            },
+            _ => fail!(">= only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_eq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_eq_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_bool(i == j)
+                    }
+                    _ => fail!("== only defined for ints atm")
+                }
+            },
+            _ => fail!("== only defined for ints atm")
+        }
     }
     
     #[no_mangle]
-    pub fn hy_neq_op(&mut self, other : Box<HyObj>) -> Box<HyObj> {
-        other
+    pub fn hy_neq_op(&mut self, other : &HyObj) -> Box<HyObj> {
+        match self.typ {
+            HyInt(i) => {
+                match other.typ {
+                    HyInt(j) => {
+                        HyObj::hy_new_bool(i != j)
+                    }
+                    _ => fail!("!= only defined for ints atm")
+                }
+            },
+            _ => fail!("!= only defined for ints atm")
+        }
     }
 
     ///////////////////////////////////////
@@ -340,6 +457,8 @@ impl HyObj {
     //  semantics                        //
     ///////////////////////////////////////
 
+    //By Value types can be optimised so that calling some_func(1, 1.3, "str") 
+    //frees the untouchable literals when it returns
     #[no_mangle]
     pub fn hy_obj_clone(this : Box<HyObj>) -> Box<HyObj> {
         match this.typ {

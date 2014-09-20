@@ -5,32 +5,35 @@ use std::from_str::from_str;
 use scanner;
 use std::collections::hashmap::HashMap;
 
+pub type AST       = Vec<Box<Stmt>>;
+pub type ASTStream = Receiver<Box<Stmt>>;
+
 ///Scan and Parse a file in parallel producing an AST
-pub fn parse_file_async(path : &str) -> Vec<Box<Stmt>> {
+pub fn parse_file_async(path : &str) -> AST {
     let tokens = scanner::stream_from_file(path);
     AsyncParser::new(tokens).parse_sync()
 }
 
 ///Scan and then Parse a file producing an AST
-pub fn parse_file_sync(path : &str) -> Vec<Box<Stmt>> {
+pub fn parse_file_sync(path : &str) -> AST {
     let tokens = scanner::tokenize_file(path);
     SyncParser::new(tokens).parse_sync()
 }
 
 ///Scan and Parse a string in parallel producing an AST
-pub fn parse_str_async(code : &str) -> Vec<Box<Stmt>> {
+pub fn parse_str_async(code : &str) -> AST {
     let tokens = scanner::stream_from_str(code);
     AsyncParser::new(tokens).parse_sync()
 }
 
 ///Scan and then Parse a string producing an AST
-pub fn parse_str_sync(code : &str) -> Vec<Box<Stmt>> {
+pub fn parse_str_sync(code : &str) -> AST {
     let tokens = scanner::tokenize_str(code);
     SyncParser::new(tokens).parse_sync()
 }
 
 ///Scan and Parse a file in parallel producing a stream of top level AST nodes
-pub fn parse_and_stream_file_async(path : &str) -> Receiver<Box<Stmt>> {
+pub fn parse_and_stream_file_async(path : &str) -> ASTStream {
     let (sendr, recvr) = channel();
     let path = path.to_string();
 
@@ -43,7 +46,7 @@ pub fn parse_and_stream_file_async(path : &str) -> Receiver<Box<Stmt>> {
 }
 
 ///Scan and then Parse a file producing a stream of top level AST nodes
-pub fn parse_and_stream_file_sync(path : &str) -> Receiver<Box<Stmt>> {
+pub fn parse_and_stream_file_sync(path : &str) -> ASTStream {
     let (sendr, recvr) = channel();
     let path = path.to_string();
 
@@ -56,7 +59,7 @@ pub fn parse_and_stream_file_sync(path : &str) -> Receiver<Box<Stmt>> {
 }
 
 ///Scan and Parse a string in parallel producing a stream of top level AST nodes
-pub fn parse_and_stream_str_async(path : &str) -> Receiver<Box<Stmt>> {
+pub fn parse_and_stream_str_async(path : &str) -> ASTStream {
     let (sendr, recvr) = channel();
     let path = path.to_string();
 
@@ -69,7 +72,7 @@ pub fn parse_and_stream_str_async(path : &str) -> Receiver<Box<Stmt>> {
 }
 
 ///Scan and then Parse a string producing a stream of top level AST nodes
-pub fn parse_and_stream_str_sync(path : &str) -> Receiver<Box<Stmt>> {
+pub fn parse_and_stream_str_sync(path : &str) -> ASTStream {
     let (sendr, recvr) = channel();
     let path = path.to_string();
 
@@ -97,7 +100,7 @@ pub struct SyncParser {
 }
 
 pub trait HydraParser : HydraBaseParser {
-    fn parse_sync(&mut self) -> Vec<Box<Stmt>> {
+    fn parse_sync(&mut self) -> AST {
         let mut stmts = Vec::new();
 
         self.for_each_stmt(|stmt : Box<Stmt>|{
@@ -751,7 +754,7 @@ trait HydraBaseParser {
     }
 
     //always optional
-    fn stmts(&mut self) -> Vec<Box<Stmt>> {
+    fn stmts(&mut self) -> AST {
         let mut stmts = Vec::new();
 
         loop {
@@ -804,7 +807,7 @@ trait HydraBaseParser {
         return idents
     }
 
-    fn block(&mut self) -> Vec<Box<Stmt>> {
+    fn block(&mut self) -> AST {
         self.expect(Lcurly);
         let stmts = self.stmts();
         self.expect(Rcurly);
@@ -812,7 +815,7 @@ trait HydraBaseParser {
         stmts
     }
 
-    fn do_block(&mut self) -> Vec<Box<Stmt>> {
+    fn do_block(&mut self) -> AST {
         self.expect(Do);
         let stmts = self.stmts();
         self.expect(End);
