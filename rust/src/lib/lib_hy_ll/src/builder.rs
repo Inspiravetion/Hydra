@@ -9,6 +9,11 @@ use std::owned::Box;
 use std::io::{File, BufferedReader};
 use std::str;
 
+//May need to be used to link for gc stuff later
+#[link(name = "LLVMCodeGen")]
+// extern {
+//     // fn LLVMLinkInMCJIT();
+// }
 
 pub struct Builder {
     builder    : LLVMBuilder,

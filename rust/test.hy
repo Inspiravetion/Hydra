@@ -1,16 +1,20 @@
-print(1 + 2);
-print(6 - 3);
-print(2 * 3 / 2);
-print(9 % 6);
+print(100000000);
 
-print(1 < 2);
-print(1 > 2);
-print(1 <= 2);
-print(1 >= 2);
-print(1 == 1);
-print(1 == 2);
-print(1 != 1);
-print(1 != 2);
+var one, two, three, six, nine = 1, 2, 3, 6, 9;
+
+print(one + two);
+print(six - three);
+print(two * three / two);
+print(nine % six);
+
+print(one < two);
+print(one > two);
+print(one <= two);
+print(one >= two);
+print(one == one);
+print(one == two);
+print(one != one);
+print(one != two);
 
 var a, b = 15;
 print(a);
@@ -23,3 +27,11 @@ b = 4;
 print(b);
 print(a);
 print(a + b);
+
+if b > 1000 then
+    print(10);
+else if 1 < 100 then 
+    print(100);
+else
+    print(1000);
+end

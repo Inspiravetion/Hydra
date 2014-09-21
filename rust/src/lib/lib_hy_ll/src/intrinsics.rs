@@ -2,6 +2,7 @@ use builder::Builder;
 
 pub fn gen_intrinsics(builder : &mut Builder) {
 
+    declare_llvm_intrinsics(builder);
     gen_runtime_types(builder);
     declare_runtime_functions(builder);
 
@@ -181,6 +182,7 @@ fn declare_runtime_functions(builder : &mut Builder) {
     let hy_obj_slice = builder.get_type("HyObjSlice");
     let hy_obj_slice_ref = builder.get_type("HyObjSlice*");
     let hy_gen_next_func = builder.get_type("HyGenNextFunc");
+    let i32 = builder.int32_type();
     let i64 = builder.int64_type();
     let f64 = builder.float64_type();
     let boolean = builder.int1_type();
@@ -282,5 +284,19 @@ fn declare_runtime_functions(builder : &mut Builder) {
     );
     builder.declare_function(
         "hy_neq_op", vec![hy_obj_ref, hy_obj_ref], hy_obj_ref
+    );
+    builder.declare_function(
+        "hy_obj_to_truthy_val", vec![hy_obj_ref], i32
+    );
+}
+
+fn declare_llvm_intrinsics(builder : &mut Builder) {
+    let mem_ptr = builder.string_type();
+    let mem_ptr_ptr = builder.to_ptr_type(mem_ptr);
+    let void = builder.void_type();
+
+    //Will be needed for Garbage Collector Later
+    builder.declare_function(
+        "llvm.gcroot", vec![mem_ptr_ptr, mem_ptr], void
     );
 }

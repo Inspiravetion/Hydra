@@ -127,6 +127,14 @@ impl HyObj {
     }
 
     #[no_mangle]
+    pub fn hy_obj_to_truthy_val(obj : &HyObj) -> i32 {
+        match obj.typ {
+            HyBool(b) => b as i32,
+            _ => 0
+        }
+    }
+
+    #[no_mangle]
     pub fn hy_obj_to_str(&self) -> *const i8 {
         match self.typ {
             HyUndefined => {

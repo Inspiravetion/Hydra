@@ -527,7 +527,8 @@ fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Buil
           Some(ref expr) => {
             builder.goto_block(next_cond);
 
-            let cond = expr.to_value(builder);
+            let cond_obj = expr.to_value(builder);
+            let cond = builder.call("hy_obj_to_truthy_val", vec![cond_obj], "cond");
             let false_value = builder.int32(0);
             let cmp = builder.cmp_eq(cond, false_value, "if_cmp");
 
