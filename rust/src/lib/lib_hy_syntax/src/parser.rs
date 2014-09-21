@@ -632,6 +632,14 @@ trait HydraBaseParser {
         match self.peek() {
             Some(tok) => {
                 match tok.typ {
+                    True => {
+                        self.next();
+                        Some(Bool::new(true))
+                    }, 
+                    False => {
+                        self.next();
+                        Some(Bool::new(false))
+                    },
                     Int_Literal => {
                         self.next();
                         let num = from_str::<int>(self.tok().text.as_slice()).unwrap();

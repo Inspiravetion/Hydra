@@ -826,6 +826,11 @@ impl Builder {
         u!(llvm::LLVMConstInt(self.int32_type(), num as c_ulonglong, False))
     }
 
+    pub fn bool(&mut self, b : bool) -> Value {
+        let i1 = self.int1_type();
+        u!(llvm::LLVMConstInt(i1, b as c_ulonglong, False))
+    }
+
     pub fn string(&mut self, literal : &str, variable_name : &str) -> Value {
         let global = u!(llvm::LLVMBuildGlobalString(
             self.builder,

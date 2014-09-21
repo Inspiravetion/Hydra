@@ -30,8 +30,14 @@ print(a + b);
 
 if b > 1000 then
     print(10);
-else if 1 < 100 then 
+else if false then 
     print(100);
 else
     print(1000);
+end
+
+var i = 0;
+while i < 3 do
+    print(i);
+    i = i + 1;
 end

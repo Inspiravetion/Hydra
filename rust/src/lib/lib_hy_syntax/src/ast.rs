@@ -40,6 +40,9 @@ pub enum Expr_ {
     Int(int),
 
     //1.value
+    Bool(bool),
+
+    //1.value
     IdentExpr(Ident),
 
     //1.lhs, 2.op, 3.rhs
@@ -85,6 +88,16 @@ pub mod Int {
     pub fn new(value : int) -> Box<Expr> {
         box Expr {
             node : Int(value)
+        }
+    }
+}
+
+pub mod Bool {
+    use self::super::{Expr, Bool};
+
+    pub fn new(value : bool) -> Box<Expr> {
+        box Expr {
+            node : Bool(value)
         }
     }
 }

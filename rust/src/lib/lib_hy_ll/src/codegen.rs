@@ -120,6 +120,7 @@ impl ExprGenerator for Expr {
         match self.node {
             FuncCall(ref prop_path, ref params) => func_call_to_value(prop_path, params, builder),
             Int(num) => int_to_value(num, builder),
+            Bool(boolean) => bool_to_value(boolean, builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -203,6 +204,19 @@ fn int_to_value(value : int, builder : &mut Builder) -> Value {
 
 fn int_to_gen_value(value : int, builder : &mut Builder, ctxt : Value) -> Value {
     int_to_value(value, builder)
+}
+
+///////////////////////////////////////
+//            Bool Generation        //
+///////////////////////////////////////
+
+fn bool_to_value(value : bool, builder : &mut Builder) -> Value {
+    let val = builder.bool(value);
+    builder.call("hy_new_bool", vec![val], "hy_bool")
+}
+
+fn bool_to_gen_value(value : bool, builder : &mut Builder, ctxt : Value) -> Value {
+    bool_to_value(value, builder)
 }
 
 ///////////////////////////////////////
@@ -662,7 +676,8 @@ fn while_loop_gen_code(cond  : &Box<Expr>, stmts : &Vec<Box<Stmt>>, builder : &m
     builder.break_to(loop_check);
 
     builder.goto_block(loop_check);
-    let cond = cond.to_value(builder);
+    let cond_obj = cond.to_value(builder);
+    let cond = builder.call("hy_obj_to_truthy_val", vec![cond_obj], "cond");
     let fals = builder.int32(0);
     let cmp = builder.cmp_eq(fals, cond, "while_cmp");
     builder.conditional_break(cmp, loop_exit, loop_stmts);
