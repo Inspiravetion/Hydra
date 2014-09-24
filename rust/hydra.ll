@@ -7,6 +7,8 @@
 %HyGenNextProc = type { i1 (i8*, %HyObjSlice*, %HyGenCtxt*)*, i8* }
 %HyGenCtxt = type { i8*, %HyObjSlice, %HyObjSlice, %HyObjSlice }
 
+@"global_\22AzzNTittys\22_literal" = private unnamed_addr constant [13 x i8] c"\22AzzNTittys\22\00"
+
 define i32 @"!range_gen_next"(%"!range_gen"*) {
 
 entry:                                            ; No predecessors!
@@ -282,36 +284,36 @@ if_cond:                                          ; preds = %0
   %">_tmp69" = call %HyObj* @">"(%HyObj* %b67, %HyObj* %hy_int68)
   %cond = call i32 @hy_obj_to_truthy_val(%HyObj* %">_tmp69")
   %if_cmp = icmp eq i32 %cond, 0
-  br i1 %if_cmp, label %if_else_cond, label %if_else_stmts
+  br i1 %if_cmp, label %if_else_cond_or_exit, label %if_else_stmts
 
-if_else_exit:                                     ; preds = %if_else_cond74, %if_else_stmts75, %if_else_stmts
+if_else_cond_or_exit:                             ; preds = %if_else_stmts, %if_cond
+  %hy_bool = call %HyObj* @hy_new_bool(i1 false)
+  %cond72 = call i32 @hy_obj_to_truthy_val(%HyObj* %hy_bool)
+  %if_cmp73 = icmp eq i32 %cond72, 0
+  br i1 %if_cmp73, label %if_else_cond_or_exit74, label %if_else_stmts75
+
+if_else_stmts:                                    ; preds = %if_cond
+  %hy_int70 = call %HyObj* @hy_new_int(i64 10)
+  %print_tmp71 = call %HyObj* @print(%HyObj* %hy_int70)
+  br label %if_else_cond_or_exit
+
+if_else_cond_or_exit74:                           ; preds = %if_else_stmts75, %if_else_cond_or_exit
+  %hy_int78 = call %HyObj* @hy_new_int(i64 1000)
+  %print_tmp79 = call %HyObj* @print(%HyObj* %hy_int78)
+  br label %else_exit
+
+if_else_stmts75:                                  ; preds = %if_else_cond_or_exit
+  %hy_int76 = call %HyObj* @hy_new_int(i64 100)
+  %print_tmp77 = call %HyObj* @print(%HyObj* %hy_int76)
+  br label %if_else_cond_or_exit74
+
+else_exit:                                        ; preds = %if_else_cond_or_exit74
   %hy_int80 = call %HyObj* @hy_new_int(i64 0)
   %i = alloca %HyObj*
   store %HyObj* %hy_int80, %HyObj** %i
   br label %while_loop_check
 
-if_else_cond:                                     ; preds = %if_cond
-  %hy_bool = call %HyObj* @hy_new_bool(i1 false)
-  %cond72 = call i32 @hy_obj_to_truthy_val(%HyObj* %hy_bool)
-  %if_cmp73 = icmp eq i32 %cond72, 0
-  br i1 %if_cmp73, label %if_else_cond74, label %if_else_stmts75
-
-if_else_stmts:                                    ; preds = %if_cond
-  %hy_int70 = call %HyObj* @hy_new_int(i64 10)
-  %print_tmp71 = call %HyObj* @print(%HyObj* %hy_int70)
-  br label %if_else_exit
-
-if_else_cond74:                                   ; preds = %if_else_cond
-  %hy_int78 = call %HyObj* @hy_new_int(i64 1000)
-  %print_tmp79 = call %HyObj* @print(%HyObj* %hy_int78)
-  br label %if_else_exit
-
-if_else_stmts75:                                  ; preds = %if_else_cond
-  %hy_int76 = call %HyObj* @hy_new_int(i64 100)
-  %print_tmp77 = call %HyObj* @print(%HyObj* %hy_int76)
-  br label %if_else_exit
-
-while_loop_check:                                 ; preds = %while_loop_stmts, %if_else_exit
+while_loop_check:                                 ; preds = %while_loop_stmts, %else_exit
   %i81 = load %HyObj** %i
   %hy_int82 = call %HyObj* @hy_new_int(i64 3)
   %"<_tmp83" = call %HyObj* @"<"(%HyObj* %i81, %HyObj* %hy_int82)
@@ -329,7 +331,48 @@ while_loop_stmts:                                 ; preds = %while_loop_check
   br label %while_loop_check
 
 while_loop_exit:                                  ; preds = %while_loop_check
+  %hy_int90 = call %HyObj* @hy_new_int(i64 10)
+  %i91 = alloca %HyObj*
+  store %HyObj* %hy_int90, %HyObj** %i91
+  br label %while_loop_check92
+
+while_loop_check92:                               ; preds = %if_else_cond_or_exit106, %while_loop_exit
+  %hy_bool95 = call %HyObj* @hy_new_bool(i1 true)
+  %cond96 = call i32 @hy_obj_to_truthy_val(%HyObj* %hy_bool95)
+  %while_cmp97 = icmp eq i32 0, %cond96
+  br i1 %while_cmp97, label %while_loop_exit94, label %while_loop_stmts93
+
+while_loop_stmts93:                               ; preds = %while_loop_check92
+  %i98 = load %HyObj** %i91
+  %print_tmp99 = call %HyObj* @print(%HyObj* %i98)
+  br label %if_cond100
+
+while_loop_exit94:                                ; preds = %if_else_stmts107, %while_loop_check92
+  %hy_string = call %HyObj* @hy_new_string(i8* getelementptr inbounds ([13 x i8]* @"global_\22AzzNTittys\22_literal", i32 0, i32 0))
+  %azz = alloca %HyObj*
+  store %HyObj* %hy_string, %HyObj** %azz
+  %azz111 = load %HyObj** %azz
+  %print_tmp112 = call %HyObj* @print(%HyObj* %azz111)
   ret i32 0
+
+if_cond100:                                       ; preds = %while_loop_stmts93
+  %i101 = load %HyObj** %i91
+  %hy_int102 = call %HyObj* @hy_new_int(i64 20)
+  %"==_tmp103" = call %HyObj* @"=="(%HyObj* %i101, %HyObj* %hy_int102)
+  %cond104 = call i32 @hy_obj_to_truthy_val(%HyObj* %"==_tmp103")
+  %if_cmp105 = icmp eq i32 %cond104, 0
+  br i1 %if_cmp105, label %if_else_cond_or_exit106, label %if_else_stmts107
+
+if_else_cond_or_exit106:                          ; preds = %if_else_stmts107, %if_cond100
+  %i108 = load %HyObj** %i91
+  %hy_int109 = call %HyObj* @hy_new_int(i64 1)
+  %"+_tmp110" = call %HyObj* @"+"(%HyObj* %i108, %HyObj* %hy_int109)
+  store %HyObj* %"+_tmp110", %HyObj** %i91
+  br label %while_loop_check92
+
+if_else_stmts107:                                 ; preds = %if_cond100
+  br label %while_loop_exit94
+  br label %if_else_cond_or_exit106
 }
 
 attributes #0 = { nounwind }

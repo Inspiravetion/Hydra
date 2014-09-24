@@ -150,7 +150,8 @@ impl HyObj {
                 unsafe { (format!("float : {}", f)).to_c_str().unwrap() }
             },
             HyString(ref s) => {
-                unsafe { s.clone().to_c_str().unwrap() }
+                let ret = unsafe { s.to_c_str_unchecked().unwrap() };
+                ret
             },
             HyRegex(ref r) => {
                 unsafe { (format!("regex : {}", r)).to_c_str().unwrap() }
@@ -193,7 +194,7 @@ impl HyObj {
     pub fn hy_new_string(buf : *const i8) -> Box<HyObj> {
         let mut s = String::new();
         unsafe {
-            let c_str = CString::new(buf, true);
+            let c_str = CString::new(buf, false);
             s.push_bytes(c_str.as_bytes());
         };
         box HyObj {

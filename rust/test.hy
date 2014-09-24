@@ -41,3 +41,16 @@ while i < 3 do
     print(i);
     i = i + 1;
 end
+
+var i = 10;
+while true do
+    print(i);
+    if i == 20 then
+        break;
+    end
+    i = i + 1;
+end
+
+var azz = "AzzNTittys";
+
+print(azz);

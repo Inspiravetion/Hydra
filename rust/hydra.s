@@ -201,7 +201,7 @@ Ltmp13:
 	.align	4, 0x90
 _main:                                  ## @main
 	.cfi_startproc
-## BB#0:
+## BB#0:                                ## %if_cond
 	pushq	%rbp
 Ltmp14:
 	.cfi_def_cfa_offset 16
@@ -339,22 +339,25 @@ Ltmp18:
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
 	je	LBB14_1
-## BB#3:                                ## %if_else_stmts
+## BB#10:                               ## %if_else_stmts
 	movl	$10, %edi
-	jmp	LBB14_4
-LBB14_1:                                ## %if_else_cond
+	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_print
+LBB14_1:                                ## %if_else_cond_or_exit
 	xorl	%edi, %edi
 	callq	_hy_new_bool
 	movq	%rax, %rdi
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
-	je	LBB14_2
-## BB#8:                                ## %if_else_stmts75
+	je	LBB14_3
+## BB#2:                                ## %if_else_stmts75
 	movl	$100, %edi
-	jmp	LBB14_4
-LBB14_2:                                ## %if_else_cond74
+	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_print
+LBB14_3:                                ## %else_exit
 	movl	$1000, %edi             ## imm = 0x3E8
-LBB14_4:                                ## %if_else_exit
 	callq	_hy_new_int
 	movq	%rax, %rdi
 	callq	_print
@@ -364,10 +367,10 @@ LBB14_4:                                ## %if_else_exit
 	leaq	-16(%rcx), %r14
 	movq	%r14, %rsp
 	movq	%rax, -16(%rcx)
-	jmp	LBB14_5
+	jmp	LBB14_4
 	.align	4, 0x90
-LBB14_6:                                ## %while_loop_stmts
-                                        ##   in Loop: Header=BB14_5 Depth=1
+LBB14_5:                                ## %while_loop_stmts
+                                        ##   in Loop: Header=BB14_4 Depth=1
 	movq	(%r14), %rdi
 	callq	_print
 	movq	(%r14), %rbx
@@ -377,7 +380,7 @@ LBB14_6:                                ## %while_loop_stmts
 	movq	%rax, %rsi
 	callq	"_+"
 	movq	%rax, (%r14)
-LBB14_5:                                ## %while_loop_check
+LBB14_4:                                ## %while_loop_check
                                         ## =>This Inner Loop Header: Depth=1
 	movq	(%r14), %rbx
 	movl	$3, %edi
@@ -388,8 +391,56 @@ LBB14_5:                                ## %while_loop_check
 	movq	%rax, %rdi
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
-	jne	LBB14_6
-## BB#7:                                ## %while_loop_exit
+	jne	LBB14_5
+## BB#6:                                ## %while_loop_exit
+	movl	$10, %edi
+	callq	_hy_new_int
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %r14
+	movq	%r14, %rsp
+	movq	%rax, -16(%rcx)
+	jmp	LBB14_7
+	.align	4, 0x90
+LBB14_9:                                ## %if_else_cond_or_exit106
+                                        ##   in Loop: Header=BB14_7 Depth=1
+	movq	(%r14), %rbx
+	movl	$1, %edi
+	callq	_hy_new_int
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	"_+"
+	movq	%rax, (%r14)
+LBB14_7:                                ## %while_loop_check92
+                                        ## =>This Inner Loop Header: Depth=1
+	movl	$1, %edi
+	callq	_hy_new_bool
+	movq	%rax, %rdi
+	callq	_hy_obj_to_truthy_val
+	testl	%eax, %eax
+	je	LBB14_11
+## BB#8:                                ## %if_cond100
+                                        ##   in Loop: Header=BB14_7 Depth=1
+	movq	(%r14), %rdi
+	callq	_print
+	movq	(%r14), %rbx
+	movl	$20, %edi
+	callq	_hy_new_int
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	"_=="
+	movq	%rax, %rdi
+	callq	_hy_obj_to_truthy_val
+	testl	%eax, %eax
+	je	LBB14_9
+LBB14_11:                               ## %while_loop_exit94
+	leaq	"L_global_\"AzzNTittys\"_literal"(%rip), %rdi
+	callq	_hy_new_string
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rax, %rdi
+	callq	_print
 	xorl	%eax, %eax
 	leaq	-16(%rbp), %rsp
 	popq	%rbx
@@ -397,6 +448,10 @@ LBB14_5:                                ## %while_loop_check
 	popq	%rbp
 	retq
 	.cfi_endproc
+
+	.section	__TEXT,__cstring,cstring_literals
+"L_global_\"AzzNTittys\"_literal":      ## @"global_\22AzzNTittys\22_literal"
+	.asciz	"\"AzzNTittys\""
 
 
 .subsections_via_symbols

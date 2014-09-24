@@ -121,6 +121,7 @@ impl ExprGenerator for Expr {
             FuncCall(ref prop_path, ref params) => func_call_to_value(prop_path, params, builder),
             Int(num) => int_to_value(num, builder),
             Bool(boolean) => bool_to_value(boolean, builder),
+            StringLit(ref string) => string_to_value(string.as_slice(), builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -217,6 +218,19 @@ fn bool_to_value(value : bool, builder : &mut Builder) -> Value {
 
 fn bool_to_gen_value(value : bool, builder : &mut Builder, ctxt : Value) -> Value {
     bool_to_value(value, builder)
+}
+
+///////////////////////////////////////
+//          String Generation        //
+///////////////////////////////////////
+
+fn string_to_value(value : &str, builder : &mut Builder) -> Value {
+    let val = builder.string(value, format!("{}_literal", value).as_slice());
+    builder.call("hy_new_string", vec![val], "hy_string")
+}
+
+fn string_to_gen_value(value : String, builder : &mut Builder, ctxt : Value) -> Value {
+    string_to_value(value.as_slice(), builder)
 }
 
 ///////////////////////////////////////
@@ -532,7 +546,6 @@ fn loop_ctrl_stmt_gen_code(typ : TokenType, builder : &mut Builder){
 
 fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Builder){
     let mut next_cond = builder.new_block("if_cond");
-    let if_else_exit = builder.new_block("if_else_exit");
 
     builder.break_to(next_cond);
 
@@ -546,7 +559,7 @@ fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Buil
             let false_value = builder.int32(0);
             let cmp = builder.cmp_eq(cond, false_value, "if_cmp");
 
-            next_cond = builder.new_block("if_else_cond");
+            next_cond = builder.new_block("if_else_cond_or_exit");
             let stmts_block = builder.new_block("if_else_stmts");
             builder.conditional_break(cmp, next_cond, stmts_block);
 
@@ -558,7 +571,7 @@ fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Buil
             }
 
             builder.close_scope();
-            builder.break_to(if_else_exit);
+            builder.break_to(next_cond);
           },
           None => {
             builder.goto_block(next_cond);
@@ -569,12 +582,14 @@ fn if_else_stmt_gen_code(branches : &Vec<Box<IfElseBranch>>, builder : &mut Buil
             }
 
             builder.close_scope();
-            builder.break_to(if_else_exit);
+
+            next_cond = builder.new_block("else_exit");
+            builder.break_to(next_cond);
           }  
         };
     }
 
-    builder.goto_block(if_else_exit);
+    builder.goto_block(next_cond);
 }
 
 ///////////////////////////////////////

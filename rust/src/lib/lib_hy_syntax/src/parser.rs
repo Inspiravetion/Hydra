@@ -645,6 +645,11 @@ trait HydraBaseParser {
                         let num = from_str::<int>(self.tok().text.as_slice()).unwrap();
                         Some(Int::new(num))
                     },
+                    String_Literal => {
+                        self.next();
+                        let literal = self.tok().text.to_string();
+                        Some(StringLit::new(literal))
+                    },
                     Identifier => {
                         Some(self.ident_or_func_call())
                     }

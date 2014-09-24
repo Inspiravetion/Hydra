@@ -43,6 +43,9 @@ pub enum Expr_ {
     Bool(bool),
 
     //1.value
+    StringLit(String),
+
+    //1.value
     IdentExpr(Ident),
 
     //1.lhs, 2.op, 3.rhs
@@ -98,6 +101,16 @@ pub mod Bool {
     pub fn new(value : bool) -> Box<Expr> {
         box Expr {
             node : Bool(value)
+        }
+    }
+}
+
+pub mod StringLit {
+    use self::super::{Expr, StringLit};
+
+    pub fn new(value : String) -> Box<Expr> {
+        box Expr {
+            node : StringLit(value)
         }
     }
 }
