@@ -40,6 +40,9 @@ pub enum Expr_ {
     Int(int),
 
     //1.value
+    Float(f64),
+
+    //1.value
     Bool(bool),
 
     //1.value
@@ -91,6 +94,16 @@ pub mod Int {
     pub fn new(value : int) -> Box<Expr> {
         box Expr {
             node : Int(value)
+        }
+    }
+}
+
+pub mod Float {
+    use self::super::{Expr, Float};
+
+    pub fn new(value : f64) -> Box<Expr> {
+        box Expr {
+            node : Float(value)
         }
     }
 }

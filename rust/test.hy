@@ -52,5 +52,15 @@ while true do
 end
 
 var azz = "AzzNTittys";
-
 print(azz);
+
+var hex = 0xdeadbeef;
+print(hex);
+
+var bin = 0b0001001;
+print(bin);
+
+var float = 123.456;
+print(float);
+
+

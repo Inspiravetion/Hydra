@@ -66,7 +66,7 @@ declare %HyObj* @hy_new_array()
 
 declare %HyObj* @hy_new_int(i64)
 
-declare %HyObj* @hy_new_float(float)
+declare %HyObj* @hy_new_float(double)
 
 declare %HyObj* @hy_new_bool(i1)
 
@@ -353,6 +353,21 @@ while_loop_exit94:                                ; preds = %if_else_stmts107, %
   store %HyObj* %hy_string, %HyObj** %azz
   %azz111 = load %HyObj** %azz
   %print_tmp112 = call %HyObj* @print(%HyObj* %azz111)
+  %hy_int113 = call %HyObj* @hy_new_int(i64 3735928559)
+  %hex = alloca %HyObj*
+  store %HyObj* %hy_int113, %HyObj** %hex
+  %hex114 = load %HyObj** %hex
+  %print_tmp115 = call %HyObj* @print(%HyObj* %hex114)
+  %hy_int116 = call %HyObj* @hy_new_int(i64 9)
+  %bin = alloca %HyObj*
+  store %HyObj* %hy_int116, %HyObj** %bin
+  %bin117 = load %HyObj** %bin
+  %print_tmp118 = call %HyObj* @print(%HyObj* %bin117)
+  %hy_float = call %HyObj* @hy_new_float(double 1.234560e+02)
+  %float = alloca %HyObj*
+  store %HyObj* %hy_float, %HyObj** %float
+  %float119 = load %HyObj** %float
+  %print_tmp120 = call %HyObj* @print(%HyObj* %float119)
   ret i32 0
 
 if_cond100:                                       ; preds = %while_loop_stmts93

@@ -197,6 +197,11 @@ Ltmp13:
 	retq
 	.cfi_endproc
 
+	.section	__TEXT,__literal8,8byte_literals
+	.align	3
+LCPI14_0:
+	.quad	4638387860618067575     ## double 123.456
+	.section	__TEXT,__text,regular,pure_instructions
 	.globl	_main
 	.align	4, 0x90
 _main:                                  ## @main
@@ -435,6 +440,30 @@ LBB14_7:                                ## %while_loop_check92
 LBB14_11:                               ## %while_loop_exit94
 	leaq	"L_global_\"AzzNTittys\"_literal"(%rip), %rdi
 	callq	_hy_new_string
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rax, %rdi
+	callq	_print
+	movl	$3735928559, %edi       ## imm = 0xDEADBEEF
+	callq	_hy_new_int
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rax, %rdi
+	callq	_print
+	movl	$9, %edi
+	callq	_hy_new_int
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rax, %rdi
+	callq	_print
+	movsd	LCPI14_0(%rip), %xmm0
+	callq	_hy_new_float
 	movq	%rsp, %rcx
 	leaq	-16(%rcx), %rdx
 	movq	%rdx, %rsp

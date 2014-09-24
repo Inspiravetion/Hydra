@@ -120,6 +120,7 @@ impl ExprGenerator for Expr {
         match self.node {
             FuncCall(ref prop_path, ref params) => func_call_to_value(prop_path, params, builder),
             Int(num) => int_to_value(num, builder),
+            Float(num) => float_to_value(num, builder),
             Bool(boolean) => bool_to_value(boolean, builder),
             StringLit(ref string) => string_to_value(string.as_slice(), builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
@@ -205,6 +206,19 @@ fn int_to_value(value : int, builder : &mut Builder) -> Value {
 
 fn int_to_gen_value(value : int, builder : &mut Builder, ctxt : Value) -> Value {
     int_to_value(value, builder)
+}
+
+///////////////////////////////////////
+//            Int Generation         //
+///////////////////////////////////////
+
+fn float_to_value(value : f64, builder : &mut Builder) -> Value {
+    let val = builder.f64(value);
+    builder.call("hy_new_float", vec![val], "hy_float")
+}
+
+fn float_to_gen_value(value : f64, builder : &mut Builder, ctxt : Value) -> Value {
+    float_to_value(value, builder)
 }
 
 ///////////////////////////////////////

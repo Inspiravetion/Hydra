@@ -184,7 +184,7 @@ fn declare_runtime_functions(builder : &mut Builder) {
     let hy_gen_next_func = builder.get_type("HyGenNextFunc");
     let i32 = builder.int32_type();
     let i64 = builder.int64_type();
-    let f64 = builder.float64_type();
+    let f64 = builder.f64_type();
     let boolean = builder.int1_type();
     let string = builder.string_type();
     let void = builder.void_type();

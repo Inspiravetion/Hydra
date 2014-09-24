@@ -4,6 +4,7 @@ use ast::*;
 use std::from_str::from_str;
 use scanner;
 use std::collections::hashmap::HashMap;
+use std::int::parse_bytes;
 
 pub type AST       = Vec<Box<Stmt>>;
 pub type ASTStream = Receiver<Box<Stmt>>;
@@ -643,6 +644,21 @@ trait HydraBaseParser {
                     Int_Literal => {
                         self.next();
                         let num = from_str::<int>(self.tok().text.as_slice()).unwrap();
+                        Some(Int::new(num))
+                    },
+                    Float_Literal => {
+                        self.next();
+                        let num = from_str::<f64>(self.tok().text.as_slice()).unwrap();
+                        Some(Float::new(num))
+                    },
+                    Binary_Literal => {
+                        self.next();
+                        let num = parse_bytes(self.tok().text.as_slice().slice_from(2).as_bytes(), 2).unwrap();
+                        Some(Int::new(num))
+                    },
+                    Hex_Literal => {
+                        self.next();
+                        let num = parse_bytes(self.tok().text.as_slice().slice_from(2).as_bytes(), 16).unwrap();
                         Some(Int::new(num))
                     },
                     String_Literal => {

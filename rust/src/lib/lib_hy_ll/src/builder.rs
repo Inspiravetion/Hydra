@@ -780,6 +780,10 @@ impl Builder {
         u!(llvm::LLVMInt64TypeInContext(self.ctx))
     }
 
+    pub fn f64_type(&mut self) -> Type {
+        u!(llvm::LLVMDoubleTypeInContext(self.ctx))
+    }
+
     pub fn float64_type(&mut self) -> Type {
         u!(llvm::LLVMFloatTypeInContext(self.ctx))
     }
@@ -820,6 +824,10 @@ impl Builder {
     
     pub fn int64(&mut self, num : int) -> Value {
         u!(llvm::LLVMConstInt(self.int64_type(), num as c_ulonglong, False))
+    }
+
+    pub fn f64(&mut self, num : f64) -> Value {
+        u!(llvm::LLVMConstReal(self.f64_type(), num))
     }
 
     pub fn int32(&mut self, num : int) -> Value {
