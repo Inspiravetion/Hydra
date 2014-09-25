@@ -123,6 +123,8 @@ impl ExprGenerator for Expr {
             Float(num) => float_to_value(num, builder),
             Bool(boolean) => bool_to_value(boolean, builder),
             StringLit(ref string) => string_to_value(string.as_slice(), builder),
+            ArrayLit(ref exprs) => array_to_value(exprs, builder),
+            MapLit(ref exprs) => map_to_value(exprs, builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -245,6 +247,32 @@ fn string_to_value(value : &str, builder : &mut Builder) -> Value {
 
 fn string_to_gen_value(value : String, builder : &mut Builder, ctxt : Value) -> Value {
     string_to_value(value.as_slice(), builder)
+}
+
+///////////////////////////////////////
+//           Array Generation        //
+///////////////////////////////////////
+
+fn array_to_value(values : &Exprs, builder : &mut Builder) -> Value {
+    //push expressions when parsin this and function calls are supported
+    builder.call("hy_new_array", vec![], "hy_array")
+}
+
+fn array_to_gen_value(values : &Exprs, builder : &mut Builder, ctxt : Value) -> Value {
+    array_to_value(values, builder)
+}
+
+///////////////////////////////////////
+//             Map Generation        //
+///////////////////////////////////////
+
+fn map_to_value(values : &Exprs, builder : &mut Builder) -> Value {
+    //push expressions when parsin this and function calls are supported
+    builder.call("hy_new_map", vec![], "hy_map")
+}
+
+fn map_to_gen_value(values : &Exprs, builder : &mut Builder, ctxt : Value) -> Value {
+    map_to_value(values, builder)
 }
 
 ///////////////////////////////////////

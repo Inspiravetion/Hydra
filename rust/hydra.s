@@ -470,6 +470,20 @@ LBB14_11:                               ## %while_loop_exit94
 	movq	%rax, -16(%rcx)
 	movq	%rax, %rdi
 	callq	_print
+	callq	_hy_new_array
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rax, %rdi
+	callq	_print
+	callq	_hy_new_map
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rax, %rdi
+	callq	_print
 	xorl	%eax, %eax
 	leaq	-16(%rbp), %rsp
 	popq	%rbx

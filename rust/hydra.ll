@@ -368,6 +368,16 @@ while_loop_exit94:                                ; preds = %if_else_stmts107, %
   store %HyObj* %hy_float, %HyObj** %float
   %float119 = load %HyObj** %float
   %print_tmp120 = call %HyObj* @print(%HyObj* %float119)
+  %hy_array = call %HyObj* @hy_new_array()
+  %arr = alloca %HyObj*
+  store %HyObj* %hy_array, %HyObj** %arr
+  %arr121 = load %HyObj** %arr
+  %print_tmp122 = call %HyObj* @print(%HyObj* %arr121)
+  %hy_map = call %HyObj* @hy_new_map()
+  %map = alloca %HyObj*
+  store %HyObj* %hy_map, %HyObj** %map
+  %map123 = load %HyObj** %map
+  %print_tmp124 = call %HyObj* @print(%HyObj* %map123)
   ret i32 0
 
 if_cond100:                                       ; preds = %while_loop_stmts93

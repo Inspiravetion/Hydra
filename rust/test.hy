@@ -63,4 +63,10 @@ print(bin);
 var float = 123.456;
 print(float);
 
+var arr = [];
+print(arr);
+
+var map = {};
+print(map);
+
 

@@ -666,6 +666,16 @@ trait HydraBaseParser {
                         let literal = self.tok().text.to_string();
                         Some(StringLit::new(literal))
                     },
+                    Lbracket => {
+                        self.next();
+                        self.expect(Rbracket);
+                        Some(ArrayLit::new(Vec::new()))
+                    },
+                    Lcurly => {
+                        self.next();
+                        self.expect(Rcurly);
+                        Some(MapLit::new(Vec::new()))
+                    },
                     Identifier => {
                         Some(self.ident_or_func_call())
                     }

@@ -1,7 +1,10 @@
 use std::fmt::{Show, Formatter, Result};
 use token::*;
 
-pub type Ident = String;
+pub type Ident  = String;
+pub type Idents = Vec<Ident>;
+pub type Exprs  = Vec<Box<Expr>>;
+
 
 #[deriving(PartialEq)]
 pub struct Expr {
@@ -27,8 +30,9 @@ impl Show for Stmt {
 
 #[deriving(Show, PartialEq)]
 pub enum Expr_ {
+
     //1.prop_path, 2.params
-    FuncCall(Vec<Ident>, Vec<Box<Expr>>),
+    FuncCall(Idents, Exprs),
 
     //1.start, 2.end
     InclusiveRange(Box<Expr>, Box<Expr>),
@@ -49,6 +53,12 @@ pub enum Expr_ {
     StringLit(String),
 
     //1.value
+    ArrayLit(Exprs),
+
+    //1.value
+    MapLit(Exprs),
+
+    //1.value
     IdentExpr(Ident),
 
     //1.lhs, 2.op, 3.rhs
@@ -59,9 +69,9 @@ pub enum Expr_ {
 }
 
 pub mod FuncCall {
-    use self::super::{Expr, Ident, FuncCall};
+    use self::super::{Expr, Ident, FuncCall, Idents, Exprs};
 
-    pub fn new(prop_path : Vec<Ident>, params : Vec<Box<Expr>>) -> Box<Expr> {
+    pub fn new(prop_path : Idents, params : Exprs) -> Box<Expr> {
         box Expr {
             node : FuncCall(prop_path, params)
         }
@@ -128,6 +138,26 @@ pub mod StringLit {
     }
 }
 
+pub mod ArrayLit {
+    use self::super::{Expr, ArrayLit, Exprs};
+
+    pub fn new(value : Exprs) -> Box<Expr> {
+        box Expr {
+            node : ArrayLit(value)
+        }
+    }
+}
+
+pub mod MapLit {
+    use self::super::{Expr, MapLit, Exprs};
+
+    pub fn new(value : Exprs) -> Box<Expr> {
+        box Expr {
+            node : MapLit(value)
+        }
+    }
+}
+
 pub mod IdentExpr {
     use self::super::{Expr, Ident, IdentExpr};
 
@@ -164,13 +194,13 @@ pub enum Stmt_ {
     ExprStmt(Box<Expr>),
 
     //1.vars
-    VarDecl(Vec<Ident>),
+    VarDecl(Idents),
 
     //1.vars, 2.vals
-    VarAssign(Vec<Ident>, Vec<Box<Expr>>),
+    VarAssign(Idents, Exprs),
 
     //1.lhs, 2.rhs
-    AssignStmt(Vec<Vec<Ident>>, Vec<Box<Expr>>),
+    AssignStmt(Vec<Idents>, Exprs),
 
     //1.typ 
     LoopControlStmt(TokenType),
@@ -179,22 +209,22 @@ pub enum Stmt_ {
     IfElseStmt(Vec<Box<IfElseBranch>>),
 
     //1.vars, 2.gen, 3.stmts
-    ForInLoop(Vec<Ident>, Box<Expr>,  Vec<Box<Stmt>>),
+    ForInLoop(Idents, Box<Expr>,  Vec<Box<Stmt>>),
 
     //1.cond, 2.stmts
     WhileLoop(Box<Expr>,  Vec<Box<Stmt>>),
 
     //1.name, 2.params, 3.stmts
-    FunctionDef(Ident, Vec<Ident>,  Vec<Box<Stmt>>),
+    FunctionDef(Ident, Idents,  Vec<Box<Stmt>>),
 
     //1.ret_expr
     ReturnStmt(Box<Expr>),
 
     //1.name, 2.params, 3.stmts
-    GeneratorDef(Ident, Vec<Ident>, Vec<Box<Stmt>>),
+    GeneratorDef(Ident, Idents, Vec<Box<Stmt>>),
 
     //1.values
-    YieldStmt(Vec<Box<Expr>>)
+    YieldStmt(Exprs)
 }
 
 pub mod ExprStmt {
@@ -208,9 +238,9 @@ pub mod ExprStmt {
 }
 
 pub mod VarDecl {
-    use self::super::{Stmt, Ident, VarDecl};
+    use self::super::{Stmt, Ident, VarDecl, Idents};
 
-    pub fn new(vars : Vec<Ident>) -> Box<Stmt> {
+    pub fn new(vars : Idents) -> Box<Stmt> {
         box Stmt {
             node : VarDecl(vars)
         }
@@ -218,9 +248,9 @@ pub mod VarDecl {
 }
 
 pub mod VarAssign {
-    use self::super::{Expr, Stmt, Ident, VarAssign};
+    use self::super::{Expr, Stmt, Ident, VarAssign, Idents, Exprs};
 
-    pub fn new(vars : Vec<Ident>, vals : Vec<Box<Expr>>) -> Box<Stmt> {
+    pub fn new(vars : Idents, vals : Exprs) -> Box<Stmt> {
         box Stmt {
             node : VarAssign(vars, vals)
         }
@@ -228,9 +258,9 @@ pub mod VarAssign {
 }
 
 pub mod AssignStmt {
-    use self::super::{Expr, Stmt, Ident, AssignStmt};
+    use self::super::{Expr, Stmt, Ident, AssignStmt, Idents, Exprs};
 
-    pub fn new(lhs : Vec<Vec<Ident>>, rhs : Vec<Box<Expr>>) -> Box<Stmt> {
+    pub fn new(lhs : Vec<Idents>, rhs : Exprs) -> Box<Stmt> {
         box Stmt {
             node : AssignStmt(lhs, rhs)
         }
@@ -280,9 +310,9 @@ pub mod IfElseStmt {
 }
 
 pub mod ForInLoop {
-    use self::super::{Expr, Stmt, Ident, ForInLoop};
+    use self::super::{Expr, Stmt, Ident, ForInLoop, Idents};
 
-    pub fn new(vars : Vec<Ident>, gen : Box<Expr>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+    pub fn new(vars : Idents, gen : Box<Expr>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
         box Stmt {
             node : ForInLoop(vars, gen, stmts)
         }
@@ -300,9 +330,9 @@ pub mod WhileLoop {
 }
 
 pub mod FunctionDef {
-    use self::super::{Stmt, Ident, FunctionDef};
+    use self::super::{Stmt, Ident, FunctionDef, Idents};
 
-    pub fn new(name : Ident, params : Vec<Ident>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+    pub fn new(name : Ident, params : Idents, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
         box Stmt {
             node : FunctionDef(name, params, stmts)
         }
@@ -320,9 +350,9 @@ pub mod ReturnStmt {
 }
 
 pub mod GeneratorDef {
-    use self::super::{Stmt, Ident, GeneratorDef};
+    use self::super::{Stmt, Ident, GeneratorDef, Idents};
 
-    pub fn new(name : Ident, params : Vec<Ident>, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
+    pub fn new(name : Ident, params : Idents, stmts : Vec<Box<Stmt>>) -> Box<Stmt> {
         box Stmt {
             node : GeneratorDef(name, params, stmts)
         }
@@ -330,9 +360,9 @@ pub mod GeneratorDef {
 }
 
 pub mod YieldStmt {
-    use self::super::{Expr, Stmt, YieldStmt};
+    use self::super::{Expr, Stmt, YieldStmt, Exprs};
 
-    pub fn new(values : Vec<Box<Expr>>) -> Box<Stmt> {
+    pub fn new(values : Exprs) -> Box<Stmt> {
         box Stmt {
             node : YieldStmt(values)
         }

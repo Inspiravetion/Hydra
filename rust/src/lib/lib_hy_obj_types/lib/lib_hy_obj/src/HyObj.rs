@@ -147,7 +147,6 @@ impl HyObj {
                 unsafe { (format!("int : {}", i)).to_c_str().unwrap() }
             },
             HyFloat(f) => {
-                println!("{}", f);
                 unsafe { (format!("float : {}", f)).to_c_str().unwrap() }
             },
             HyString(ref s) => {
