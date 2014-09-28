@@ -231,6 +231,8 @@ Ltmp18:
 	callq	_hy_obj_slice_init
 	movl	$100000000, %edi        ## imm = 0x5F5E100
 	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -258,6 +260,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_+"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -270,6 +274,8 @@ Ltmp18:
 	movq	-72(%rbp), %rdi
 	movq	-64(%rbp), %rsi
 	callq	"_-"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -285,6 +291,8 @@ Ltmp18:
 	movq	-56(%rbp), %rsi
 	movq	%rax, %rdi
 	callq	"_/"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -297,6 +305,8 @@ Ltmp18:
 	movq	-80(%rbp), %rdi
 	movq	-72(%rbp), %rsi
 	callq	"_%"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -309,6 +319,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_<"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -321,6 +333,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_>"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -333,6 +347,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_<="
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -345,6 +361,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_>="
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -357,6 +375,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	%rdi, %rsi
 	callq	"_=="
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -369,6 +389,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_=="
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -381,6 +403,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	%rdi, %rsi
 	callq	"_!="
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -393,6 +417,8 @@ Ltmp18:
 	movq	-48(%rbp), %rdi
 	movq	-56(%rbp), %rsi
 	callq	"_!="
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -407,8 +433,10 @@ Ltmp18:
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-376(%rbp), %rsi
+	movq	-376(%rbp), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -416,8 +444,10 @@ Ltmp18:
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-384(%rbp), %rsi
+	movq	-384(%rbp), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -425,8 +455,10 @@ Ltmp18:
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-376(%rbp), %rsi
+	movq	-376(%rbp), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -437,6 +469,8 @@ Ltmp18:
 	movq	-376(%rbp), %rdi
 	movq	%rdi, %rsi
 	callq	"_+"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -446,8 +480,10 @@ Ltmp18:
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-376(%rbp), %rsi
+	movq	-376(%rbp), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -458,8 +494,10 @@ Ltmp18:
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-384(%rbp), %rsi
+	movq	-384(%rbp), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -467,8 +505,10 @@ Ltmp18:
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-376(%rbp), %rsi
+	movq	-376(%rbp), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -479,6 +519,8 @@ Ltmp18:
 	movq	-376(%rbp), %rdi
 	movq	-384(%rbp), %rsi
 	callq	"_+"
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -503,6 +545,8 @@ Ltmp18:
 	callq	_hy_obj_slice_init
 	movl	$10, %edi
 	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -515,7 +559,7 @@ LBB14_1:                                ## %if_else_cond_or_exit
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
 	je	LBB14_3
-## BB#2:                                ## %if_else_stmts96
+## BB#2:                                ## %if_else_stmts117
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
 	movq	%rbx, %rsp
@@ -524,6 +568,8 @@ LBB14_1:                                ## %if_else_cond_or_exit
 	callq	_hy_obj_slice_init
 	movl	$100, %edi
 	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -538,6 +584,8 @@ LBB14_3:                                ## %else_exit
 	callq	_hy_obj_slice_init
 	movl	$1000, %edi             ## imm = 0x3E8
 	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -559,8 +607,10 @@ LBB14_5:                                ## %while_loop_stmts
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	(%r14), %rsi
+	movq	(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -592,7 +642,7 @@ LBB14_4:                                ## %while_loop_check
 	movq	%rax, -16(%rcx)
 	jmp	LBB14_7
 	.align	4, 0x90
-LBB14_9:                                ## %if_else_cond_or_exit131
+LBB14_9:                                ## %if_else_cond_or_exit156
                                         ##   in Loop: Header=BB14_7 Depth=1
 	movq	(%r14), %rbx
 	movl	$1, %edi
@@ -601,7 +651,7 @@ LBB14_9:                                ## %if_else_cond_or_exit131
 	movq	%rax, %rsi
 	callq	"_+"
 	movq	%rax, (%r14)
-LBB14_7:                                ## %while_loop_check116
+LBB14_7:                                ## %while_loop_check140
                                         ## =>This Inner Loop Header: Depth=1
 	movl	$1, %edi
 	callq	_hy_new_bool
@@ -609,7 +659,7 @@ LBB14_7:                                ## %while_loop_check116
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
 	je	LBB14_10
-## BB#8:                                ## %if_cond125
+## BB#8:                                ## %if_cond150
                                         ##   in Loop: Header=BB14_7 Depth=1
 	movq	%rsp, %rbx
 	addq	$-32, %rbx
@@ -617,8 +667,10 @@ LBB14_7:                                ## %while_loop_check116
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	(%r14), %rsi
+	movq	(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -645,8 +697,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -662,8 +716,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -679,8 +735,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -696,8 +754,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -712,8 +772,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -728,8 +790,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print
@@ -741,11 +805,15 @@ LBB14_10:                               ## %function_def_bridge
 	callq	_hy_obj_slice_init
 	movl	$1, %edi
 	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movl	$2, %edi
 	callq	_hy_new_int
+	movq	%rax, %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
@@ -761,8 +829,10 @@ LBB14_10:                               ## %function_def_bridge
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	-16(%r14), %rsi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
 	movq	%rbx, %rdi
+	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_print

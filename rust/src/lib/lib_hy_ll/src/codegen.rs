@@ -160,7 +160,8 @@ fn func_call_to_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder
 
     for param in params.iter() {
         let val = param.to_value(builder);
-        builder.call("hy_obj_slice_push", vec![slice, val], "");
+        let cloned_val = builder.call("hy_obj_clone", vec![val], "obj_clone");
+        builder.call("hy_obj_slice_push", vec![slice, cloned_val], "");
     }
 
     //getting the function name will change later

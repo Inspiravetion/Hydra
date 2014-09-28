@@ -516,13 +516,15 @@ impl HyObj {
     //By Value types can be optimised so that calling some_func(1, 1.3, "str") 
     //frees the untouchable literals when it returns
     #[no_mangle]
-    pub fn hy_obj_clone(this : Box<HyObj>) -> Box<HyObj> {
-        match this.typ {
-            HyInt(i) => HyObj::hy_new_int(i),
-            HyFloat(f) => HyObj::hy_new_float(f),
-            HyString(s) => unsafe { HyObj::hy_new_string(s.clone().to_c_str().unwrap()) },
-            HyBool(b) => HyObj::hy_new_bool(b),
-            _ => this
+    pub fn hy_obj_clone(this : *const HyObj) -> Box<HyObj> {
+        unsafe {
+            match (*this).typ {
+                HyInt(i) => HyObj::hy_new_int(i),
+                HyFloat(f) => HyObj::hy_new_float(f),
+                HyString(ref s) => HyObj::hy_new_string(String::from_str(s.as_slice()).to_c_str_unchecked().unwrap()),
+                HyBool(b) => HyObj::hy_new_bool(b),
+                _ => mem::transmute(this)
+            }
         }
     }
 
