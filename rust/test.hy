@@ -69,4 +69,10 @@ print(arr);
 var map = {};
 print(map);
 
+function add(a, b) {
+    var sum = a + b;
+    return sum;
+}
 
+var sum = add(1 , 2);
+print(sum);

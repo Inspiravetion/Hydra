@@ -19,9 +19,10 @@ use regex::Regex;
 
 pub enum HyObjType {
     HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
-    HyChannel(Sender<HyObj>, Receiver<HyObj>),
+    HyChannel(Sender<Box<HyObj>>, Receiver<Box<HyObj>>),
     HyMap(TreeMap<String, Box<HyObj>>),
-    HyArray(Vec<HyObj>),
+    HyArray(Vec<Box<HyObj>>),
+    HyTuple(Vec<Box<HyObj>>),
     HyString(String),
     HyRegex(Regex),
     HyFloat(f64),
@@ -36,27 +37,57 @@ pub struct HyObj {
 }
 
 pub struct HyObjSlice {
-    pub objs : *const *const HyObj,
+    pub objs : *mut *mut HyObj,
     pub len  : uint,
     pub cap  : uint
 }
 
 #[no_mangle]
-pub fn hy_new_obj_slice(cap : int) -> HyObjSlice {
-    let mem_sz = mem::size_of::<*const HyObj>();
-    let alignment = mem::min_align_of::<*const HyObj>();
-    let ptr = unsafe { heap::allocate(mem_sz * (cap as uint), alignment) as *const *const HyObj };
+pub fn hy_obj_slice_init(this : *mut HyObjSlice, cap : int) {
+    let mem_sz = mem::size_of::<*mut HyObj>();
+    let alignment = mem::min_align_of::<*mut HyObj>();
+    
+    unsafe { 
+        let ptr = heap::allocate(mem_sz * (cap as uint), alignment) as *mut *mut HyObj;
 
-    HyObjSlice {
-        objs : ptr,
-        cap  : cap as uint,
-        len  : 0
+        (*this).objs = ptr;
+        (*this).cap  = cap as uint;
+        (*this).len  = 0;
+    };
+}
+
+#[no_mangle]
+pub fn hy_obj_slice_reinit(this : *mut HyObjSlice, cap : int) {
+    // let mem_sz = mem::size_of::<*mut HyObj>();
+    // let alignment = mem::min_align_of::<*mut HyObj>();
+    
+    unsafe { 
+        // let ptr = heap::allocate(mem_sz * (cap as uint), alignment) as *mut *mut HyObj;
+
+        // (*this).objs = ptr;
+        // (*this).cap  = cap as uint;
+        (*this).len  = 0;
+    };
+}
+
+#[no_mangle]
+pub fn hy_obj_slice_clear(this : *mut HyObjSlice) {
+    unsafe { 
+        let mem_sz = mem::size_of::<*mut HyObj>() * (*this).cap;
+        let alignment = mem::min_align_of::<*mut HyObj>();
+
+        //set counts to 0 and free hyobj array
+        (*this).len = 0;
+        (*this).cap = 0;
+
+        let ptr = (*this).objs;
+        heap::deallocate(ptr as *mut u8, mem_sz, alignment);
     }
 }
 
 //fail if full because this should never get called when its full
 #[no_mangle]
-pub fn hy_obj_slice_push(this : *const HyObjSlice, obj : *const HyObj) {
+pub fn hy_obj_slice_push(this : *mut HyObjSlice, obj : *mut HyObj) {
     let ptr = unsafe { 
         let len = (*this).len;
         let cap = (*this).cap;
@@ -65,6 +96,7 @@ pub fn hy_obj_slice_push(this : *const HyObjSlice, obj : *const HyObj) {
             fail!("Tried to push too many HyObjs into the HyObjSlice");
         }
 
+        (*this).len = len + 1;
         (*this).objs.offset(len as int)
     };
 
@@ -72,12 +104,12 @@ pub fn hy_obj_slice_push(this : *const HyObjSlice, obj : *const HyObj) {
 }
 
 #[no_mangle]
-pub fn hy_obj_slice_get(this : *const HyObjSlice, index : uint) -> *const HyObj {
+pub fn hy_obj_slice_get(this : *mut HyObjSlice, index : uint) -> *mut HyObj {
     unsafe { 
         let len = (*this).len;
 
         if index >= len {
-            fail!("Tried to get an invalid index out of a HyObjSlice");
+            return mem::transmute(HyObj::hy_new_undefined()) 
         }
 
         let ptr = (*this).objs.offset(index as int);
@@ -102,8 +134,8 @@ impl HyGenCtxt {
 
             (*ctxt).block  = block;
             (*ctxt).params = params;
-            (*ctxt).state  = hy_new_obj_slice(num_state);
-            (*ctxt).yields = hy_new_obj_slice(num_yields);    
+            hy_obj_slice_init(&mut(*ctxt).state, num_state);
+            hy_obj_slice_init(&mut(*ctxt).yields, num_yields);    
         
             ctxt as *const HyGenCtxt
         }
@@ -164,6 +196,14 @@ impl HyObj {
                 // print!("]");
                 unsafe{ "Array : []".to_string().to_c_str().unwrap() }
             },
+            HyTuple(ref vec) => {
+                // print!("[");
+                // for obj in vec.iter() {
+                //     obj.hy_obj_print();
+                // }
+                // print!("]");
+                unsafe{ "Tuple : ()".to_string().to_c_str().unwrap() }
+            },
             HyMap(ref map) => {
                 unsafe{ "Map : {}".to_string().to_c_str().unwrap() }  
             },
@@ -220,6 +260,13 @@ impl HyObj {
     pub fn hy_new_array() -> Box<HyObj> {
         box HyObj {
             typ : HyArray(Vec::new())
+        }
+    }
+
+    #[no_mangle]
+    pub fn hy_new_tuple(size : int) -> Box<HyObj> {
+        box HyObj {
+            typ : HyTuple(Vec::with_capacity(size as uint))
         }
     }
 
@@ -526,5 +573,23 @@ impl HyObj {
             },
             _ => fail!("Called hy_map_contains on an object that is not a Map")
         }
+    }
+
+    ///////////////////////////////////////
+    //          Tuple Functions          //
+    ///////////////////////////////////////
+
+    #[no_mangle]
+    pub fn hy_tuple_insert(&mut self, val : Box<HyObj>) {
+        match self.typ {
+            HyTuple(ref mut vec) => {
+                if vec.capacity() == vec.len() {
+                    fail!("Tried to add too many objects to a tuple");
+                }
+
+                vec.push(val);
+            },
+            _ => fail!("Called hy_tuple_insert on an object that is not a Tuple")
+        };
     }
 }

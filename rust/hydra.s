@@ -46,6 +46,9 @@ _print:                                 ## @print
 	pushq	%rax
 Ltmp2:
 	.cfi_def_cfa_offset 16
+	xorl	%esi, %esi
+	callq	_hy_obj_slice_get
+	movq	%rax, %rdi
 	callq	_hy_obj_to_str
 	movq	%rax, %rdi
 	callq	_puts
@@ -217,124 +220,271 @@ Ltmp16:
 	.cfi_def_cfa_register %rbp
 	pushq	%r14
 	pushq	%rbx
-	subq	$64, %rsp
+	subq	$560, %rsp              ## imm = 0x230
 Ltmp17:
 	.cfi_offset %rbx, -32
 Ltmp18:
 	.cfi_offset %r14, -24
+	leaq	-40(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
 	movl	$100000000, %edi        ## imm = 0x5F5E100
 	callq	_hy_new_int
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movl	$1, %edi
 	callq	_hy_new_int
-	movq	%rax, -24(%rbp)
+	movq	%rax, -48(%rbp)
 	movl	$2, %edi
 	callq	_hy_new_int
-	movq	%rax, -32(%rbp)
+	movq	%rax, -56(%rbp)
 	movl	$3, %edi
 	callq	_hy_new_int
-	movq	%rax, -40(%rbp)
+	movq	%rax, -64(%rbp)
 	movl	$6, %edi
 	callq	_hy_new_int
-	movq	%rax, -48(%rbp)
+	movq	%rax, -72(%rbp)
 	movl	$9, %edi
 	callq	_hy_new_int
-	movq	%rax, -56(%rbp)
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
-	callq	"_+"
-	movq	%rax, %rdi
-	callq	_print
+	movq	%rax, -80(%rbp)
+	leaq	-104(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
 	movq	-48(%rbp), %rdi
-	movq	-40(%rbp), %rsi
-	callq	"_-"
-	movq	%rax, %rdi
+	movq	-56(%rbp), %rsi
+	callq	"_+"
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-32(%rbp), %rdi
-	movq	-40(%rbp), %rsi
+	leaq	-128(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-72(%rbp), %rdi
+	movq	-64(%rbp), %rsi
+	callq	"_-"
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_print
+	leaq	-152(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-56(%rbp), %rdi
+	movq	-64(%rbp), %rsi
 	callq	"_*"
-	movq	-32(%rbp), %rsi
+	movq	-56(%rbp), %rsi
 	movq	%rax, %rdi
 	callq	"_/"
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-56(%rbp), %rdi
-	movq	-48(%rbp), %rsi
+	leaq	-176(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-80(%rbp), %rdi
+	movq	-72(%rbp), %rsi
 	callq	"_%"
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
+	leaq	-200(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
+	movq	-56(%rbp), %rsi
 	callq	"_<"
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
+	leaq	-224(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
+	movq	-56(%rbp), %rsi
 	callq	"_>"
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
+	leaq	-248(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
+	movq	-56(%rbp), %rsi
 	callq	"_<="
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
+	leaq	-272(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
+	movq	-56(%rbp), %rsi
 	callq	"_>="
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
+	leaq	-296(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
 	movq	%rdi, %rsi
 	callq	"_=="
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
+	leaq	-320(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
+	movq	-56(%rbp), %rsi
 	callq	"_=="
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
+	leaq	-344(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
 	movq	%rdi, %rsi
 	callq	"_!="
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-24(%rbp), %rdi
-	movq	-32(%rbp), %rsi
+	leaq	-368(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-48(%rbp), %rdi
+	movq	-56(%rbp), %rsi
 	callq	"_!="
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movl	$15, %edi
 	callq	_hy_new_int
-	movq	%rax, -64(%rbp)
+	movq	%rax, -376(%rbp)
 	callq	_hy_new_undefined
-	movq	%rax, -72(%rbp)
-	movq	-64(%rbp), %rdi
+	movq	%rax, -384(%rbp)
+	leaq	-408(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-376(%rbp), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-72(%rbp), %rdi
+	leaq	-432(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-384(%rbp), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-64(%rbp), %rdi
+	leaq	-456(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-376(%rbp), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-64(%rbp), %rdi
+	leaq	-480(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-376(%rbp), %rdi
 	movq	%rdi, %rsi
 	callq	"_+"
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-64(%rbp), %rdi
+	leaq	-504(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-376(%rbp), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movl	$4, %edi
 	callq	_hy_new_int
-	movq	%rax, -72(%rbp)
-	movq	%rax, %rdi
+	movq	%rax, -384(%rbp)
+	leaq	-528(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-384(%rbp), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-64(%rbp), %rdi
+	leaq	-552(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-376(%rbp), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-64(%rbp), %rdi
-	movq	-72(%rbp), %rsi
+	leaq	-576(%rbp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-376(%rbp), %rdi
+	movq	-384(%rbp), %rsi
 	callq	"_+"
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
-	movq	-72(%rbp), %rbx
+	movq	-384(%rbp), %rbx
 	movl	$1000, %edi             ## imm = 0x3E8
 	callq	_hy_new_int
 	movq	%rbx, %rdi
@@ -344,10 +494,19 @@ Ltmp18:
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
 	je	LBB14_1
-## BB#10:                               ## %if_else_stmts
+## BB#11:                               ## %if_else_stmts
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
 	movl	$10, %edi
 	callq	_hy_new_int
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 LBB14_1:                                ## %if_else_cond_or_exit
 	xorl	%edi, %edi
@@ -356,15 +515,33 @@ LBB14_1:                                ## %if_else_cond_or_exit
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
 	je	LBB14_3
-## BB#2:                                ## %if_else_stmts75
+## BB#2:                                ## %if_else_stmts96
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
 	movl	$100, %edi
 	callq	_hy_new_int
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 LBB14_3:                                ## %else_exit
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
 	movl	$1000, %edi             ## imm = 0x3E8
 	callq	_hy_new_int
-	movq	%rax, %rdi
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	xorl	%edi, %edi
 	callq	_hy_new_int
@@ -376,7 +553,16 @@ LBB14_3:                                ## %else_exit
 	.align	4, 0x90
 LBB14_5:                                ## %while_loop_stmts
                                         ##   in Loop: Header=BB14_4 Depth=1
-	movq	(%r14), %rdi
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movq	(%r14), %rbx
 	movl	$1, %edi
@@ -406,7 +592,7 @@ LBB14_4:                                ## %while_loop_check
 	movq	%rax, -16(%rcx)
 	jmp	LBB14_7
 	.align	4, 0x90
-LBB14_9:                                ## %if_else_cond_or_exit106
+LBB14_9:                                ## %if_else_cond_or_exit131
                                         ##   in Loop: Header=BB14_7 Depth=1
 	movq	(%r14), %rbx
 	movl	$1, %edi
@@ -415,17 +601,26 @@ LBB14_9:                                ## %if_else_cond_or_exit106
 	movq	%rax, %rsi
 	callq	"_+"
 	movq	%rax, (%r14)
-LBB14_7:                                ## %while_loop_check92
+LBB14_7:                                ## %while_loop_check116
                                         ## =>This Inner Loop Header: Depth=1
 	movl	$1, %edi
 	callq	_hy_new_bool
 	movq	%rax, %rdi
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
-	je	LBB14_11
-## BB#8:                                ## %if_cond100
+	je	LBB14_10
+## BB#8:                                ## %if_cond125
                                         ##   in Loop: Header=BB14_7 Depth=1
-	movq	(%r14), %rdi
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movq	(%r14), %rbx
 	movl	$20, %edi
@@ -437,57 +632,183 @@ LBB14_7:                                ## %while_loop_check92
 	callq	_hy_obj_to_truthy_val
 	testl	%eax, %eax
 	je	LBB14_9
-LBB14_11:                               ## %while_loop_exit94
+LBB14_10:                               ## %function_def_bridge
 	leaq	"L_global_\"AzzNTittys\"_literal"(%rip), %rdi
 	callq	_hy_new_string
-	movq	%rsp, %rcx
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movq	%rax, -16(%rcx)
-	movq	%rax, %rdi
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movl	$3735928559, %edi       ## imm = 0xDEADBEEF
 	callq	_hy_new_int
-	movq	%rsp, %rcx
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movq	%rax, -16(%rcx)
-	movq	%rax, %rdi
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movl	$9, %edi
 	callq	_hy_new_int
-	movq	%rsp, %rcx
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movq	%rax, -16(%rcx)
-	movq	%rax, %rdi
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	movsd	LCPI14_0(%rip), %xmm0
 	callq	_hy_new_float
-	movq	%rsp, %rcx
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movq	%rax, -16(%rcx)
-	movq	%rax, %rdi
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	callq	_hy_new_array
-	movq	%rsp, %rcx
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movq	%rax, -16(%rcx)
-	movq	%rax, %rdi
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	callq	_hy_new_map
-	movq	%rsp, %rcx
-	leaq	-16(%rcx), %rdx
-	movq	%rdx, %rsp
-	movq	%rax, -16(%rcx)
-	movq	%rax, %rdi
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_print
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$2, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movl	$1, %edi
+	callq	_hy_new_int
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movl	$2, %edi
+	callq	_hy_new_int
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_add
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rsi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
 	callq	_print
 	xorl	%eax, %eax
 	leaq	-16(%rbp), %rsp
 	popq	%rbx
 	popq	%r14
+	popq	%rbp
+	retq
+	.cfi_endproc
+
+	.globl	_add
+	.align	4, 0x90
+_add:                                   ## @add
+	.cfi_startproc
+## BB#0:                                ## %add_param_setup
+	pushq	%rbp
+Ltmp19:
+	.cfi_def_cfa_offset 16
+Ltmp20:
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+Ltmp21:
+	.cfi_def_cfa_register %rbp
+	pushq	%rbx
+	subq	$24, %rsp
+Ltmp22:
+	.cfi_offset %rbx, -24
+	movq	%rdi, %rbx
+	xorl	%esi, %esi
+                                        ## kill: RDI<def> RBX<kill>
+	callq	_hy_obj_slice_get
+	movq	%rax, -16(%rbp)
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_get
+	movq	%rax, -24(%rbp)
+	movq	-16(%rbp), %rdi
+	movq	-24(%rbp), %rsi
+	callq	"_+"
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	leaq	-8(%rbp), %rsp
+	popq	%rbx
 	popq	%rbp
 	retq
 	.cfi_endproc

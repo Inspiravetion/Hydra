@@ -152,14 +152,21 @@ fn func_call_gen_code(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder
 }
 
 fn func_call_to_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder : &mut Builder) -> Value {
-    let mut param_vals = Vec::new();
+    let hy_obj_slice = builder.get_type("HyObjSlice");
+    let slice = builder.alloca(hy_obj_slice, "param_slice");
+
+    let slice_len = builder.int64(params.len() as int);
+    builder.call("hy_obj_slice_init", vec![slice, slice_len], "");
+
     for param in params.iter() {
-        param_vals.push(param.to_value(builder));
+        let val = param.to_value(builder);
+        builder.call("hy_obj_slice_push", vec![slice, val], "");
     }
 
     //getting the function name will change later
     let func_name = prop_path[0].as_slice();
-    builder.call(func_name, param_vals, format!("{}_tmp", func_name).as_slice())
+    builder.call(func_name, vec![slice], format!("{}_tmp", func_name).as_slice())
+    //do cleanup here!!!
 }
 
 fn func_call_to_gen_value(prop_path : &Vec<Ident>, params : &Vec<Box<Expr>>, builder : &mut Builder, ctxt : Value) -> Value {
@@ -761,31 +768,46 @@ fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>
     builder.break_to(saved_block);
 
     builder.with_fresh_scope(|fb : &mut Builder|{
-        //This will end up being some general HyObj type or sumthn
-        let int_type = fb.int32_type();
+        let hy_obj_slice_ref_type = fb.get_type("HyObjSlice*");
+        let hy_obj_ref = fb.get_type("HyObj*");
 
         let name = name.as_slice();
-        let param_types = Vec::from_elem(params.len(), int_type);
+        let param_types = vec![hy_obj_slice_ref_type];
 
-        fb.create_function(name, param_types, int_type,|fb : &mut Builder|{
+        fb.create_function(name, param_types, hy_obj_ref,|fb : &mut Builder|{
             fb.goto_first_block();
+
+            let param_setup = fb.new_block(format!("{}_param_setup", name).as_slice());
+            fb.goto_block(param_setup);
             
-            //bind params to local vars
+            //bind params to local vars or init them to undefined
+            let param_slice = fb.get_param(0);
             let mut i = 0;
             for param in params.iter() {
-                //right now this is pass by value...not by ref
                 let name = param.as_slice();
-                let param_val = fb.get_param(i);
-                let var_val = fb.new_var(param_val, name);
-                fb.set_var(name, var_val);
+
+                let param_idx = fb.int64(i);
+                let param_val = fb.call("hy_obj_slice_get", vec![param_slice, param_idx], format!("param_{}", i).as_slice());
+
+                let boxed_val = fb.new_var(param_val, name);
+                fb.set_var(name, boxed_val);
 
                 i += 1;
             }
+
+            let func_body = fb.new_block(format!("{}_function_body", name).as_slice());
+            fb.break_to(func_body);
+            fb.goto_block(func_body);
 
             for stmt in stmts.iter() {
                 stmt.gen_code(fb);
             }
 
+            //clear out the HyObjSlice to signify no return values
+            let undefined = fb.call("hy_new_undefined", vec![], "undefined");
+            fb.ret(undefined);
+
+            //need to return an empty hyobjslice here to signal a path that doesnt return anything
             fb.goto_block(saved_block);
         });
     });
@@ -796,6 +818,8 @@ fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>
 ///////////////////////////////////////
 
 fn return_stmt_gen_code(ret_expr : &Box<Expr>, builder : &mut Builder){
+    //if there are more than one values pack them into a tuple
+
     let val = ret_expr.to_value(builder);
     builder.ret(val);
 }

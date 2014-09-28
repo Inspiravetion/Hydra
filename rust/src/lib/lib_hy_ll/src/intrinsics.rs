@@ -7,6 +7,7 @@ pub fn gen_intrinsics(builder : &mut Builder) {
     declare_runtime_functions(builder);
 
     let hy_obj_ref = builder.get_type("HyObj*");
+    let hy_obj_slice_ref = builder.get_type("HyObjSlice*");
     let int_type = builder.int32_type();
     let string_type = builder.string_type();
     let void_type = builder.void_type();
@@ -17,10 +18,12 @@ pub fn gen_intrinsics(builder : &mut Builder) {
     builder.declare_variadic_function(
         "sprintf", vec!(string_type, string_type), int_type
     );
-    builder.create_function("print", vec!(hy_obj_ref), hy_obj_ref, |fb : &mut Builder|{
+    builder.create_function("print", vec!(hy_obj_slice_ref), hy_obj_ref, |fb : &mut Builder|{
         fb.goto_first_block();
 
-        let obj = fb.get_param(0);
+        let objs = fb.get_param(0);
+        let zero = fb.int64(0);
+        let obj  = fb.call("hy_obj_slice_get", vec![objs, zero], "tmp_obj");
         let obj_str = fb.call("hy_obj_to_str", vec!(obj), "tmp_str");
         fb.call("puts", vec![obj_str], "putsres");
 
@@ -153,15 +156,19 @@ fn gen_runtime_types(builder : &mut Builder) {
     //HyObj*
     let hy_obj_ptr      = builder.to_ptr_type(hy_obj_type);
     builder.add_type("HyObj*", hy_obj_ptr);
+
     //HyObj**
     let hy_obj_ptr_ptr  = builder.to_ptr_type(hy_obj_ptr);
     builder.add_type("HyObj**", hy_obj_ptr_ptr);
+    
     //type { HyObj**, i64, i64 }
     let hy_obj_slice    = builder.create_type(&vec![hy_obj_ptr_ptr, int64_type, int64_type], "HyObjSlice");
     builder.add_type("HyObjSlice", hy_obj_slice);
+    
     //HyObjSlice*
     let hy_obj_slice_ref = builder.to_ptr_type(hy_obj_slice);
     builder.add_type("HyObjSlice*", hy_obj_slice_ref);
+    
     //{ i8*, %HyObjSlice, %HyObjSlice, %HyObjSlice }
     let hy_gen_ctxt = builder.create_type(&vec![i8_ref, hy_obj_slice, hy_obj_slice, hy_obj_slice], "HyGenCtxt");
     builder.add_type("HyGenCtxt", hy_gen_ctxt);
@@ -170,6 +177,7 @@ fn gen_runtime_types(builder : &mut Builder) {
 
     let hy_gen_next_func = builder.func_type(vec![i8_ref, hy_obj_slice_ref, hy_gen_ctxt_ref], boolean, 0);
     let hy_gen_next_func_ref = builder.to_ptr_type(hy_gen_next_func);
+    
     //{ i1 (i8*, %HyObjSlice*, %HyGenCtxt*)*, i8* }*
     let hy_gen_next_proc = builder.create_type(&vec![hy_gen_next_func_ref, i8_ref], "HyGenNextProc");
     let hy_gen_next      = builder.to_ptr_type(hy_gen_next_proc);
@@ -205,6 +213,9 @@ fn declare_runtime_functions(builder : &mut Builder) {
         "hy_new_array", vec![], hy_obj_ref
     );
     builder.declare_function(    
+        "hy_new_tuple", vec![i64], hy_obj_ref
+    );
+    builder.declare_function(    
         "hy_new_int", vec![i64], hy_obj_ref
     );
     builder.declare_function(    
@@ -232,16 +243,28 @@ fn declare_runtime_functions(builder : &mut Builder) {
         hy_obj_ref
     );    
     builder.declare_function(
-        "hy_new_obj_slice", vec![i64], hy_obj_slice
+        "hy_obj_slice_init", vec![hy_obj_slice_ref, i64], void
+    );
+    builder.declare_function(
+        "hy_obj_slice_reinit", vec![hy_obj_slice_ref, i64], void
+    );
+    builder.declare_function(
+        "hy_obj_slice_clear", vec![hy_obj_slice_ref], void
     );
     builder.declare_function(
         "hy_obj_slice_push", vec![hy_obj_slice_ref, hy_obj_ref], void
+    );
+    builder.declare_function(
+        "hy_obj_slice_get", vec![hy_obj_slice_ref, i64], hy_obj_ref
     );
     builder.declare_function(
         "hy_obj_to_str", vec![hy_obj_ref], string
     );
     builder.declare_function(
         "hy_obj_clone", vec![hy_obj_ref], hy_obj_ref
+    );
+    builder.declare_function(
+        "hy_tuple_insert", vec![hy_obj_ref, hy_obj_ref], void
     );
     builder.declare_function(
         "hy_map_insert", vec![hy_obj_ref, hy_obj_ref, hy_obj_ref], hy_obj_ref
