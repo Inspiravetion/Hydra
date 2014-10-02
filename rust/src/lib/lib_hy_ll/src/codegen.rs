@@ -261,9 +261,16 @@ fn string_to_gen_value(value : String, builder : &mut Builder, ctxt : Value) -> 
 //           Array Generation        //
 ///////////////////////////////////////
 
-fn array_to_value(values : &Exprs, builder : &mut Builder) -> Value {
+fn array_to_value(exprs : &Exprs, builder : &mut Builder) -> Value {
     //push expressions when parsin this and function calls are supported
-    builder.call("hy_new_array", vec![], "hy_array")
+    let array = builder.call("hy_new_array", vec![], "hy_array");
+
+    for expr in exprs.iter() {
+        let val = expr.to_value(builder);
+        builder.call("hy_array_push", vec![array, val], "");
+    }
+
+    array
 }
 
 fn array_to_gen_value(values : &Exprs, builder : &mut Builder, ctxt : Value) -> Value {
@@ -359,7 +366,7 @@ impl StmtGenerator for Stmt {
             ForInLoop(ref vars, ref cond, ref stmts) => for_in_gen_code(vars, cond, stmts, builder),
             WhileLoop(ref cond, ref stmts) => while_loop_gen_code(cond, stmts, builder),
             FunctionDef(ref name, ref params, ref stmts) => func_def_gen_code(name, params, stmts, builder),
-            ReturnStmt(ref val) => return_stmt_gen_code(val, builder),
+            ReturnStmt(ref vals) => return_stmt_gen_code(vals, builder),
             GeneratorDef(ref name, ref params, ref stmts) => gen_def_gen_code(name, params, stmts, builder),
             _ => fail!("Called gen_code on a non code generating node")
         };
@@ -818,11 +825,32 @@ fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>
 //       Return Stmt Generation      //
 ///////////////////////////////////////
 
-fn return_stmt_gen_code(ret_expr : &Box<Expr>, builder : &mut Builder){
+fn return_stmt_gen_code(ret_exprs : &Exprs, builder : &mut Builder){
     //if there are more than one values pack them into a tuple
+    let len = ret_exprs.len();
 
-    let val = ret_expr.to_value(builder);
-    builder.ret(val);
+    if len == 0 {
+        //return undefined
+        let undefined = builder.call("hy_new_undefined", vec![], "undefined");
+        builder.ret(undefined);
+
+    } else if len == 1 {
+        //return the first expression
+        let val = ret_exprs.get(0).to_value(builder);
+        builder.ret(val);
+
+    } else {
+        //return a tuple of the expressions
+        let tuple_size = builder.int64(len as int);
+        let tuple = builder.call("hy_new_tuple", vec![tuple_size], "ret_tuple");
+
+        for expr in ret_exprs.iter() {
+            let val = expr.to_value(builder);
+            builder.call("hy_tuple_insert", vec![tuple, val], "");
+        }
+
+        builder.ret(tuple);  
+    };
 }
 
 ///////////////////////////////////////

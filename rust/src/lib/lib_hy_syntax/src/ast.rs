@@ -217,8 +217,8 @@ pub enum Stmt_ {
     //1.name, 2.params, 3.stmts
     FunctionDef(Ident, Idents,  Vec<Box<Stmt>>),
 
-    //1.ret_expr
-    ReturnStmt(Box<Expr>),
+    //1.ret_exprs
+    ReturnStmt(Exprs),
 
     //1.name, 2.params, 3.stmts
     GeneratorDef(Ident, Idents, Vec<Box<Stmt>>),
@@ -340,9 +340,9 @@ pub mod FunctionDef {
 }
 
 pub mod ReturnStmt {
-    use self::super::{Expr, Stmt, ReturnStmt};
+    use self::super::{Exprs, Stmt, ReturnStmt};
 
-    pub fn new(ret_expr : Box<Expr>) -> Box<Stmt> {
+    pub fn new(ret_expr : Exprs) -> Box<Stmt> {
         box Stmt {
             node : ReturnStmt(ret_expr)
         }

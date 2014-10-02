@@ -176,45 +176,68 @@ impl HyObj {
                 unsafe { "null".to_string().to_c_str().unwrap() }
             },
             HyInt(i) => {
-                unsafe { (format!("int : {}", i)).to_c_str().unwrap() }
+                unsafe { (format!("{}", i)).to_c_str().unwrap() }
             },
             HyFloat(f) => {
-                unsafe { (format!("float : {}", f)).to_c_str().unwrap() }
+                unsafe { (format!("{}", f)).to_c_str().unwrap() }
             },
             HyString(ref s) => {
                 let ret = unsafe { s.to_c_str_unchecked().unwrap() };
                 ret
             },
             HyRegex(ref r) => {
-                unsafe { (format!("regex : {}", r)).to_c_str().unwrap() }
+                unsafe { (format!("{}", r)).to_c_str().unwrap() }
             },
             HyArray(ref vec) => {
-                // print!("[");
-                // for obj in vec.iter() {
-                //     obj.hy_obj_print();
-                // }
-                // print!("]");
-                unsafe{ "Array : []".to_string().to_c_str().unwrap() }
+                let mut arr_str = "[".to_string();
+                HyObj::append_hy_obj_strs(&mut arr_str, vec);
+                arr_str.push_str("]");
+                unsafe{ arr_str.to_c_str_unchecked().unwrap() }
             },
             HyTuple(ref vec) => {
-                // print!("[");
-                // for obj in vec.iter() {
-                //     obj.hy_obj_print();
-                // }
-                // print!("]");
-                unsafe{ "Tuple : ()".to_string().to_c_str().unwrap() }
+                let mut tuple_str = "(".to_string();
+                HyObj::append_hy_obj_strs(&mut tuple_str, vec);
+                tuple_str.push_str(")");
+                unsafe{ tuple_str.to_c_str_unchecked().unwrap() }
             },
             HyMap(ref map) => {
-                unsafe{ "Map : {}".to_string().to_c_str().unwrap() }  
+                unsafe{ "{}".to_string().to_c_str().unwrap() }  
             },
             HyBool(ref b) => {
                 if *b {
-                    unsafe{ "bool : true".to_string().to_c_str().unwrap() }  
+                    unsafe{ "true".to_string().to_c_str().unwrap() }  
                 } else {
-                    unsafe{ "bool : false".to_string().to_c_str().unwrap() }  
+                    unsafe{ "false".to_string().to_c_str().unwrap() }  
                 }
             },
             _ => unsafe{ "Called print on an object that is not an Array, Map, or bool".to_string().to_c_str().unwrap() }
+        }
+    }
+
+    fn append_hy_obj_strs(s : &mut String, vec : &Vec<Box<HyObj>>) {
+        let mut objs = vec.iter();
+
+        match objs.next() {
+            Some(obj) => {
+                let obj_str = obj.hy_obj_to_str();
+            
+                unsafe {
+                    let c_str = CString::new(obj_str, false);
+                    s.push_str(c_str.as_str().unwrap());
+                }
+            },
+            None =>{}
+        };
+
+        for obj in objs {
+            s.push_str(", ");
+
+            let obj_str = obj.hy_obj_to_str();
+            
+            unsafe {
+                let c_str = CString::new(obj_str, false);
+                s.push_str(c_str.as_str().unwrap());
+            }
         }
     }
 
@@ -592,6 +615,20 @@ impl HyObj {
                 vec.push(val);
             },
             _ => fail!("Called hy_tuple_insert on an object that is not a Tuple")
+        };
+    }
+
+    ///////////////////////////////////////
+    //          Array Functions          //
+    ///////////////////////////////////////
+
+    #[no_mangle]
+    pub fn hy_array_push(&mut self, val : Box<HyObj>) {
+        match self.typ {
+            HyArray(ref mut vec) => {
+                vec.push(val);
+            },
+            _ => fail!("Called hy_array_push on an object that is not an Array")
         };
     }
 }

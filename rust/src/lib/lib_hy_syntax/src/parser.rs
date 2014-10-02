@@ -534,11 +534,11 @@ trait HydraBaseParser {
 
                         self.next();
                         //TODO: this should be optional...you should be able to return early
-                        let ret_val = self.expr();
+                        let ret_vals = self.exprs();
 
                         self.next_is(Semicolon);
 
-                        Some(ReturnStmt::new(ret_val))
+                        Some(ReturnStmt::new(ret_vals))
                     },
                     Yield => {
                         if !self.parsing_generator() {
@@ -668,8 +668,9 @@ trait HydraBaseParser {
                     },
                     Lbracket => {
                         self.next();
+                        let exprs = self.exprs();
                         self.expect(Rbracket);
-                        Some(ArrayLit::new(Vec::new()))
+                        Some(ArrayLit::new(exprs))
                     },
                     Lcurly => {
                         self.next();

@@ -267,6 +267,9 @@ fn declare_runtime_functions(builder : &mut Builder) {
         "hy_tuple_insert", vec![hy_obj_ref, hy_obj_ref], void
     );
     builder.declare_function(
+        "hy_array_push", vec![hy_obj_ref, hy_obj_ref], void
+    );
+    builder.declare_function(
         "hy_map_insert", vec![hy_obj_ref, hy_obj_ref, hy_obj_ref], hy_obj_ref
     );
     builder.declare_function(

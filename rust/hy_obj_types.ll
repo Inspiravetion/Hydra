@@ -227,12 +227,12 @@ entry-block:
   %1 = getelementptr inbounds %"struct.collections::vec::Vec<[u8]>[#6]"* %0, i32 0, i32 0
   %2 = getelementptr inbounds %"struct.collections::vec::Vec<[u8]>[#6]"* %0, i32 0, i32 1
   %3 = getelementptr inbounds %"struct.collections::vec::Vec<[u8]>[#6]"* %0, i32 0, i32 2
-  call void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop21h17097550259533271499E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias nocapture dereferenceable(24) %0)
+  call void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop21h10273103881597154073E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias nocapture dereferenceable(24) %0)
   ret void
 }
 
 ; Function Attrs: uwtable
-define internal void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop21h17097550259533271499E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #0 {
+define internal void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop21h10273103881597154073E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #0 {
 entry-block:
   %self = alloca %"struct.collections::vec::Vec<[u8]>[#6]"*
   %1 = alloca %"struct.core::slice::Items<[u8]>[#3]"
@@ -249,7 +249,7 @@ entry-block:
 
 then-block-29-:                                   ; preds = %entry-block
   %7 = load %"struct.collections::vec::Vec<[u8]>[#6]"** %self
-  call void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice21h16371383318391806342E"({ i8*, i64 }* noalias nocapture sret dereferenceable(16) %2, %"struct.collections::vec::Vec<[u8]>[#6]"* noalias dereferenceable(24) %7)
+  call void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice20h8206348497452995952E"({ i8*, i64 }* noalias nocapture sret dereferenceable(16) %2, %"struct.collections::vec::Vec<[u8]>[#6]"* noalias dereferenceable(24) %7)
   %8 = getelementptr inbounds { i8*, i64 }* %2, i32 0, i32 0
   %9 = load i8** %8
   %10 = getelementptr inbounds { i8*, i64 }* %2, i32 0, i32 1
@@ -258,7 +258,7 @@ then-block-29-:                                   ; preds = %entry-block
   store i8* %9, i8** %12
   %13 = getelementptr inbounds { i8*, i64 }* %__adjust, i32 0, i32 1
   store i64 %11, i64* %13
-  call void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter20h4782545645586102029E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { i8*, i64 }* noalias nocapture dereferenceable(16) %__adjust)
+  call void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter20h9843224016923745179E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { i8*, i64 }* noalias nocapture dereferenceable(16) %__adjust)
   store %"struct.core::slice::Items<[u8]>[#3]"* %1, %"struct.core::slice::Items<[u8]>[#3]"** %for_head
   %14 = load %"struct.core::slice::Items<[u8]>[#3]"** %for_head
   br label %for_loopback
@@ -270,11 +270,11 @@ for_exit:                                         ; preds = %for_loopback
   %18 = load %"struct.collections::vec::Vec<[u8]>[#6]"** %self
   %19 = getelementptr inbounds %"struct.collections::vec::Vec<[u8]>[#6]"* %18, i32 0, i32 1
   %20 = load i64* %19
-  call void @_ZN3vec7dealloc20h7474775914328390485E(i8* %17, i64 %20)
+  call void @_ZN3vec7dealloc21h14691521333487954335E(i8* %17, i64 %20)
   br label %next-block
 
 for_loopback:                                     ; preds = %for_body, %then-block-29-
-  %21 = call i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next19h493164888127332614E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias dereferenceable(16) %14)
+  %21 = call i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next21h13529738331712028859E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias dereferenceable(16) %14)
   store i8* %21, i8** %loop_option
   %22 = load i8** %loop_option
   %23 = icmp ne i8* %22, null
@@ -284,7 +284,7 @@ for_loopback:                                     ; preds = %for_body, %then-blo
 
 for_body:                                         ; preds = %for_loopback
   %26 = load i8** %loop_option
-  %27 = call i8 @_ZN3ptr4read20h4714134616004192731E(i8* %26)
+  %27 = call i8 @_ZN3ptr4read20h7379465700605390408E(i8* %26)
   br label %for_loopback
 
 next-block:                                       ; preds = %entry-block, %for_exit
@@ -292,15 +292,15 @@ next-block:                                       ; preds = %entry-block, %for_e
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter20h4782545645586102029E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter20h9843224016923745179E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %p = alloca i8*
   %2 = alloca i64
   %3 = alloca i64
   %4 = alloca i64
-  %5 = call i8* @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr20h9469748548072467152E"({ i8*, i64 }* noalias dereferenceable(16) %1)
+  %5 = call i8* @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr21h17816041181775834628E"({ i8*, i64 }* noalias dereferenceable(16) %1)
   store i8* %5, i8** %p
-  %6 = call i64 @_ZN3mem7size_of21h17422742068115852096E()
+  %6 = call i64 @_ZN3mem7size_of21h15934675622421974347E()
   store i64 %6, i64* %2
   %7 = load i64* %2
   %8 = icmp eq i64 %7, 0
@@ -313,7 +313,7 @@ then-block-75-:                                   ; preds = %entry-block
   %11 = getelementptr inbounds %"struct.core::slice::Items<[u8]>[#3]"* %0, i32 0, i32 1
   %12 = load i8** %p
   %13 = ptrtoint i8* %12 to i64
-  %14 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len21h17403538044836731958E"({ i8*, i64 }* noalias dereferenceable(16) %1)
+  %14 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h8956571359780668973E"({ i8*, i64 }* noalias dereferenceable(16) %1)
   store i64 %14, i64* %3
   %15 = load i64* %3
   %16 = add i64 %13, %15
@@ -328,10 +328,10 @@ else-block:                                       ; preds = %entry-block
   store i8* %20, i8** %19
   %21 = getelementptr inbounds %"struct.core::slice::Items<[u8]>[#3]"* %0, i32 0, i32 1
   %22 = load i8** %p
-  %23 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len21h17403538044836731958E"({ i8*, i64 }* noalias dereferenceable(16) %1)
+  %23 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h8956571359780668973E"({ i8*, i64 }* noalias dereferenceable(16) %1)
   store i64 %23, i64* %4
   %24 = load i64* %4
-  %25 = call i8* @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset20h2942546258999980188E"(i8* %22, i64 %24)
+  %25 = call i8* @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h14152898187649999506E"(i8* %22, i64 %24)
   store i8* %25, i8** %21
   %26 = getelementptr inbounds %"struct.core::slice::Items<[u8]>[#3]"* %0, i32 0, i32 2
   br label %join
@@ -341,46 +341,46 @@ join:                                             ; preds = %else-block, %then-b
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr20h9469748548072467152E"({ i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal i8* @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr21h17816041181775834628E"({ i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { i8*, i64 }*
   %1 = alloca %"struct.core::raw::Slice<[u8]>[#3]"
   store { i8*, i64 }* %0, { i8*, i64 }** %self
   %2 = load { i8*, i64 }** %self
-  call void @_ZN3raw4Repr4repr21h15677892942476045080E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { i8*, i64 }* noalias dereferenceable(16) %2)
+  call void @_ZN3raw4Repr4repr20h2131611851754934633E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { i8*, i64 }* noalias dereferenceable(16) %2)
   %3 = getelementptr inbounds %"struct.core::raw::Slice<[u8]>[#3]"* %1, i32 0, i32 0
   %4 = load i8** %3
   ret i8* %4
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3raw4Repr4repr21h15677892942476045080E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3raw4Repr4repr20h2131611851754934633E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { i8*, i64 }*
   store { i8*, i64 }* %1, { i8*, i64 }** %self
   %2 = load { i8*, i64 }** %self
-  call void @_ZN3mem14transmute_copy19h146581424050980767E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { i8*, i64 }* noalias nocapture dereferenceable(16) %2)
+  call void @_ZN3mem14transmute_copy21h12213870896044199760E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { i8*, i64 }* noalias nocapture dereferenceable(16) %2)
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3mem14transmute_copy19h146581424050980767E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3mem14transmute_copy21h12213870896044199760E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %src = alloca { i8*, i64 }*
   store { i8*, i64 }* %1, { i8*, i64 }** %src
   %2 = load { i8*, i64 }** %src
   %3 = bitcast { i8*, i64 }* %2 to %"struct.core::raw::Slice<[u8]>[#3]"*
-  call void @_ZN3ptr4read21h14938441207369488529E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[u8]>[#3]"* %3)
+  call void @_ZN3ptr4read21h16094566904093301184E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[u8]>[#3]"* %3)
   ret void
 }
 
 ; Function Attrs: alwaysinline uwtable
-define internal void @_ZN3ptr4read21h14938441207369488529E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), %"struct.core::raw::Slice<[u8]>[#3]"*) unnamed_addr #3 {
+define internal void @_ZN3ptr4read21h16094566904093301184E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), %"struct.core::raw::Slice<[u8]>[#3]"*) unnamed_addr #3 {
 entry-block:
   %src = alloca %"struct.core::raw::Slice<[u8]>[#3]"*
   %tmp = alloca %"struct.core::raw::Slice<[u8]>[#3]"
   store %"struct.core::raw::Slice<[u8]>[#3]"* %1, %"struct.core::raw::Slice<[u8]>[#3]"** %src
-  call void @_ZN3mem13uninitialized20h1220933903457653600E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %tmp)
+  call void @_ZN3mem13uninitialized21h13112403972398572963E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %tmp)
   %2 = load %"struct.core::raw::Slice<[u8]>[#3]"** %src
   %3 = bitcast %"struct.core::raw::Slice<[u8]>[#3]"* %tmp to i8*
   %4 = bitcast %"struct.core::raw::Slice<[u8]>[#3]"* %2 to i8*
@@ -392,7 +392,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3mem13uninitialized20h1220933903457653600E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3mem13uninitialized21h13112403972398572963E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   ret void
 }
@@ -401,47 +401,47 @@ entry-block:
 declare void @llvm.memcpy.p0i8.p0i8.i64(i8* nocapture, i8* nocapture readonly, i64, i32, i1) unnamed_addr #4
 
 ; Function Attrs: inlinehint uwtable
-define internal i64 @_ZN3mem7size_of21h17422742068115852096E() unnamed_addr #2 {
+define internal i64 @_ZN3mem7size_of21h15934675622421974347E() unnamed_addr #2 {
 entry-block:
   ret i64 1
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len21h17403538044836731958E"({ i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h8956571359780668973E"({ i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { i8*, i64 }*
   %1 = alloca %"struct.core::raw::Slice<[u8]>[#3]"
   store { i8*, i64 }* %0, { i8*, i64 }** %self
   %2 = load { i8*, i64 }** %self
-  call void @_ZN3raw4Repr4repr20h6835552446397089658E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { i8*, i64 }* noalias dereferenceable(16) %2)
+  call void @_ZN3raw4Repr4repr21h11069503331386662961E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { i8*, i64 }* noalias dereferenceable(16) %2)
   %3 = getelementptr inbounds %"struct.core::raw::Slice<[u8]>[#3]"* %1, i32 0, i32 1
   %4 = load i64* %3
   ret i64 %4
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3raw4Repr4repr20h6835552446397089658E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3raw4Repr4repr21h11069503331386662961E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { i8*, i64 }*
   store { i8*, i64 }* %1, { i8*, i64 }** %self
   %2 = load { i8*, i64 }** %self
-  call void @_ZN3mem14transmute_copy20h6153808434029932273E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { i8*, i64 }* noalias nocapture dereferenceable(16) %2)
+  call void @_ZN3mem14transmute_copy20h3904907569254833392E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { i8*, i64 }* noalias nocapture dereferenceable(16) %2)
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3mem14transmute_copy20h6153808434029932273E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3mem14transmute_copy20h3904907569254833392E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16), { i8*, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %src = alloca { i8*, i64 }*
   store { i8*, i64 }* %1, { i8*, i64 }** %src
   %2 = load { i8*, i64 }** %src
   %3 = bitcast { i8*, i64 }* %2 to %"struct.core::raw::Slice<[u8]>[#3]"*
-  call void @_ZN3ptr4read21h14938441207369488529E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[u8]>[#3]"* %3)
+  call void @_ZN3ptr4read21h16094566904093301184E(%"struct.core::raw::Slice<[u8]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[u8]>[#3]"* %3)
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset20h2942546258999980188E"(i8*, i64) unnamed_addr #2 {
+define internal i8* @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h14152898187649999506E"(i8*, i64) unnamed_addr #2 {
 entry-block:
   %self = alloca i8*
   %count = alloca i64
@@ -454,7 +454,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice21h16371383318391806342E"({ i8*, i64 }* noalias nocapture sret dereferenceable(16), %"struct.collections::vec::Vec<[u8]>[#6]"* noalias dereferenceable(24)) unnamed_addr #2 {
+define internal void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice20h8206348497452995952E"({ i8*, i64 }* noalias nocapture sret dereferenceable(16), %"struct.collections::vec::Vec<[u8]>[#6]"* noalias dereferenceable(24)) unnamed_addr #2 {
 entry-block:
   %self = alloca %"struct.collections::vec::Vec<[u8]>[#6]"*
   %2 = alloca i8*
@@ -462,7 +462,7 @@ entry-block:
   %3 = bitcast { i8*, i64 }* %0 to %"struct.core::raw::Slice<[u8]>[#3]"*
   %4 = getelementptr inbounds %"struct.core::raw::Slice<[u8]>[#3]"* %3, i32 0, i32 0
   %5 = load %"struct.collections::vec::Vec<[u8]>[#6]"** %self
-  %6 = call i8* @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr21h16810156135016794885E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias dereferenceable(24) %5)
+  %6 = call i8* @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr21h10824789956121331184E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias dereferenceable(24) %5)
   store i8* %6, i8** %2
   %7 = load i8** %2
   store i8* %7, i8** %4
@@ -475,7 +475,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr21h16810156135016794885E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #2 {
+define internal i8* @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr21h10824789956121331184E"(%"struct.collections::vec::Vec<[u8]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #2 {
 entry-block:
   %self = alloca %"struct.collections::vec::Vec<[u8]>[#6]"*
   store %"struct.collections::vec::Vec<[u8]>[#6]"* %0, %"struct.collections::vec::Vec<[u8]>[#6]"** %self
@@ -486,7 +486,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next19h493164888127332614E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next21h13529738331712028859E"(%"struct.core::slice::Items<[u8]>[#3]"* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %sret_slot = alloca i8*
   %self = alloca %"struct.core::slice::Items<[u8]>[#3]"*
@@ -507,7 +507,7 @@ then-block-336-:                                  ; preds = %entry-block
   br label %join2
 
 else-block:                                       ; preds = %entry-block
-  %9 = call i64 @_ZN3mem7size_of21h17422742068115852096E()
+  %9 = call i64 @_ZN3mem7size_of21h15934675622421974347E()
   store i64 %9, i64* %1
   %10 = load i64* %1
   %11 = icmp eq i64 %10, 0
@@ -537,7 +537,7 @@ else-block1:                                      ; preds = %else-block
   %26 = load %"struct.core::slice::Items<[u8]>[#3]"** %self
   %27 = getelementptr inbounds %"struct.core::slice::Items<[u8]>[#3]"* %26, i32 0, i32 0
   %28 = load i8** %27
-  %29 = call i8* @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset20h2942546258999980188E"(i8* %28, i64 1)
+  %29 = call i8* @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h14152898187649999506E"(i8* %28, i64 1)
   store i8* %29, i8** %25
   %30 = load i8** %old
   store i8* %30, i8** %sret_slot
@@ -552,12 +552,12 @@ join2:                                            ; preds = %join, %then-block-3
 }
 
 ; Function Attrs: alwaysinline uwtable
-define internal i8 @_ZN3ptr4read20h4714134616004192731E(i8*) unnamed_addr #3 {
+define internal i8 @_ZN3ptr4read20h7379465700605390408E(i8*) unnamed_addr #3 {
 entry-block:
   %src = alloca i8*
   %tmp = alloca i8
   store i8* %0, i8** %src
-  %1 = call i8 @_ZN3mem13uninitialized19h108997815160545109E()
+  %1 = call i8 @_ZN3mem13uninitialized20h9761206398301350377E()
   store i8 %1, i8* %tmp
   %2 = load i8** %src
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* %tmp, i8* %2, i64 1, i32 1, i1 false)
@@ -566,7 +566,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8 @_ZN3mem13uninitialized19h108997815160545109E() unnamed_addr #2 {
+define internal i8 @_ZN3mem13uninitialized20h9761206398301350377E() unnamed_addr #2 {
 entry-block:
   %sret_slot = alloca i8
   %0 = load i8* %sret_slot
@@ -574,7 +574,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3vec7dealloc20h7474775914328390485E(i8*, i64) unnamed_addr #2 {
+define internal void @_ZN3vec7dealloc21h14691521333487954335E(i8*, i64) unnamed_addr #2 {
 entry-block:
   %ptr = alloca i8*
   %len = alloca i64
@@ -583,7 +583,7 @@ entry-block:
   %4 = alloca i64
   store i8* %0, i8** %ptr
   store i64 %1, i64* %len
-  %5 = call i64 @_ZN3mem7size_of21h17422742068115852096E()
+  %5 = call i64 @_ZN3mem7size_of21h15934675622421974347E()
   store i64 %5, i64* %2
   %6 = load i64* %2
   %7 = icmp ne i64 %6, 0
@@ -591,12 +591,12 @@ entry-block:
 
 then-block-408-:                                  ; preds = %entry-block
   %8 = load i8** %ptr
-  %9 = call i64 @_ZN3mem7size_of21h17422742068115852096E()
+  %9 = call i64 @_ZN3mem7size_of21h15934675622421974347E()
   store i64 %9, i64* %3
   %10 = load i64* %3
   %11 = load i64* %len
   %12 = mul i64 %11, %10
-  %13 = call i64 @_ZN3mem12min_align_of21h17646139653473460473E()
+  %13 = call i64 @_ZN3mem12min_align_of21h12235408037080945632E()
   store i64 %13, i64* %4
   %14 = load i64* %4
   call void @_ZN4heap10deallocate20heea38cfb3095acaa3gaE(i8* %8, i64 %12, i64 %14)
@@ -690,7 +690,7 @@ entry-block:
 declare i64 @llvm.cttz.i64(i64, i1) unnamed_addr #5
 
 ; Function Attrs: inlinehint uwtable
-define internal i64 @_ZN3mem12min_align_of21h17646139653473460473E() unnamed_addr #2 {
+define internal i64 @_ZN3mem12min_align_of21h12235408037080945632E() unnamed_addr #2 {
 entry-block:
   ret i64 1
 }
@@ -716,12 +716,12 @@ entry-block:
   %1 = getelementptr inbounds %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* %0, i32 0, i32 0
   %2 = getelementptr inbounds %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* %0, i32 0, i32 1
   %3 = getelementptr inbounds %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* %0, i32 0, i32 2
-  call void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop20h6776424693476411584E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias nocapture dereferenceable(24) %0)
+  call void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop20h1676827320005435141E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias nocapture dereferenceable(24) %0)
   ret void
 }
 
 ; Function Attrs: uwtable
-define internal void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop20h6776424693476411584E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #0 {
+define internal void @"_ZN3vec17Vec$LT$T$GT$.Drop4drop20h1676827320005435141E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #0 {
 entry-block:
   %self = alloca %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"*
   %1 = alloca %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"
@@ -740,7 +740,7 @@ entry-block:
 
 then-block-29-:                                   ; preds = %entry-block
   %8 = load %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"** %self
-  call void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice20h6950817363883652870E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture sret dereferenceable(16) %2, %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias dereferenceable(24) %8)
+  call void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice20h2653634508032823855E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture sret dereferenceable(16) %2, %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias dereferenceable(24) %8)
   %9 = getelementptr inbounds { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %2, i32 0, i32 0
   %10 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %9
   %11 = getelementptr inbounds { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %2, i32 0, i32 1
@@ -749,7 +749,7 @@ then-block-29-:                                   ; preds = %entry-block
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %10, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %13
   %14 = getelementptr inbounds { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %__adjust, i32 0, i32 1
   store i64 %12, i64* %14
-  call void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter21h12139537997830165022E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16) %__adjust)
+  call void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter21h15294346582860845027E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16) %__adjust)
   store %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* %1, %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"** %for_head
   %15 = load %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"** %for_head
   br label %for_loopback
@@ -761,11 +761,11 @@ for_exit:                                         ; preds = %for_loopback
   %19 = load %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"** %self
   %20 = getelementptr inbounds %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* %19, i32 0, i32 1
   %21 = load i64* %20
-  call void @_ZN3vec7dealloc21h17346534855347914229E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %18, i64 %21)
+  call void @_ZN3vec7dealloc20h7733814394019370902E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %18, i64 %21)
   br label %next-block
 
 for_loopback:                                     ; preds = %for_body, %then-block-29-
-  %22 = call i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next20h4738409281873012672E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias dereferenceable(16) %15)
+  %22 = call i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next21h16426935959473949178E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias dereferenceable(16) %15)
   store i8* %22, i8** %loop_option
   %23 = load i8** %loop_option
   %24 = icmp ne i8* %23, null
@@ -776,7 +776,7 @@ for_loopback:                                     ; preds = %for_body, %then-blo
 for_body:                                         ; preds = %for_loopback
   %27 = bitcast i8** %loop_option to { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }***
   %28 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %27
-  %29 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3ptr4read21h16144873045031008570E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %28)
+  %29 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3ptr4read21h16404066856730514167E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %28)
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* %29, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %3
   %30 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %3
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* %30, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %stmt
@@ -788,15 +788,15 @@ next-block:                                       ; preds = %entry-block, %for_e
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter21h12139537997830165022E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$4iter21h15294346582860845027E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %p = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**
   %2 = alloca i64
   %3 = alloca i64
   %4 = alloca i64
-  %5 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr20h4229673111681266186E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %1)
+  %5 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr21h16341810149817067703E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %1)
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %5, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %p
-  %6 = call i64 @_ZN3mem7size_of21h15159914486260922101E()
+  %6 = call i64 @_ZN3mem7size_of20h5482855896204709293E()
   store i64 %6, i64* %2
   %7 = load i64* %2
   %8 = icmp eq i64 %7, 0
@@ -809,7 +809,7 @@ then-block-75-:                                   ; preds = %entry-block
   %11 = getelementptr inbounds %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* %0, i32 0, i32 1
   %12 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %p
   %13 = ptrtoint { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %12 to i64
-  %14 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h8958269795268750928E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %1)
+  %14 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h5656841605318602432E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %1)
   store i64 %14, i64* %3
   %15 = load i64* %3
   %16 = add i64 %13, %15
@@ -824,10 +824,10 @@ else-block:                                       ; preds = %entry-block
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %20, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %19
   %21 = getelementptr inbounds %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* %0, i32 0, i32 1
   %22 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %p
-  %23 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h8958269795268750928E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %1)
+  %23 = call i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h5656841605318602432E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %1)
   store i64 %23, i64* %4
   %24 = load i64* %4
-  %25 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h15335825461405281438E"({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %22, i64 %24)
+  %25 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h12849683030525033587E"({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %22, i64 %24)
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %25, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %21
   %26 = getelementptr inbounds %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* %0, i32 0, i32 2
   br label %join
@@ -837,46 +837,46 @@ join:                                             ; preds = %else-block, %then-b
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr20h4229673111681266186E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN5slice60_$BP$$x27a$x20$x5bT$x5d.ImmutableVector$LT$$x27a$C$$x20T$GT$6as_ptr21h16341810149817067703E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }*
   %1 = alloca %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"
   store { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %0, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
   %2 = load { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
-  call void @_ZN3raw4Repr4repr20h9341376313468312705E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %2)
+  call void @_ZN3raw4Repr4repr21h18301275191948222550E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %2)
   %3 = getelementptr inbounds %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %1, i32 0, i32 0
   %4 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %3
   ret { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %4
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3raw4Repr4repr20h9341376313468312705E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3raw4Repr4repr21h18301275191948222550E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }*
   store { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
   %2 = load { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
-  call void @_ZN3mem14transmute_copy21h12208565666152443891E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16) %2)
+  call void @_ZN3mem14transmute_copy21h16005646009455040104E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16) %2)
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3mem14transmute_copy21h12208565666152443891E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3mem14transmute_copy21h16005646009455040104E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %src = alloca { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }*
   store { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %src
   %2 = load { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %src
   %3 = bitcast { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %2 to %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"*
-  call void @_ZN3ptr4read19h407355987971464319E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %3)
+  call void @_ZN3ptr4read20h8692185016472057449E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %3)
   ret void
 }
 
 ; Function Attrs: alwaysinline uwtable
-define internal void @_ZN3ptr4read19h407355987971464319E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"*) unnamed_addr #3 {
+define internal void @_ZN3ptr4read20h8692185016472057449E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"*) unnamed_addr #3 {
 entry-block:
   %src = alloca %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"*
   %tmp = alloca %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"
   store %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %1, %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"** %src
-  call void @_ZN3mem13uninitialized20h7933605778129302173E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %tmp)
+  call void @_ZN3mem13uninitialized19h558976027815703217E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %tmp)
   %2 = load %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"** %src
   %3 = bitcast %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %tmp to i8*
   %4 = bitcast %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %2 to i8*
@@ -888,53 +888,53 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3mem13uninitialized20h7933605778129302173E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3mem13uninitialized19h558976027815703217E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i64 @_ZN3mem7size_of21h15159914486260922101E() unnamed_addr #2 {
+define internal i64 @_ZN3mem7size_of20h5482855896204709293E() unnamed_addr #2 {
 entry-block:
   ret i64 8
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h8958269795268750928E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal i64 @"_ZN5slice34_$BP$$x27a$x20$x5bT$x5d.Collection3len20h5656841605318602432E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }*
   %1 = alloca %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"
   store { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %0, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
   %2 = load { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
-  call void @_ZN3raw4Repr4repr20h6740023274894663273E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %2)
+  call void @_ZN3raw4Repr4repr20h6033938470504690138E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias dereferenceable(16) %2)
   %3 = getelementptr inbounds %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %1, i32 0, i32 1
   %4 = load i64* %3
   ret i64 %4
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3raw4Repr4repr20h6740023274894663273E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3raw4Repr4repr20h6033938470504690138E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %self = alloca { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }*
   store { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
   %2 = load { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %self
-  call void @_ZN3mem14transmute_copy20h5665795429424548864E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16) %2)
+  call void @_ZN3mem14transmute_copy20h1351450971784012303E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16) %2)
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3mem14transmute_copy20h5665795429424548864E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3mem14transmute_copy20h1351450971784012303E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16), { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %src = alloca { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }*
   store { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %1, { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %src
   %2 = load { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }** %src
   %3 = bitcast { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %2 to %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"*
-  call void @_ZN3ptr4read19h407355987971464319E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %3)
+  call void @_ZN3ptr4read20h8692185016472057449E(%"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture sret dereferenceable(16) %0, %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %3)
   ret void
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h15335825461405281438E"({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64) unnamed_addr #2 {
+define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h12849683030525033587E"({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64) unnamed_addr #2 {
 entry-block:
   %self = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**
   %count = alloca i64
@@ -947,7 +947,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice20h6950817363883652870E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture sret dereferenceable(16), %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias dereferenceable(24)) unnamed_addr #2 {
+define internal void @"_ZN3vec12Vec$LT$T$GT$12as_mut_slice20h2653634508032823855E"({ { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* noalias nocapture sret dereferenceable(16), %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias dereferenceable(24)) unnamed_addr #2 {
 entry-block:
   %self = alloca %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"*
   %2 = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**
@@ -955,7 +955,7 @@ entry-block:
   %3 = bitcast { { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64 }* %0 to %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"*
   %4 = getelementptr inbounds %"struct.core::raw::Slice<[Gc<hy_obj::_HyObj>]>[#3]"* %3, i32 0, i32 0
   %5 = load %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"** %self
-  %6 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr20h5605811120653909977E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias dereferenceable(24) %5)
+  %6 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr20h7771062665986377952E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias dereferenceable(24) %5)
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %6, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %2
   %7 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %2
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %7, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %4
@@ -968,7 +968,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr20h5605811120653909977E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #2 {
+define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3vec12Vec$LT$T$GT$10as_mut_ptr20h7771062665986377952E"(%"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* noalias nocapture dereferenceable(24)) unnamed_addr #2 {
 entry-block:
   %self = alloca %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"*
   store %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"* %0, %"struct.collections::vec::Vec<[Gc<hy_obj::_HyObj>]>[#6]"** %self
@@ -979,7 +979,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next20h4738409281873012672E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
+define internal i8* @"_ZN5slice57Items$LT$$x27a$C$$x20T$GT$.Iterator$LT$$BP$$x27a$x20T$GT$4next21h16426935959473949178E"(%"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* noalias nocapture dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %sret_slot = alloca i8*
   %self = alloca %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"*
@@ -1000,7 +1000,7 @@ then-block-336-:                                  ; preds = %entry-block
   br label %join2
 
 else-block:                                       ; preds = %entry-block
-  %9 = call i64 @_ZN3mem7size_of21h15159914486260922101E()
+  %9 = call i64 @_ZN3mem7size_of20h5482855896204709293E()
   store i64 %9, i64* %1
   %10 = load i64* %1
   %11 = icmp eq i64 %10, 0
@@ -1031,7 +1031,7 @@ else-block1:                                      ; preds = %else-block
   %27 = load %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"** %self
   %28 = getelementptr inbounds %"struct.core::slice::Items<[Gc<hy_obj::_HyObj>]>[#3]"* %27, i32 0, i32 0
   %29 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %28
-  %30 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h15335825461405281438E"({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %29, i64 1)
+  %30 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** @"_ZN3ptr31_$RP$const$x20T.RawPtr$LT$T$GT$6offset21h12849683030525033587E"({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %29, i64 1)
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %30, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %26
   %31 = bitcast i8** %sret_slot to { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }***
   %32 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %old
@@ -1047,12 +1047,12 @@ join2:                                            ; preds = %join, %then-block-3
 }
 
 ; Function Attrs: alwaysinline uwtable
-define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3ptr4read21h16144873045031008570E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**) unnamed_addr #3 {
+define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3ptr4read21h16404066856730514167E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**) unnamed_addr #3 {
 entry-block:
   %src = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**
   %tmp = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %0, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %src
-  %1 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3mem13uninitialized21h12396395688512405655E()
+  %1 = call { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3mem13uninitialized20h4830621845998053560E()
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* %1, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %tmp
   %2 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %src
   %3 = bitcast { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %tmp to i8*
@@ -1069,7 +1069,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3mem13uninitialized21h12396395688512405655E() unnamed_addr #2 {
+define internal { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }* @_ZN3mem13uninitialized20h4830621845998053560E() unnamed_addr #2 {
 entry-block:
   %sret_slot = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*
   %0 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %sret_slot
@@ -1077,7 +1077,7 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3vec7dealloc21h17346534855347914229E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64) unnamed_addr #2 {
+define internal void @_ZN3vec7dealloc20h7733814394019370902E({ i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**, i64) unnamed_addr #2 {
 entry-block:
   %ptr = alloca { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }**
   %len = alloca i64
@@ -1086,7 +1086,7 @@ entry-block:
   %4 = alloca i64
   store { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %0, { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %ptr
   store i64 %1, i64* %len
-  %5 = call i64 @_ZN3mem7size_of21h15159914486260922101E()
+  %5 = call i64 @_ZN3mem7size_of20h5482855896204709293E()
   store i64 %5, i64* %2
   %6 = load i64* %2
   %7 = icmp ne i64 %6, 0
@@ -1095,12 +1095,12 @@ entry-block:
 then-block-408-:                                  ; preds = %entry-block
   %8 = load { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }*** %ptr
   %9 = bitcast { i64, void (i8*)*, i8*, i8*, %"struct.hy_obj::_HyObj<[]>[#10]" }** %8 to i8*
-  %10 = call i64 @_ZN3mem7size_of21h15159914486260922101E()
+  %10 = call i64 @_ZN3mem7size_of20h5482855896204709293E()
   store i64 %10, i64* %3
   %11 = load i64* %3
   %12 = load i64* %len
   %13 = mul i64 %12, %11
-  %14 = call i64 @_ZN3mem12min_align_of20h2521301529043216746E()
+  %14 = call i64 @_ZN3mem12min_align_of20h5396521309496302710E()
   store i64 %14, i64* %4
   %15 = load i64* %4
   call void @_ZN4heap10deallocate20heea38cfb3095acaa3gaE(i8* %9, i64 %13, i64 %15)
@@ -1111,7 +1111,7 @@ next-block:                                       ; preds = %entry-block, %then-
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i64 @_ZN3mem12min_align_of20h2521301529043216746E() unnamed_addr #2 {
+define internal i64 @_ZN3mem12min_align_of20h5396521309496302710E() unnamed_addr #2 {
 entry-block:
   ret i64 8
 }
@@ -1201,15 +1201,15 @@ join4:                                            ; preds = %case_body
 ; Function Attrs: inlinehint uwtable
 define internal void @"_ZN5local49Task.Local$LT$local_ptr..Borrowed$LT$Task$GT$$GT$17try_unsafe_borrow20hb13b3486c7c18bf4GkaE"(%"enum.core::option::Option<[*mut rustrt::task::Task]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #2 {
 entry-block:
-  call void @_ZN9local_ptr8compiled17try_unsafe_borrow20h8858698658637908919E(%"enum.core::option::Option<[*mut rustrt::task::Task]>[#3]"* noalias nocapture sret dereferenceable(16) %0)
+  call void @_ZN9local_ptr8compiled17try_unsafe_borrow20h1830664818593056124E(%"enum.core::option::Option<[*mut rustrt::task::Task]>[#3]"* noalias nocapture sret dereferenceable(16) %0)
   ret void
 }
 
 ; Function Attrs: noinline uwtable
-define internal void @_ZN9local_ptr8compiled17try_unsafe_borrow20h8858698658637908919E(%"enum.core::option::Option<[*mut rustrt::task::Task]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #6 {
+define internal void @_ZN9local_ptr8compiled17try_unsafe_borrow20h1830664818593056124E(%"enum.core::option::Option<[*mut rustrt::task::Task]>[#3]"* noalias nocapture sret dereferenceable(16)) unnamed_addr #6 {
 entry-block:
   %1 = alloca i8
-  %2 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null20h2852680443127407117E"(i8** noalias dereferenceable(8) @_ZN9local_ptr8compiled10RT_TLS_PTR20h105e8dd88d5b0520anaE)
+  %2 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null21h10536081786876697253E"(i8** noalias dereferenceable(8) @_ZN9local_ptr8compiled10RT_TLS_PTR20h105e8dd88d5b0520anaE)
   %3 = zext i1 %2 to i8
   store i8 %3, i8* %1
   %4 = load i8* %1, !range !1
@@ -1236,13 +1236,13 @@ join:                                             ; preds = %else-block, %then-b
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null20h2852680443127407117E"(i8** noalias nocapture dereferenceable(8)) unnamed_addr #2 {
+define internal zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null21h10536081786876697253E"(i8** noalias nocapture dereferenceable(8)) unnamed_addr #2 {
 entry-block:
   %self = alloca i8**
   %1 = alloca i8*
   store i8** %0, i8*** %self
   %2 = load i8*** %self
-  %3 = call i8* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h13731027641295922798E"()
+  %3 = call i8* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h15784465473458016301E"()
   store i8* %3, i8** %1
   %4 = load i8** %1
   %5 = load i8** %2
@@ -1253,14 +1253,14 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h13731027641295922798E"() unnamed_addr #2 {
+define internal i8* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h15784465473458016301E"() unnamed_addr #2 {
 entry-block:
-  %0 = call i8* @_ZN3ptr8mut_null20h6437414239172387094E()
+  %0 = call i8* @_ZN3ptr8mut_null21h16882472721956863325E()
   ret i8* %0
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal i8* @_ZN3ptr8mut_null20h6437414239172387094E() unnamed_addr #2 {
+define internal i8* @_ZN3ptr8mut_null21h16882472721956863325E() unnamed_addr #2 {
 entry-block:
   ret i8* null
 }
@@ -1279,7 +1279,7 @@ entry-block:
   store %"struct.core::raw::Box<[()]>[#3]"* %4, %"struct.core::raw::Box<[()]>[#3]"** %mybox
   %5 = load %"struct.core::raw::Box<[()]>[#3]"** %mybox
   %6 = getelementptr inbounds %"struct.core::raw::Box<[()]>[#3]"* %5, i32 0, i32 2
-  %7 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null21h16225196677891971761E"(%"struct.core::raw::Box<[()]>[#3]"** noalias dereferenceable(8) %6)
+  %7 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null20h1600105509708245154E"(%"struct.core::raw::Box<[()]>[#3]"** noalias dereferenceable(8) %6)
   %8 = zext i1 %7 to i8
   store i8 %8, i8* %2
   %9 = load i8* %2, !range !1
@@ -1301,7 +1301,7 @@ then-block-759-:                                  ; preds = %entry-block
 next-block:                                       ; preds = %entry-block, %then-block-759-
   %19 = load %"struct.core::raw::Box<[()]>[#3]"** %mybox
   %20 = getelementptr inbounds %"struct.core::raw::Box<[()]>[#3]"* %19, i32 0, i32 3
-  %21 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null21h16225196677891971761E"(%"struct.core::raw::Box<[()]>[#3]"** noalias dereferenceable(8) %20)
+  %21 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null20h1600105509708245154E"(%"struct.core::raw::Box<[()]>[#3]"** noalias dereferenceable(8) %20)
   %22 = zext i1 %21 to i8
   store i8 %22, i8* %3
   %23 = load i8* %3, !range !1
@@ -1346,13 +1346,13 @@ next-block2:                                      ; preds = %next-block1, %then-
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null21h16225196677891971761E"(%"struct.core::raw::Box<[()]>[#3]"** noalias nocapture dereferenceable(8)) unnamed_addr #2 {
+define internal zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null20h1600105509708245154E"(%"struct.core::raw::Box<[()]>[#3]"** noalias nocapture dereferenceable(8)) unnamed_addr #2 {
 entry-block:
   %self = alloca %"struct.core::raw::Box<[()]>[#3]"**
   %1 = alloca %"struct.core::raw::Box<[()]>[#3]"*
   store %"struct.core::raw::Box<[()]>[#3]"** %0, %"struct.core::raw::Box<[()]>[#3]"*** %self
   %2 = load %"struct.core::raw::Box<[()]>[#3]"*** %self
-  %3 = call %"struct.core::raw::Box<[()]>[#3]"* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h10428178841148158910E"()
+  %3 = call %"struct.core::raw::Box<[()]>[#3]"* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h10922808916657371502E"()
   store %"struct.core::raw::Box<[()]>[#3]"* %3, %"struct.core::raw::Box<[()]>[#3]"** %1
   %4 = load %"struct.core::raw::Box<[()]>[#3]"** %1
   %5 = load %"struct.core::raw::Box<[()]>[#3]"** %2
@@ -1363,14 +1363,14 @@ entry-block:
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal %"struct.core::raw::Box<[()]>[#3]"* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h10428178841148158910E"() unnamed_addr #2 {
+define internal %"struct.core::raw::Box<[()]>[#3]"* @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$4null21h10922808916657371502E"() unnamed_addr #2 {
 entry-block:
-  %0 = call %"struct.core::raw::Box<[()]>[#3]"* @_ZN3ptr8mut_null21h15016284576396339591E()
+  %0 = call %"struct.core::raw::Box<[()]>[#3]"* @_ZN3ptr8mut_null19h676719761745311103E()
   ret %"struct.core::raw::Box<[()]>[#3]"* %0
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal %"struct.core::raw::Box<[()]>[#3]"* @_ZN3ptr8mut_null21h15016284576396339591E() unnamed_addr #2 {
+define internal %"struct.core::raw::Box<[()]>[#3]"* @_ZN3ptr8mut_null19h676719761745311103E() unnamed_addr #2 {
 entry-block:
   ret %"struct.core::raw::Box<[()]>[#3]"* null
 }
@@ -1411,7 +1411,7 @@ entry-block:
   br i1 %11, label %then-block-823-, label %next-block2
 
 then-block-823-:                                  ; preds = %entry-block
-  %12 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null21h16225196677891971761E"(%"struct.core::raw::Box<[()]>[#3]"** noalias dereferenceable(8) %alloc)
+  %12 = call zeroext i1 @"_ZN3ptr29_$RP$mut$x20T.RawPtr$LT$T$GT$7is_null20h1600105509708245154E"(%"struct.core::raw::Box<[()]>[#3]"** noalias dereferenceable(8) %alloc)
   %13 = zext i1 %12 to i8
   store i8 %13, i8* %2
   %14 = load i8* %2, !range !1
@@ -1440,7 +1440,7 @@ case_body:                                        ; preds = %then-block-829-
   %25 = bitcast %"struct.core::fmt::Argument<[]>[#3]"* %5 to [1 x %"struct.core::fmt::Argument<[]>[#3]"]*
   %26 = getelementptr inbounds %"struct.core::fmt::Argument<[]>[#3]"* %5, i32 0
   %27 = load %str_slice** %__arg0
-  call void @_ZN3fmt8argument20h2358184828320825760E(%"struct.core::fmt::Argument<[]>[#3]"* noalias nocapture sret dereferenceable(16) %26, %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)* @_ZN3fmt11secret_show20h6526169453976446250E, %str_slice* noalias dereferenceable(16) %27)
+  call void @_ZN3fmt8argument21h15245344844346352036E(%"struct.core::fmt::Argument<[]>[#3]"* noalias nocapture sret dereferenceable(16) %26, %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)* @_ZN3fmt11secret_show21h10929304997447625193E, %str_slice* noalias dereferenceable(16) %27)
   %28 = getelementptr inbounds { %"struct.core::fmt::Argument<[]>[#3]"*, i64 }* %__args_vec, i32 0, i32 0
   store %"struct.core::fmt::Argument<[]>[#3]"* %5, %"struct.core::fmt::Argument<[]>[#3]"** %28
   %29 = getelementptr inbounds { %"struct.core::fmt::Argument<[]>[#3]"*, i64 }* %__args_vec, i32 0, i32 1
@@ -1510,7 +1510,7 @@ case_body5:                                       ; preds = %then-block-916-
   %58 = bitcast %"struct.core::fmt::Argument<[]>[#3]"* %9 to [1 x %"struct.core::fmt::Argument<[]>[#3]"]*
   %59 = getelementptr inbounds %"struct.core::fmt::Argument<[]>[#3]"* %9, i32 0
   %60 = load %str_slice** %__arg07
-  call void @_ZN3fmt8argument20h2358184828320825760E(%"struct.core::fmt::Argument<[]>[#3]"* noalias nocapture sret dereferenceable(16) %59, %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)* @_ZN3fmt11secret_show20h6526169453976446250E, %str_slice* noalias dereferenceable(16) %60)
+  call void @_ZN3fmt8argument21h15245344844346352036E(%"struct.core::fmt::Argument<[]>[#3]"* noalias nocapture sret dereferenceable(16) %59, %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)* @_ZN3fmt11secret_show21h10929304997447625193E, %str_slice* noalias dereferenceable(16) %60)
   %61 = getelementptr inbounds { %"struct.core::fmt::Argument<[]>[#3]"*, i64 }* %__args_vec8, i32 0, i32 0
   store %"struct.core::fmt::Argument<[]>[#3]"* %9, %"struct.core::fmt::Argument<[]>[#3]"** %61
   %62 = getelementptr inbounds { %"struct.core::fmt::Argument<[]>[#3]"*, i64 }* %__args_vec8, i32 0, i32 1
@@ -1552,7 +1552,7 @@ next-block14:                                     ; preds = %next-block2, %next-
 }
 
 ; Function Attrs: inlinehint uwtable
-define internal void @_ZN3fmt8argument20h2358184828320825760E(%"struct.core::fmt::Argument<[]>[#3]"* noalias nocapture sret dereferenceable(16), %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)*, %str_slice* noalias dereferenceable(16)) unnamed_addr #2 {
+define internal void @_ZN3fmt8argument21h15245344844346352036E(%"struct.core::fmt::Argument<[]>[#3]"* noalias nocapture sret dereferenceable(16), %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)*, %str_slice* noalias dereferenceable(16)) unnamed_addr #2 {
 entry-block:
   %f = alloca %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" (%str_slice*, %"struct.core::fmt::Formatter<[]>[#3]"*)*
   %t = alloca %str_slice*
@@ -1570,7 +1570,7 @@ entry-block:
 }
 
 ; Function Attrs: uwtable
-define internal %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" @_ZN3fmt11secret_show20h6526169453976446250E(%str_slice* noalias nocapture dereferenceable(16), %"struct.core::fmt::Formatter<[]>[#3]"* noalias nocapture dereferenceable(96)) unnamed_addr #0 {
+define internal %"enum.core::result::Result<[(), core::fmt::FormatError]>[#3]" @_ZN3fmt11secret_show21h10929304997447625193E(%str_slice* noalias nocapture dereferenceable(16), %"struct.core::fmt::Formatter<[]>[#3]"* noalias nocapture dereferenceable(96)) unnamed_addr #0 {
 entry-block:
   %x = alloca %str_slice*
   %fmt = alloca %"struct.core::fmt::Formatter<[]>[#3]"*
