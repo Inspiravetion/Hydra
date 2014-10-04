@@ -55,8 +55,8 @@ pub enum Expr_ {
     //1.value
     ArrayLit(Exprs),
 
-    //1.value
-    MapLit(Exprs),
+    //1.keys, 2.values
+    MapLit(Exprs, Exprs),
 
     //1.value
     IdentExpr(Ident),
@@ -151,9 +151,9 @@ pub mod ArrayLit {
 pub mod MapLit {
     use self::super::{Expr, MapLit, Exprs};
 
-    pub fn new(value : Exprs) -> Box<Expr> {
+    pub fn new(keys : Exprs, values : Exprs) -> Box<Expr> {
         box Expr {
-            node : MapLit(value)
+            node : MapLit(keys, values)
         }
     }
 }

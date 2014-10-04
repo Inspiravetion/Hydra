@@ -124,7 +124,7 @@ impl ExprGenerator for Expr {
             Bool(boolean) => bool_to_value(boolean, builder),
             StringLit(ref string) => string_to_value(string.as_slice(), builder),
             ArrayLit(ref exprs) => array_to_value(exprs, builder),
-            MapLit(ref exprs) => map_to_value(exprs, builder),
+            MapLit(ref keys, ref vals) => map_to_value(keys, vals, builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -281,13 +281,22 @@ fn array_to_gen_value(values : &Exprs, builder : &mut Builder, ctxt : Value) -> 
 //             Map Generation        //
 ///////////////////////////////////////
 
-fn map_to_value(values : &Exprs, builder : &mut Builder) -> Value {
+fn map_to_value(keys : &Exprs, values : &Exprs, builder : &mut Builder) -> Value {
     //push expressions when parsin this and function calls are supported
-    builder.call("hy_new_map", vec![], "hy_map")
+    let map = builder.call("hy_new_map", vec![], "hy_map");
+
+    let mut key_val_pairs = keys.iter().zip(values.iter());
+    for (key, val) in key_val_pairs {
+        let key = key.to_value(builder);
+        let val = val.to_value(builder);
+        builder.call("hy_map_insert", vec![map, key, val], "insert_result");
+    }
+
+    map
 }
 
-fn map_to_gen_value(values : &Exprs, builder : &mut Builder, ctxt : Value) -> Value {
-    map_to_value(values, builder)
+fn map_to_gen_value(keys : &Exprs, values : &Exprs, builder : &mut Builder, ctxt : Value) -> Value {
+    map_to_value(keys, values, builder)
 }
 
 ///////////////////////////////////////

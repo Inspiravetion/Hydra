@@ -147,15 +147,91 @@ impl HyObj {
     #[no_mangle]
     pub fn hy_obj_print(&self) {
         match self.typ {
+            HyUndefined => {
+                print!("{}", "undefined");
+            },
+            HyNull => {
+                print!("{}", "null");
+            },
+            HyInt(i) => {
+                print!("{}", (format!("{}", i)));
+            },
+            HyFloat(f) => {
+                print!("{}", (format!("{}", f)));
+            },
+            HyString(ref s) => {
+                print!("{}", s);
+            },
+            HyRegex(ref r) => {
+                println!("{}", (format!("{}", r)));
+            },
             HyArray(ref vec) => {
                 print!("[");
-                for obj in vec.iter() {
-                    obj.hy_obj_print();
+
+                let mut vals = vec.iter();
+
+                match vals.next() {
+                    Some(val) => val.hy_obj_print(),
+                    None => {}
+                }
+
+                for val in vals {
+                    print!(", ");
+                    val.hy_obj_print();
                 }
                 print!("]");
             },
-            _ => fail!("Called print on an object that is not an Array")
+            HyTuple(ref vec) => {
+                print!("(");
+
+                let mut vals = vec.iter();
+
+                match vals.next() {
+                    Some(val) => val.hy_obj_print(),
+                    None => {}
+                }
+
+                for val in vals {
+                    print!(", ");
+                    val.hy_obj_print();
+                }
+                print!(")");
+            },
+            HyMap(ref map) => {
+                //to deal with escaping -_-...i know theres a better way but now i cnt remember it
+                print!("{}", "{");
+
+                let mut key_val_pairs = map.iter();
+
+                match key_val_pairs.next() {
+                    Some((key, val)) => {
+                        print!("{} : ", key);
+                        val.hy_obj_print();
+                    },
+                    None => {}
+                }
+
+                for (key, val) in key_val_pairs {
+                    print!(", {} : ", key);
+                    val.hy_obj_print();
+                }
+                print!("{}", "}");
+            },
+            HyBool(ref b) => {
+                if *b {
+                    print!("true");
+                } else {
+                    print!("false");
+                }
+            },
+            _ => print!("Called print on an object that is not an Array, Map, or bool")
         };
+    }
+
+    #[no_mangle]
+    pub fn hy_obj_println(&self) {
+        self.hy_obj_print();
+        print!("\n");
     }
 
     #[no_mangle]
@@ -190,18 +266,22 @@ impl HyObj {
             },
             HyArray(ref vec) => {
                 let mut arr_str = "[".to_string();
-                HyObj::append_hy_obj_strs(&mut arr_str, vec);
+                HyObj::append_hy_obj_str_from_vec(&mut arr_str, vec);
                 arr_str.push_str("]");
                 unsafe{ arr_str.to_c_str_unchecked().unwrap() }
             },
             HyTuple(ref vec) => {
                 let mut tuple_str = "(".to_string();
-                HyObj::append_hy_obj_strs(&mut tuple_str, vec);
+                HyObj::append_hy_obj_str_from_vec(&mut tuple_str, vec);
                 tuple_str.push_str(")");
                 unsafe{ tuple_str.to_c_str_unchecked().unwrap() }
             },
             HyMap(ref map) => {
-                unsafe{ "{}".to_string().to_c_str().unwrap() }  
+                let mut map_str = "{".to_string();
+                HyObj::append_hy_obj_str_from_map(&mut map_str, map);
+                map_str.push_str("}");
+                println!("ASDFASDF: {}", map_str);
+                unsafe{ map_str.to_c_str_unchecked().unwrap() }
             },
             HyBool(ref b) => {
                 if *b {
@@ -214,7 +294,7 @@ impl HyObj {
         }
     }
 
-    fn append_hy_obj_strs(s : &mut String, vec : &Vec<Box<HyObj>>) {
+    fn append_hy_obj_str_from_vec(s : &mut String, vec : &Vec<Box<HyObj>>) {
         let mut objs = vec.iter();
 
         match objs.next() {
@@ -236,6 +316,37 @@ impl HyObj {
             
             unsafe {
                 let c_str = CString::new(obj_str, false);
+                s.push_str(c_str.as_str().unwrap());
+            }
+        }
+    }
+
+    fn append_hy_obj_str_from_map(s : &mut String, map : &TreeMap<String, Box<HyObj>>) {
+        let mut objs = map.iter();
+
+        match objs.next() {
+            Some((key, val)) => {
+                s.push_str(key.as_slice());
+                s.push_str(" : ");
+
+                let val_str = val.hy_obj_to_str();
+                unsafe {
+                    let c_str = CString::new(val_str, false);
+                    s.push_str(c_str.as_str().unwrap());
+                }
+            },
+            None =>{}
+        };
+
+        for (key, val) in objs {
+            s.push_str(", ");
+
+            s.push_str(key.as_slice());
+            s.push_str(" : ");
+
+            let val_str = val.hy_obj_to_str();
+            unsafe {
+                let c_str = CString::new(val_str, false);
                 s.push_str(c_str.as_str().unwrap());
             }
         }

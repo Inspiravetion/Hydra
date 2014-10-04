@@ -7,6 +7,9 @@
 %HyGenNextProc = type { i1 (i8*, %HyObjSlice*, %HyGenCtxt*)*, i8* }
 %HyGenCtxt = type { i8*, %HyObjSlice, %HyObjSlice, %HyObjSlice }
 
+@"global_\22arr\22_literal" = private unnamed_addr constant [6 x i8] c"\22arr\22\00"
+@"global_\22avc\22_literal" = private unnamed_addr constant [6 x i8] c"\22avc\22\00"
+
 define i32 @"!range_gen_next"(%"!range_gen"*) {
 
 entry:                                            ; No predecessors!
@@ -51,6 +54,10 @@ define void @"!range_gen_init"(%"!range_gen"*, i32, i32) {
 
 ; Function Attrs: nounwind
 declare void @llvm.gcroot(i8**, i8*) #0
+
+declare void @hy_obj_print(%HyObj*)
+
+declare void @hy_obj_println(%HyObj*)
 
 declare %HyObj* @hy_new_undefined()
 
@@ -130,8 +137,14 @@ declare i32 @sprintf(i8*, i8*, ...)
 
 define %HyObj* @print(%HyObjSlice*) {
   %tmp_obj = call %HyObj* @hy_obj_slice_get(%HyObjSlice* %0, i64 0)
-  %tmp_str = call i8* @hy_obj_to_str(%HyObj* %tmp_obj)
-  %putsres = call i32 @puts(i8* %tmp_str)
+  call void @hy_obj_print(%HyObj* %tmp_obj)
+  %tmp_ret = call %HyObj* @hy_new_undefined()
+  ret %HyObj* %tmp_ret
+}
+
+define %HyObj* @println(%HyObjSlice*) {
+  %tmp_obj = call %HyObj* @hy_obj_slice_get(%HyObjSlice* %0, i64 0)
+  call void @hy_obj_println(%HyObj* %tmp_obj)
   %tmp_ret = call %HyObj* @hy_new_undefined()
   ret %HyObj* %tmp_ret
 }
@@ -211,7 +224,7 @@ function_def_bridge1:                             ; preds = %function_def_bridge
   %add_and_mult_tmp = call %HyObj* @add_and_mult(%HyObjSlice* %param_slice2)
   %obj_clone5 = call %HyObj* @hy_obj_clone(%HyObj* %add_and_mult_tmp)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice, %HyObj* %obj_clone5)
-  %print_tmp = call %HyObj* @print(%HyObjSlice* %param_slice)
+  %println_tmp = call %HyObj* @println(%HyObjSlice* %param_slice)
   %param_slice6 = alloca %HyObjSlice
   call void @hy_obj_slice_init(%HyObjSlice* %param_slice6, i64 1)
   %hy_array = call %HyObj* @hy_new_array()
@@ -231,7 +244,22 @@ function_def_bridge1:                             ; preds = %function_def_bridge
   call void @hy_array_push(%HyObj* %hy_array, %HyObj* %add_and_mult_tmp13)
   %obj_clone14 = call %HyObj* @hy_obj_clone(%HyObj* %hy_array)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice6, %HyObj* %obj_clone14)
-  %print_tmp15 = call %HyObj* @print(%HyObjSlice* %param_slice6)
+  %println_tmp15 = call %HyObj* @println(%HyObjSlice* %param_slice6)
+  %hy_map = call %HyObj* @hy_new_map()
+  %hy_string = call %HyObj* @hy_new_string(i8* getelementptr inbounds ([6 x i8]* @"global_\22arr\22_literal", i32 0, i32 0))
+  %hy_array16 = call %HyObj* @hy_new_array()
+  %insert_result = call %HyObj* @hy_map_insert(%HyObj* %hy_map, %HyObj* %hy_string, %HyObj* %hy_array16)
+  %hy_string17 = call %HyObj* @hy_new_string(i8* getelementptr inbounds ([6 x i8]* @"global_\22avc\22_literal", i32 0, i32 0))
+  %hy_bool18 = call %HyObj* @hy_new_bool(i1 true)
+  %insert_result19 = call %HyObj* @hy_map_insert(%HyObj* %hy_map, %HyObj* %hy_string17, %HyObj* %hy_bool18)
+  %a = alloca %HyObj*
+  store %HyObj* %hy_map, %HyObj** %a
+  %param_slice20 = alloca %HyObjSlice
+  call void @hy_obj_slice_init(%HyObjSlice* %param_slice20, i64 1)
+  %a21 = load %HyObj** %a
+  %obj_clone22 = call %HyObj* @hy_obj_clone(%HyObj* %a21)
+  call void @hy_obj_slice_push(%HyObjSlice* %param_slice20, %HyObj* %obj_clone22)
+  %println_tmp23 = call %HyObj* @println(%HyObjSlice* %param_slice20)
   ret i32 0
 }
 

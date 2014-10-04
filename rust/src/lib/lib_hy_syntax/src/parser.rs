@@ -673,9 +673,7 @@ trait HydraBaseParser {
                         Some(ArrayLit::new(exprs))
                     },
                     Lcurly => {
-                        self.next();
-                        self.expect(Rcurly);
-                        Some(MapLit::new(Vec::new()))
+                        Some(self.map_lit())
                     },
                     Identifier => {
                         Some(self.ident_or_func_call())
@@ -685,6 +683,31 @@ trait HydraBaseParser {
             },
             None => None
         }
+    }
+
+    fn map_lit(&mut self) -> Box<Expr> {
+        self.next();
+        let mut keys = vec![];
+        let mut values = vec![];
+
+        if !self.next_is(Rcurly) {
+            keys.push(self.expr());
+            self.expect(Colon);
+            values.push(self.expr());
+
+            loop {
+                if !self.next_is(Comma) {
+                    self.expect(Rcurly);
+                    break;
+                }
+
+                keys.push(self.expr());
+                self.expect(Colon);
+                values.push(self.expr());
+            }
+        }
+
+        MapLit::new(keys, values)
     }
 
     fn ident_or_func_call(&mut self) -> Box<Expr> {

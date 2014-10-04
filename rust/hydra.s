@@ -49,9 +49,24 @@ Ltmp2:
 	xorl	%esi, %esi
 	callq	_hy_obj_slice_get
 	movq	%rax, %rdi
-	callq	_hy_obj_to_str
+	callq	_hy_obj_print
+	callq	_hy_new_undefined
+	popq	%rdx
+	retq
+	.cfi_endproc
+
+	.globl	_println
+	.align	4, 0x90
+_println:                               ## @println
+	.cfi_startproc
+## BB#0:
+	pushq	%rax
+Ltmp3:
+	.cfi_def_cfa_offset 16
+	xorl	%esi, %esi
+	callq	_hy_obj_slice_get
 	movq	%rax, %rdi
-	callq	_puts
+	callq	_hy_obj_println
 	callq	_hy_new_undefined
 	popq	%rdx
 	retq
@@ -63,7 +78,7 @@ Ltmp2:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp3:
+Ltmp4:
 	.cfi_def_cfa_offset 16
 	callq	_hy_add_op
 	popq	%rdx
@@ -76,7 +91,7 @@ Ltmp3:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp4:
+Ltmp5:
 	.cfi_def_cfa_offset 16
 	callq	_hy_sub_op
 	popq	%rdx
@@ -89,7 +104,7 @@ Ltmp4:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp5:
+Ltmp6:
 	.cfi_def_cfa_offset 16
 	callq	_hy_mul_op
 	popq	%rdx
@@ -102,7 +117,7 @@ Ltmp5:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp6:
+Ltmp7:
 	.cfi_def_cfa_offset 16
 	callq	_hy_div_op
 	popq	%rdx
@@ -115,7 +130,7 @@ Ltmp6:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp7:
+Ltmp8:
 	.cfi_def_cfa_offset 16
 	callq	_hy_mod_op
 	popq	%rdx
@@ -128,7 +143,7 @@ Ltmp7:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp8:
+Ltmp9:
 	.cfi_def_cfa_offset 16
 	callq	_hy_lt_op
 	popq	%rdx
@@ -141,7 +156,7 @@ Ltmp8:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp9:
+Ltmp10:
 	.cfi_def_cfa_offset 16
 	callq	_hy_gt_op
 	popq	%rdx
@@ -154,7 +169,7 @@ Ltmp9:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp10:
+Ltmp11:
 	.cfi_def_cfa_offset 16
 	callq	_hy_lt_eq_op
 	popq	%rdx
@@ -167,7 +182,7 @@ Ltmp10:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp11:
+Ltmp12:
 	.cfi_def_cfa_offset 16
 	callq	_hy_gt_eq_op
 	popq	%rdx
@@ -180,7 +195,7 @@ Ltmp11:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp12:
+Ltmp13:
 	.cfi_def_cfa_offset 16
 	callq	_hy_eq_op
 	popq	%rdx
@@ -193,7 +208,7 @@ Ltmp12:
 	.cfi_startproc
 ## BB#0:
 	pushq	%rax
-Ltmp13:
+Ltmp14:
 	.cfi_def_cfa_offset 16
 	callq	_hy_neq_op
 	popq	%rdx
@@ -206,28 +221,28 @@ _main:                                  ## @main
 	.cfi_startproc
 ## BB#0:                                ## %function_def_bridge1
 	pushq	%r15
-Ltmp14:
+Ltmp15:
 	.cfi_def_cfa_offset 16
 	pushq	%r14
-Ltmp15:
+Ltmp16:
 	.cfi_def_cfa_offset 24
 	pushq	%rbx
-Ltmp16:
-	.cfi_def_cfa_offset 32
-	subq	$96, %rsp
 Ltmp17:
-	.cfi_def_cfa_offset 128
+	.cfi_def_cfa_offset 32
+	subq	$128, %rsp
 Ltmp18:
-	.cfi_offset %rbx, -32
+	.cfi_def_cfa_offset 160
 Ltmp19:
-	.cfi_offset %r14, -24
+	.cfi_offset %rbx, -32
 Ltmp20:
+	.cfi_offset %r14, -24
+Ltmp21:
 	.cfi_offset %r15, -16
-	leaq	72(%rsp), %r14
+	leaq	104(%rsp), %r14
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
-	leaq	48(%rsp), %rbx
+	leaq	80(%rsp), %rbx
 	movl	$2, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
@@ -253,8 +268,8 @@ Ltmp20:
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%r14, %rdi
-	callq	_print
-	leaq	24(%rsp), %r14
+	callq	_println
+	leaq	56(%rsp), %r14
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
@@ -270,7 +285,7 @@ Ltmp20:
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_array_push
-	leaq	(%rsp), %r15
+	leaq	32(%rsp), %r15
 	movl	$2, %esi
 	movq	%r15, %rdi
 	callq	_hy_obj_slice_init
@@ -299,9 +314,40 @@ Ltmp20:
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%r14, %rdi
-	callq	_print
+	callq	_println
+	callq	_hy_new_map
+	movq	%rax, %rbx
+	leaq	"L_global_\"arr\"_literal"(%rip), %rdi
+	callq	_hy_new_string
+	movq	%rax, %r14
+	callq	_hy_new_array
+	movq	%rbx, %rdi
+	movq	%r14, %rsi
+	movq	%rax, %rdx
+	callq	_hy_map_insert
+	leaq	"L_global_\"avc\"_literal"(%rip), %rdi
+	callq	_hy_new_string
+	movq	%rax, %r14
+	movl	$1, %edi
+	callq	_hy_new_bool
+	movq	%rbx, %rdi
+	movq	%r14, %rsi
+	movq	%rax, %rdx
+	callq	_hy_map_insert
+	movq	%rbx, 24(%rsp)
+	leaq	(%rsp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	24(%rsp), %rdi
+	callq	_hy_obj_clone
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_println
 	xorl	%eax, %eax
-	addq	$96, %rsp
+	addq	$128, %rsp
 	popq	%rbx
 	popq	%r14
 	popq	%r15
@@ -314,12 +360,12 @@ _add:                                   ## @add
 	.cfi_startproc
 ## BB#0:                                ## %add_param_setup
 	pushq	%rbx
-Ltmp21:
+Ltmp22:
 	.cfi_def_cfa_offset 16
 	subq	$16, %rsp
-Ltmp22:
-	.cfi_def_cfa_offset 32
 Ltmp23:
+	.cfi_def_cfa_offset 32
+Ltmp24:
 	.cfi_offset %rbx, -16
 	movq	%rdi, %rbx
 	xorl	%esi, %esi
@@ -344,12 +390,12 @@ _add_and_mult:                          ## @add_and_mult
 	.cfi_startproc
 ## BB#0:                                ## %add_and_mult_param_setup
 	pushq	%rbx
-Ltmp24:
+Ltmp25:
 	.cfi_def_cfa_offset 16
 	subq	$16, %rsp
-Ltmp25:
-	.cfi_def_cfa_offset 32
 Ltmp26:
+	.cfi_def_cfa_offset 32
+Ltmp27:
 	.cfi_offset %rbx, -16
 	movq	%rdi, %rbx
 	xorl	%esi, %esi
@@ -380,6 +426,13 @@ Ltmp26:
 	popq	%rbx
 	retq
 	.cfi_endproc
+
+	.section	__TEXT,__cstring,cstring_literals
+"L_global_\"arr\"_literal":             ## @"global_\22arr\22_literal"
+	.asciz	"\"arr\""
+
+"L_global_\"avc\"_literal":             ## @"global_\22avc\22_literal"
+	.asciz	"\"avc\""
 
 
 .subsections_via_symbols
