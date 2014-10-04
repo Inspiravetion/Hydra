@@ -13,9 +13,11 @@ use std::collections::TreeMap;
 use std::c_str::CString;
 use std::mem;
 use std::ptr;
-// use std::gc::{Gc, GC};
 
 use regex::Regex;
+
+static UNDEFINED : &'static HyObj = &HyObj { typ : HyUndefined };
+static NULL      : &'static HyObj = &HyObj { typ : HyNull };
 
 pub enum HyObjType {
     HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
@@ -460,12 +462,12 @@ impl HyObj {
 
     #[no_mangle]
     pub fn hy_new_undefined() -> Box<HyObj> {
-        box HyObj { typ : HyUndefined }
+        unsafe{ mem::transmute(UNDEFINED) }
     }
 
     #[no_mangle]
     pub fn hy_new_null() -> Box<HyObj> {
-        box HyObj { typ : HyNull }
+        unsafe{ mem::transmute(NULL) }
     }
 
     ///////////////////////////////////////

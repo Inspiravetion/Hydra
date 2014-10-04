@@ -131,10 +131,6 @@ declare %HyObj* @hy_neq_op(%HyObj*, %HyObj*)
 
 declare i32 @hy_obj_to_truthy_val(%HyObj*)
 
-declare i32 @puts(i8*)
-
-declare i32 @sprintf(i8*, i8*, ...)
-
 define %HyObj* @print(%HyObjSlice*) {
   %tmp_obj = call %HyObj* @hy_obj_slice_get(%HyObjSlice* %0, i64 0)
   call void @hy_obj_print(%HyObj* %tmp_obj)
@@ -260,6 +256,23 @@ function_def_bridge1:                             ; preds = %function_def_bridge
   %obj_clone22 = call %HyObj* @hy_obj_clone(%HyObj* %a21)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice20, %HyObj* %obj_clone22)
   %println_tmp23 = call %HyObj* @println(%HyObjSlice* %param_slice20)
+  %_b = call %HyObj* @hy_new_undefined()
+  %b = alloca %HyObj*
+  store %HyObj* %_b, %HyObj** %b
+  %param_slice24 = alloca %HyObjSlice
+  call void @hy_obj_slice_init(%HyObjSlice* %param_slice24, i64 1)
+  %b25 = load %HyObj** %b
+  %obj_clone26 = call %HyObj* @hy_obj_clone(%HyObj* %b25)
+  call void @hy_obj_slice_push(%HyObjSlice* %param_slice24, %HyObj* %obj_clone26)
+  %println_tmp27 = call %HyObj* @println(%HyObjSlice* %param_slice24)
+  %hy_int28 = call %HyObj* @hy_new_int(i64 14)
+  store %HyObj* %hy_int28, %HyObj** %b
+  %param_slice29 = alloca %HyObjSlice
+  call void @hy_obj_slice_init(%HyObjSlice* %param_slice29, i64 1)
+  %b30 = load %HyObj** %b
+  %obj_clone31 = call %HyObj* @hy_obj_clone(%HyObj* %b30)
+  call void @hy_obj_slice_push(%HyObjSlice* %param_slice29, %HyObj* %obj_clone31)
+  %println_tmp32 = call %HyObj* @println(%HyObjSlice* %param_slice29)
   ret i32 0
 }
 

@@ -229,20 +229,20 @@ Ltmp16:
 	pushq	%rbx
 Ltmp17:
 	.cfi_def_cfa_offset 32
-	subq	$128, %rsp
+	subq	$192, %rsp
 Ltmp18:
-	.cfi_def_cfa_offset 160
+	.cfi_def_cfa_offset 224
 Ltmp19:
 	.cfi_offset %rbx, -32
 Ltmp20:
 	.cfi_offset %r14, -24
 Ltmp21:
 	.cfi_offset %r15, -16
-	leaq	104(%rsp), %r14
+	leaq	168(%rsp), %r14
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
-	leaq	80(%rsp), %rbx
+	leaq	144(%rsp), %rbx
 	movl	$2, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
@@ -269,7 +269,7 @@ Ltmp21:
 	callq	_hy_obj_slice_push
 	movq	%r14, %rdi
 	callq	_println
-	leaq	56(%rsp), %r14
+	leaq	120(%rsp), %r14
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
@@ -285,7 +285,7 @@ Ltmp21:
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_array_push
-	leaq	32(%rsp), %r15
+	leaq	96(%rsp), %r15
 	movl	$2, %esi
 	movq	%r15, %rdi
 	callq	_hy_obj_slice_init
@@ -334,12 +334,39 @@ Ltmp21:
 	movq	%r14, %rsi
 	movq	%rax, %rdx
 	callq	_hy_map_insert
-	movq	%rbx, 24(%rsp)
-	leaq	(%rsp), %rbx
+	movq	%rbx, 88(%rsp)
+	leaq	64(%rsp), %rbx
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	24(%rsp), %rdi
+	movq	88(%rsp), %rdi
+	callq	_hy_obj_clone
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_println
+	callq	_hy_new_undefined
+	movq	%rax, 56(%rsp)
+	leaq	32(%rsp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	56(%rsp), %rdi
+	callq	_hy_obj_clone
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_println
+	movl	$14, %edi
+	callq	_hy_new_int
+	movq	%rax, 56(%rsp)
+	leaq	8(%rsp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	56(%rsp), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
@@ -347,7 +374,7 @@ Ltmp21:
 	movq	%rbx, %rdi
 	callq	_println
 	xorl	%eax, %eax
-	addq	$128, %rsp
+	addq	$192, %rsp
 	popq	%rbx
 	popq	%r14
 	popq	%r15
