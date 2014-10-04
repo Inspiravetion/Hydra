@@ -12,20 +12,12 @@ pub fn gen_intrinsics(builder : &mut Builder) {
     let string_type = builder.string_type();
     let void_type = builder.void_type();
 
-    builder.declare_function(
-        "puts", vec!(string_type), int_type
-    );
-    builder.declare_variadic_function(
-        "sprintf", vec!(string_type, string_type), int_type
-    );
     builder.create_function("print", vec!(hy_obj_slice_ref), hy_obj_ref, |fb : &mut Builder|{
         fb.goto_first_block();
 
         let objs = fb.get_param(0);
         let zero = fb.int64(0);
         let obj  = fb.call("hy_obj_slice_get", vec![objs, zero], "tmp_obj");
-        // let obj_str = fb.call("hy_obj_to_str", vec!(obj), "tmp_str");
-        // fb.call("puts", vec![obj_str], "putsres");
         fb.call("hy_obj_print", vec![obj], "");
         
 
@@ -38,8 +30,6 @@ pub fn gen_intrinsics(builder : &mut Builder) {
         let objs = fb.get_param(0);
         let zero = fb.int64(0);
         let obj  = fb.call("hy_obj_slice_get", vec![objs, zero], "tmp_obj");
-        // let obj_str = fb.call("hy_obj_to_str", vec!(obj), "tmp_str");
-        // fb.call("puts", vec![obj_str], "putsres");
         fb.call("hy_obj_println", vec![obj], "");
 
         let ret = fb.call("hy_new_undefined", vec![], "tmp_ret");
