@@ -229,20 +229,20 @@ Ltmp16:
 	pushq	%rbx
 Ltmp17:
 	.cfi_def_cfa_offset 32
-	subq	$192, %rsp
+	subq	$224, %rsp
 Ltmp18:
-	.cfi_def_cfa_offset 224
+	.cfi_def_cfa_offset 256
 Ltmp19:
 	.cfi_offset %rbx, -32
 Ltmp20:
 	.cfi_offset %r14, -24
 Ltmp21:
 	.cfi_offset %r15, -16
-	leaq	168(%rsp), %r14
+	leaq	200(%rsp), %r14
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
-	leaq	144(%rsp), %rbx
+	leaq	176(%rsp), %rbx
 	movl	$2, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
@@ -269,7 +269,7 @@ Ltmp21:
 	callq	_hy_obj_slice_push
 	movq	%r14, %rdi
 	callq	_println
-	leaq	120(%rsp), %r14
+	leaq	152(%rsp), %r14
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
@@ -285,7 +285,7 @@ Ltmp21:
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_array_push
-	leaq	96(%rsp), %r15
+	leaq	128(%rsp), %r15
 	movl	$2, %esi
 	movq	%r15, %rdi
 	callq	_hy_obj_slice_init
@@ -334,7 +334,20 @@ Ltmp21:
 	movq	%r14, %rsi
 	movq	%rax, %rdx
 	callq	_hy_map_insert
-	movq	%rbx, 88(%rsp)
+	movq	%rbx, 120(%rsp)
+	leaq	96(%rsp), %rbx
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	120(%rsp), %rdi
+	callq	_hy_obj_clone
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_println
+	callq	_hy_new_undefined
+	movq	%rax, 88(%rsp)
 	leaq	64(%rsp), %rbx
 	movl	$1, %esi
 	movq	%rbx, %rdi
@@ -346,27 +359,30 @@ Ltmp21:
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_println
-	callq	_hy_new_undefined
-	movq	%rax, 56(%rsp)
-	leaq	32(%rsp), %rbx
+	movl	$14, %edi
+	callq	_hy_new_int
+	movq	%rax, 88(%rsp)
+	leaq	40(%rsp), %rbx
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	56(%rsp), %rdi
+	movq	88(%rsp), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movq	%rbx, %rdi
 	callq	_println
-	movl	$14, %edi
-	callq	_hy_new_int
-	movq	%rax, 56(%rsp)
+	leaq	"L_global_a.*sdf(a)+sdf_literal"(%rip), %rdi
+	callq	_hy_new_string
+	movq	%rax, %rdi
+	callq	_hy_new_regex
+	movq	%rax, 32(%rsp)
 	leaq	8(%rsp), %rbx
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	56(%rsp), %rdi
+	movq	32(%rsp), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
@@ -374,7 +390,7 @@ Ltmp21:
 	movq	%rbx, %rdi
 	callq	_println
 	xorl	%eax, %eax
-	addq	$192, %rsp
+	addq	$224, %rsp
 	popq	%rbx
 	popq	%r14
 	popq	%r15
@@ -460,6 +476,9 @@ Ltmp27:
 
 "L_global_\"avc\"_literal":             ## @"global_\22avc\22_literal"
 	.asciz	"\"avc\""
+
+"L_global_a.*sdf(a)+sdf_literal":       ## @"global_a.*sdf(a)+sdf_literal"
+	.asciz	"a.*sdf(a)+sdf"
 
 
 .subsections_via_symbols

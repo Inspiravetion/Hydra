@@ -19,3 +19,6 @@ var b;
 println(b);
 b = 14;
 println(b);
+
+var regex = /a.*sdf(a)+sdf/;
+println(regex);

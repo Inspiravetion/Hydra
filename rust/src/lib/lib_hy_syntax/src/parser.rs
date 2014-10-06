@@ -675,6 +675,9 @@ trait HydraBaseParser {
                     Lcurly => {
                         Some(self.map_lit())
                     },
+                    Div_Op => {
+                        Some(self.regex_lit())
+                    },
                     Identifier => {
                         Some(self.ident_or_func_call())
                     }
@@ -683,6 +686,35 @@ trait HydraBaseParser {
             },
             None => None
         }
+    }
+
+    fn regex_lit(&mut self) -> Box<Expr> {
+        self.next();
+        let mut pattern = String::new();
+        let mut is_end_delimiter = false;
+
+        //TODO incorporate parsing escape sequences
+        //this is terrible
+        loop {
+            match self.peek() {
+                Some(tok) => {
+                    if (tok.typ == Div_Op) && is_end_delimiter {
+                        break
+                    }
+
+                    is_end_delimiter = true;
+                },
+                None => { fail!("Unfinished Regex literal") }
+            };
+
+            self.next();
+            let tok = self.tok();
+            pattern.push_str(tok.text.as_slice());
+        }
+
+        self.expect(Div_Op);
+
+        RegexLit::new(pattern)
     }
 
     fn map_lit(&mut self) -> Box<Expr> {

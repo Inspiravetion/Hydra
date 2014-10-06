@@ -125,6 +125,7 @@ impl ExprGenerator for Expr {
             StringLit(ref string) => string_to_value(string.as_slice(), builder),
             ArrayLit(ref exprs) => array_to_value(exprs, builder),
             MapLit(ref keys, ref vals) => map_to_value(keys, vals, builder),
+            RegexLit(ref pattern) => regex_to_value(pattern.as_slice(), builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -282,7 +283,6 @@ fn array_to_gen_value(values : &Exprs, builder : &mut Builder, ctxt : Value) -> 
 ///////////////////////////////////////
 
 fn map_to_value(keys : &Exprs, values : &Exprs, builder : &mut Builder) -> Value {
-    //push expressions when parsin this and function calls are supported
     let map = builder.call("hy_new_map", vec![], "hy_map");
 
     let mut key_val_pairs = keys.iter().zip(values.iter());
@@ -297,6 +297,19 @@ fn map_to_value(keys : &Exprs, values : &Exprs, builder : &mut Builder) -> Value
 
 fn map_to_gen_value(keys : &Exprs, values : &Exprs, builder : &mut Builder, ctxt : Value) -> Value {
     map_to_value(keys, values, builder)
+}
+
+///////////////////////////////////////
+//           Regex Generation        //
+///////////////////////////////////////
+
+fn regex_to_value(pattern : &str, builder : &mut Builder) -> Value {
+    let pattern = string_to_value(pattern, builder);
+    builder.call("hy_new_regex", vec![pattern], "hy_regex")
+}
+
+fn regex_to_gen_value(pattern : &str, builder : &mut Builder) -> Value {
+    regex_to_value(pattern, builder)
 }
 
 ///////////////////////////////////////

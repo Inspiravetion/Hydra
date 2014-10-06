@@ -18,6 +18,8 @@ use regex::Regex;
 
 static UNDEFINED : &'static HyObj = &HyObj { typ : HyUndefined };
 static NULL      : &'static HyObj = &HyObj { typ : HyNull };
+static TRUE      : &'static HyObj = &HyObj { typ : HyBool(true) };
+static FALSE     : &'static HyObj = &HyObj { typ : HyBool(false) };
 
 pub enum HyObjType {
     HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
@@ -165,7 +167,7 @@ impl HyObj {
                 print!("{}", s);
             },
             HyRegex(ref r) => {
-                println!("{}", (format!("{}", r)));
+                print!("/{}/", (format!("{}", r)));
             },
             HyArray(ref vec) => {
                 print!("[");
@@ -219,8 +221,8 @@ impl HyObj {
                 }
                 print!("{}", "}");
             },
-            HyBool(ref b) => {
-                if *b {
+            HyBool(b) => {
+                if b {
                     print!("true");
                 } else {
                     print!("false");
@@ -240,7 +242,7 @@ impl HyObj {
     pub fn hy_obj_to_truthy_val(obj : &HyObj) -> i32 {
         match obj.typ {
             HyBool(b) => b as i32,
-            _ => 0
+            _ => 0        
         }
     }
 
@@ -264,7 +266,7 @@ impl HyObj {
                 ret
             },
             HyRegex(ref r) => {
-                unsafe { (format!("{}", r)).to_c_str().unwrap() }
+                unsafe { (format!("/{}/", r)).to_c_str().unwrap() }
             },
             HyArray(ref vec) => {
                 let mut arr_str = "[".to_string();
@@ -282,11 +284,10 @@ impl HyObj {
                 let mut map_str = "{".to_string();
                 HyObj::append_hy_obj_str_from_map(&mut map_str, map);
                 map_str.push_str("}");
-                println!("ASDFASDF: {}", map_str);
                 unsafe{ map_str.to_c_str_unchecked().unwrap() }
             },
-            HyBool(ref b) => {
-                if *b {
+            HyBool(b) => {
+                if b {
                     unsafe{ "true".to_string().to_c_str().unwrap() }  
                 } else {
                     unsafe{ "false".to_string().to_c_str().unwrap() }  
@@ -408,8 +409,14 @@ impl HyObj {
 
     #[no_mangle]
     pub fn hy_new_bool(b : bool) -> Box<HyObj> {
-        box HyObj {
-            typ : HyBool(b)
+        unsafe { 
+            mem::transmute(
+                if b {
+                    TRUE
+                } else {
+                    FALSE
+                }
+            )
         }
     }
 

@@ -58,6 +58,9 @@ pub enum Expr_ {
     //1.keys, 2.values
     MapLit(Exprs, Exprs),
 
+    //1.pattern
+    RegexLit(String),
+
     //1.value
     IdentExpr(Ident),
 
@@ -154,6 +157,16 @@ pub mod MapLit {
     pub fn new(keys : Exprs, values : Exprs) -> Box<Expr> {
         box Expr {
             node : MapLit(keys, values)
+        }
+    }
+}
+
+pub mod RegexLit {
+    use self::super::{Expr, RegexLit};
+
+    pub fn new(pattern : String) -> Box<Expr> {
+        box Expr {
+            node : RegexLit(pattern)
         }
     }
 }

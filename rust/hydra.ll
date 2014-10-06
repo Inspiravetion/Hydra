@@ -9,6 +9,7 @@
 
 @"global_\22arr\22_literal" = private unnamed_addr constant [6 x i8] c"\22arr\22\00"
 @"global_\22avc\22_literal" = private unnamed_addr constant [6 x i8] c"\22avc\22\00"
+@"global_a.*sdf(a)+sdf_literal" = private unnamed_addr constant [14 x i8] c"a.*sdf(a)+sdf\00"
 
 define i32 @"!range_gen_next"(%"!range_gen"*) {
 
@@ -273,6 +274,16 @@ function_def_bridge1:                             ; preds = %function_def_bridge
   %obj_clone31 = call %HyObj* @hy_obj_clone(%HyObj* %b30)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice29, %HyObj* %obj_clone31)
   %println_tmp32 = call %HyObj* @println(%HyObjSlice* %param_slice29)
+  %hy_string33 = call %HyObj* @hy_new_string(i8* getelementptr inbounds ([14 x i8]* @"global_a.*sdf(a)+sdf_literal", i32 0, i32 0))
+  %hy_regex = call %HyObj* @hy_new_regex(%HyObj* %hy_string33)
+  %regex = alloca %HyObj*
+  store %HyObj* %hy_regex, %HyObj** %regex
+  %param_slice34 = alloca %HyObjSlice
+  call void @hy_obj_slice_init(%HyObjSlice* %param_slice34, i64 1)
+  %regex35 = load %HyObj** %regex
+  %obj_clone36 = call %HyObj* @hy_obj_clone(%HyObj* %regex35)
+  call void @hy_obj_slice_push(%HyObjSlice* %param_slice34, %HyObj* %obj_clone36)
+  %println_tmp37 = call %HyObj* @println(%HyObjSlice* %param_slice34)
   ret i32 0
 }
 
