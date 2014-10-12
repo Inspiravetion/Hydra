@@ -23,6 +23,7 @@ static FALSE     : &'static HyObj = &HyObj { typ : HyBool(false) };
 
 pub enum HyObjType {
     HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
+    HyFunction(proc(HyObjSlice) : Send -> Box<HyObj>, *const i8),
     HyChannel(Sender<Box<HyObj>>, Receiver<Box<HyObj>>),
     HyMap(TreeMap<String, Box<HyObj>>),
     HyArray(Vec<Box<HyObj>>),
@@ -227,6 +228,15 @@ impl HyObj {
                 } else {
                     print!("false");
                 }
+            },
+            HyFunction(ref f, ptr) => {
+                let mut s = String::new();
+                unsafe {
+                    let c_str = CString::new(ptr, false);
+                    s.push_bytes(c_str.as_bytes());
+                };
+
+                print!("{} [function]", s);
             },
             _ => print!("Called print on an object that is not an Array, Map, or bool")
         };
@@ -443,6 +453,13 @@ impl HyObj {
 
         box HyObj {
             typ : HyChannel(sendr, recvr)
+        }
+    }   
+
+    #[no_mangle]
+    pub fn hy_new_func(func : proc(HyObjSlice) : Send -> Box<HyObj>, name : *const i8) -> Box<HyObj> {
+        box HyObj {
+            typ : HyFunction(func, name)
         }
     }   
 

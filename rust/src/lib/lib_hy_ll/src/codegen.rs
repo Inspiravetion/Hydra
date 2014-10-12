@@ -220,7 +220,7 @@ fn int_to_gen_value(value : int, builder : &mut Builder, ctxt : Value) -> Value 
 }
 
 ///////////////////////////////////////
-//            Int Generation         //
+//            Float Generation       //
 ///////////////////////////////////////
 
 fn float_to_value(value : f64, builder : &mut Builder) -> Value {
@@ -797,14 +797,14 @@ fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>
     let saved_block = builder.new_block("function_def_bridge");
     builder.break_to(saved_block);
 
-    builder.with_fresh_scope(|fb : &mut Builder|{
-        let hy_obj_slice_ref_type = fb.get_type("HyObjSlice*");
-        let hy_obj_ref = fb.get_type("HyObj*");
+    let hy_obj_slice_ref_type = builder.get_type("HyObjSlice*");
+    let hy_obj_ref = builder.get_type("HyObj*");
 
-        let name = name.as_slice();
-        let param_types = vec![hy_obj_slice_ref_type];
+    let name = name.as_slice();
+    let param_types = vec![hy_obj_slice_ref_type];
 
-        fb.create_function(name, param_types, hy_obj_ref,|fb : &mut Builder|{
+    let func = builder.create_function(name, param_types, hy_obj_ref,|fb : &mut Builder|{
+        fb.with_fresh_scope(|fb : &mut Builder|{
             fb.goto_first_block();
 
             let param_setup = fb.new_block(format!("{}_param_setup", name).as_slice());
@@ -841,6 +841,30 @@ fn func_def_gen_code(name : &Ident, params : &Vec<Ident>, stmts : &Vec<Box<Stmt>
             fb.goto_block(saved_block);
         });
     });
+
+    let proc_type = builder.get_type("HyFunc");
+    let i8_ref = builder.string_type();
+    let params = vec![i8_ref, hy_obj_slice_ref_type];
+    let null = builder.null(i8_ref);
+
+    let hy_proc = builder.create_function(format!("_{}_", name).as_slice(), params, hy_obj_ref, |fb : &mut Builder|{
+        fb.goto_first_block();
+        let params = fb.get_param(1);
+        let result = fb.call(name, vec![params], "tmp_val");
+        fb.ret(result);
+        fb.goto_block(saved_block);
+    });
+
+    let slot = builder.alloca(proc_type, "proc_slot");
+    let proc_fields = vec![hy_proc, null];
+    let prok = builder.new_struct(proc_type, proc_fields);
+    builder.store(prok, slot);
+    let name_ptr = builder.string(name, format!("{}_func_name", name).as_slice());
+    let hy_func = builder.call("hy_new_func", vec![slot, name_ptr], "hy_func");
+
+    let boxed_val = builder.new_var(hy_func, "hy_func");
+    builder.set_var(name, boxed_val);
+    //make proc -> make HyFunction -> store in top scope
 }
 
 ///////////////////////////////////////

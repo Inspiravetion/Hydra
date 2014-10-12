@@ -22,3 +22,5 @@ println(b);
 
 var regex = /a.*sdf(a)+sdf/;
 println(regex);
+
+println(add);

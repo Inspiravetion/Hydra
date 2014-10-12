@@ -188,6 +188,12 @@ fn gen_runtime_types(builder : &mut Builder) {
     let hy_gen_next      = builder.to_ptr_type(hy_gen_next_proc);
     builder.add_type("HyGenNextFunc", hy_gen_next);
 
+    let hy_func = builder.func_type(vec![i8_ref, hy_obj_slice_ref], hy_obj_ptr, 0);
+    let hy_func_ref = builder.to_ptr_type(hy_func);
+    let hy_proc = builder.create_type(&vec![hy_func_ref, i8_ref], "HyFunc");
+    builder.add_type("HyFunc", hy_proc);
+    let hy_proc_ref = builder.to_ptr_type(hy_proc);
+    builder.add_type("HyFunc*", hy_proc_ref);
 }
 
 fn declare_runtime_functions(builder : &mut Builder) {
@@ -195,6 +201,7 @@ fn declare_runtime_functions(builder : &mut Builder) {
     let hy_obj_slice = builder.get_type("HyObjSlice");
     let hy_obj_slice_ref = builder.get_type("HyObjSlice*");
     let hy_gen_next_func = builder.get_type("HyGenNextFunc");
+    let hy_func = builder.get_type("HyFunc*");
     let i32 = builder.int32_type();
     let i64 = builder.int64_type();
     let f64 = builder.f64_type();
@@ -241,6 +248,9 @@ fn declare_runtime_functions(builder : &mut Builder) {
     );
     builder.declare_function(    
         "hy_new_string", vec![string], hy_obj_ref
+    );
+    builder.declare_function(    
+        "hy_new_func", vec![hy_func, string], hy_obj_ref
     );
     builder.declare_function(    
         "hy_new_gen", 

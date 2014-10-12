@@ -219,30 +219,60 @@ Ltmp14:
 	.align	4, 0x90
 _main:                                  ## @main
 	.cfi_startproc
-## BB#0:                                ## %function_def_bridge1
-	pushq	%r15
+## BB#0:
+	pushq	%rbp
 Ltmp15:
 	.cfi_def_cfa_offset 16
-	pushq	%r14
 Ltmp16:
-	.cfi_def_cfa_offset 24
-	pushq	%rbx
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
 Ltmp17:
-	.cfi_def_cfa_offset 32
-	subq	$224, %rsp
+	.cfi_def_cfa_register %rbp
+	pushq	%r15
+	pushq	%r14
+	pushq	%r12
+	pushq	%rbx
 Ltmp18:
-	.cfi_def_cfa_offset 256
+	.cfi_offset %rbx, -48
 Ltmp19:
-	.cfi_offset %rbx, -32
+	.cfi_offset %r12, -40
 Ltmp20:
-	.cfi_offset %r14, -24
+	.cfi_offset %r14, -32
 Ltmp21:
-	.cfi_offset %r15, -16
-	leaq	200(%rsp), %r14
+	.cfi_offset %r15, -24
+	movq	%rsp, %rax
+	leaq	-16(%rax), %rdi
+	movq	%rdi, %rsp
+	leaq	__add_(%rip), %rcx
+	movq	%rcx, -16(%rax)
+	movq	$0, -8(%rax)
+	leaq	L_global_add_func_name(%rip), %rsi
+	callq	_hy_new_func
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %r12
+	movq	%r12, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rsp, %rax
+	leaq	-16(%rax), %rdi
+	movq	%rdi, %rsp
+	leaq	__add_and_mult_(%rip), %rcx
+	movq	%rcx, -16(%rax)
+	movq	$0, -8(%rax)
+	leaq	L_global_add_and_mult_func_name(%rip), %rsi
+	callq	_hy_new_func
+	movq	%rsp, %rcx
+	leaq	-16(%rcx), %rdx
+	movq	%rdx, %rsp
+	movq	%rax, -16(%rcx)
+	movq	%rsp, %r14
+	addq	$-32, %r14
+	movq	%r14, %rsp
 	movl	$1, %esi
 	movq	%r14, %rdi
 	callq	_hy_obj_slice_init
-	leaq	176(%rsp), %rbx
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
 	movl	$2, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
@@ -269,51 +299,55 @@ Ltmp21:
 	callq	_hy_obj_slice_push
 	movq	%r14, %rdi
 	callq	_println
-	leaq	152(%rsp), %r14
+	movq	%rsp, %r15
+	addq	$-32, %r15
+	movq	%r15, %rsp
 	movl	$1, %esi
-	movq	%r14, %rdi
+	movq	%r15, %rdi
 	callq	_hy_obj_slice_init
 	callq	_hy_new_array
-	movq	%rax, %rbx
+	movq	%rax, %r14
 	movl	$1, %edi
 	callq	_hy_new_int
-	movq	%rbx, %rdi
+	movq	%r14, %rdi
 	movq	%rax, %rsi
 	callq	_hy_array_push
 	movl	$1, %edi
 	callq	_hy_new_bool
-	movq	%rbx, %rdi
+	movq	%r14, %rdi
 	movq	%rax, %rsi
 	callq	_hy_array_push
-	leaq	128(%rsp), %r15
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
 	movl	$2, %esi
-	movq	%r15, %rdi
+	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
 	movl	$5, %edi
 	callq	_hy_new_int
 	movq	%rax, %rdi
 	callq	_hy_obj_clone
-	movq	%r15, %rdi
+	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
 	movl	$6, %edi
 	callq	_hy_new_int
 	movq	%rax, %rdi
 	callq	_hy_obj_clone
-	movq	%r15, %rdi
+	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
-	movq	%r15, %rdi
-	callq	_add_and_mult
 	movq	%rbx, %rdi
+	callq	_add_and_mult
+	movq	%r14, %rdi
 	movq	%rax, %rsi
 	callq	_hy_array_push
-	movq	%rbx, %rdi
-	callq	_hy_obj_clone
 	movq	%r14, %rdi
+	callq	_hy_obj_clone
+	movq	%r15, %rdi
 	movq	%rax, %rsi
 	callq	_hy_obj_slice_push
-	movq	%r14, %rdi
+	movq	%r15, %rdi
 	callq	_println
 	callq	_hy_new_map
 	movq	%rax, %rbx
@@ -334,12 +368,17 @@ Ltmp21:
 	movq	%r14, %rsi
 	movq	%rax, %rdx
 	callq	_hy_map_insert
-	movq	%rbx, 120(%rsp)
-	leaq	96(%rsp), %rbx
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rax
+	movq	%rax, %rsp
+	movq	%rbx, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	120(%rsp), %rdi
+	movq	-16(%r14), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
@@ -347,12 +386,17 @@ Ltmp21:
 	movq	%rbx, %rdi
 	callq	_println
 	callq	_hy_new_undefined
-	movq	%rax, 88(%rsp)
-	leaq	64(%rsp), %rbx
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	88(%rsp), %rdi
+	movq	-16(%r14), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
@@ -361,12 +405,14 @@ Ltmp21:
 	callq	_println
 	movl	$14, %edi
 	callq	_hy_new_int
-	movq	%rax, 88(%rsp)
-	leaq	40(%rsp), %rbx
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	88(%rsp), %rdi
+	movq	-16(%r14), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
@@ -377,12 +423,30 @@ Ltmp21:
 	callq	_hy_new_string
 	movq	%rax, %rdi
 	callq	_hy_new_regex
-	movq	%rax, 32(%rsp)
-	leaq	8(%rsp), %rbx
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
 	movl	$1, %esi
 	movq	%rbx, %rdi
 	callq	_hy_obj_slice_init
-	movq	32(%rsp), %rdi
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_println
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	(%r12), %rdi
 	callq	_hy_obj_clone
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
@@ -390,10 +454,12 @@ Ltmp21:
 	movq	%rbx, %rdi
 	callq	_println
 	xorl	%eax, %eax
-	addq	$224, %rsp
+	leaq	-32(%rbp), %rsp
 	popq	%rbx
+	popq	%r12
 	popq	%r14
 	popq	%r15
+	popq	%rbp
 	retq
 	.cfi_endproc
 
@@ -427,18 +493,32 @@ Ltmp24:
 	retq
 	.cfi_endproc
 
+	.globl	__add_
+	.align	4, 0x90
+__add_:                                 ## @_add_
+	.cfi_startproc
+## BB#0:
+	pushq	%rax
+Ltmp25:
+	.cfi_def_cfa_offset 16
+	movq	%rsi, %rdi
+	callq	_add
+	popq	%rdx
+	retq
+	.cfi_endproc
+
 	.globl	_add_and_mult
 	.align	4, 0x90
 _add_and_mult:                          ## @add_and_mult
 	.cfi_startproc
 ## BB#0:                                ## %add_and_mult_param_setup
 	pushq	%rbx
-Ltmp25:
+Ltmp26:
 	.cfi_def_cfa_offset 16
 	subq	$16, %rsp
-Ltmp26:
-	.cfi_def_cfa_offset 32
 Ltmp27:
+	.cfi_def_cfa_offset 32
+Ltmp28:
 	.cfi_offset %rbx, -16
 	movq	%rdi, %rbx
 	xorl	%esi, %esi
@@ -470,7 +550,27 @@ Ltmp27:
 	retq
 	.cfi_endproc
 
+	.globl	__add_and_mult_
+	.align	4, 0x90
+__add_and_mult_:                        ## @_add_and_mult_
+	.cfi_startproc
+## BB#0:
+	pushq	%rax
+Ltmp29:
+	.cfi_def_cfa_offset 16
+	movq	%rsi, %rdi
+	callq	_add_and_mult
+	popq	%rdx
+	retq
+	.cfi_endproc
+
 	.section	__TEXT,__cstring,cstring_literals
+L_global_add_func_name:                 ## @global_add_func_name
+	.asciz	"add"
+
+L_global_add_and_mult_func_name:        ## @global_add_and_mult_func_name
+	.asciz	"add_and_mult"
+
 "L_global_\"arr\"_literal":             ## @"global_\22arr\22_literal"
 	.asciz	"\"arr\""
 

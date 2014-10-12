@@ -9,11 +9,13 @@ use std::owned::Box;
 use std::io::{File, BufferedReader};
 use std::str;
 
-//May need to be used to link for gc stuff later
+// May need to be used to link for gc stuff later
 #[link(name = "LLVMCodeGen")]
-// extern {
-//     // fn LLVMLinkInMCJIT();
-// }
+extern {
+    // fn LLVMLinkInMCJIT();
+    fn LLVMGetTypeByName(pkg : Package, typ_name : *const i8) -> Type;
+    // LLVMGetNamedFunction();
+}
 
 pub struct Builder {
     builder    : LLVMBuilder,
@@ -172,9 +174,21 @@ impl Builder {
 
         b.create_package("hydra");
         b.add_builtin_types();
+
         // b.link_in_std();
 
         b
+    }
+
+    pub fn get_type_from_pkg(pkg : Package, typ_name : &str) -> Option<Type> {
+        unsafe { 
+            let typ = LLVMGetTypeByName(pkg, chars(typ_name)); 
+            if typ.is_null() {
+                None
+            } else {
+                Some(typ)
+            }
+        }
     }
 
     pub fn link_in_std(&mut self) {
@@ -469,13 +483,16 @@ impl Builder {
         u!(llvm::LLVMAddFunction(self.curr_pkg.unwrap(), chars(name), typ))
     }
 
-    pub fn create_function(&mut self, name : &str, args : Vec<Type>, ret : Type, cb : |&mut Builder|) {
+    pub fn create_function(&mut self, name : &str, args : Vec<Type>, ret : Type, cb : |&mut Builder|) -> Value{
         let typ = self.func_type(args, ret, False);
         let saved_func = self.curr_func.clone();
         self.curr_func = Some(u!(llvm::LLVMAddFunction(self.curr_pkg.unwrap(), chars(name), typ)));
         self.new_block("");
         cb(self);
+        let new_func = self.curr_func;
         self.curr_func = saved_func;
+
+        new_func.unwrap()
     }
 
     pub fn create_variadic_function(&mut self, name : &str, args : Vec<Type>, ret : Type, cb : |&mut Builder|) {
@@ -710,6 +727,28 @@ impl Builder {
         self.add_type(typ_name, typ);
 
         typ
+    }
+
+    pub fn new_struct(&mut self, typ : Type, fields : Vec<Value>) -> Value {
+        let len = fields.len();
+
+        u!(llvm::LLVMConstNamedStruct(
+            typ,
+            fields.as_ptr(),
+            len as u32
+        ))
+    }
+
+    pub fn null(&mut self, typ : Type) -> Value {
+        u!(llvm::LLVMConstNull(typ))
+    }
+
+    pub fn func_ptr(&mut self, func : Value) -> Value {
+        let typ = self.type_of(func);
+        let ptr = u!(llvm::LLVMConstPointerNull(typ));
+
+        self.store(func, ptr);
+        ptr
     }
 
     pub fn alloca(&mut self, obj_typ : Type, name : &str) -> Value {
