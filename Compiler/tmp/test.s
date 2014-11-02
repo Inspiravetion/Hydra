@@ -454,7 +454,7 @@ Ltmp21:
 	movq	%rbx, %rdi
 	callq	_println
 	xorl	%edi, %edi
-	callq	_hy_new_chan
+	callq	_hy_new_sync_chan
 	movq	%rsp, %r14
 	leaq	-16(%r14), %rcx
 	movq	%rcx, %rsp
@@ -473,7 +473,25 @@ Ltmp21:
 	movq	%rbx, %rdi
 	callq	_println
 	movl	$1234, %edi             ## imm = 0x4D2
-	callq	_hy_new_chan
+	callq	_hy_new_sync_chan
+	movq	%rsp, %r14
+	leaq	-16(%r14), %rcx
+	movq	%rcx, %rsp
+	movq	%rax, -16(%r14)
+	movq	%rsp, %rbx
+	addq	$-32, %rbx
+	movq	%rbx, %rsp
+	movl	$1, %esi
+	movq	%rbx, %rdi
+	callq	_hy_obj_slice_init
+	movq	-16(%r14), %rdi
+	callq	_hy_obj_clone
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	callq	_hy_obj_slice_push
+	movq	%rbx, %rdi
+	callq	_println
+	callq	_hy_new_async_chan
 	movq	%rsp, %r14
 	leaq	-16(%r14), %rcx
 	movq	%rcx, %rsp

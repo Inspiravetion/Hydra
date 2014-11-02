@@ -30,3 +30,6 @@ println(chan);
 
 var chan = <-1234->;
 println(chan);
+
+var async_chan = <--->;
+println(async_chan);

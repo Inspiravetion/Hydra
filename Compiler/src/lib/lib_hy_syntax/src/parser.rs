@@ -722,6 +722,12 @@ pub trait HydraBaseParser {
 
     fn chan_lit(&mut self) -> Box<Expr> {
         self.next();
+
+        if self.next_is(Decrement) {
+            self.expect(Greater_Than);
+            return AsyncChanLit::new();
+        }
+
         let mut buff_sz = 0;
 
         if self.next_is(Int_Literal) {
@@ -730,7 +736,7 @@ pub trait HydraBaseParser {
 
         self.expect(Chan_Send);
 
-        ChanLit::new(buff_sz)
+        SyncChanLit::new(buff_sz)
     }
 
     fn map_lit(&mut self) -> Box<Expr> {

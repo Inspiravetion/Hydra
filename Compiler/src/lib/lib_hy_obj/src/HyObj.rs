@@ -9,7 +9,7 @@ extern crate core;
 
 use alloc::heap;
 
-use std::comm::{sync_channel, SyncSender, Receiver};
+use std::comm::{sync_channel, SyncSender, Sender, Receiver};
 use std::collections::TreeMap;
 use std::c_str::CString;
 use std::mem;
@@ -26,7 +26,8 @@ use regex::Regex;
 pub enum HyObjType {
     HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
     HyFunction(proc(HyObjSlice) : Send -> Box<HyObj>, *const i8),
-    HyChannel(SyncSender<Box<HyObj>>, Receiver<Box<HyObj>>, int),
+    HySyncChannel(SyncSender<Box<HyObj>>, Receiver<Box<HyObj>>, int),
+    HyAsyncChannel(Sender<Box<HyObj>>, Receiver<Box<HyObj>>),
     HyMap(TreeMap<String, Box<HyObj>>),
     HyArray(Vec<Box<HyObj>>),
     HyTuple(Vec<Box<HyObj>>),
@@ -242,7 +243,7 @@ impl HyObj {
 
                 print!("{} [function]", s);
             },
-            HyChannel(ref sendr, ref recvr, buffer_sz) => {
+            HySyncChannel(ref sendr, ref recvr, buffer_sz) => {
                 match buffer_sz {
                     0 => {
                         print!("<-->");
@@ -251,6 +252,9 @@ impl HyObj {
                         print!("<-{}->", buffer_sz);
                     }
                 };
+            },
+            HyAsyncChannel(ref sendr, ref recvr) => {
+                print!("<--->");
             },
             _ => print!("Called print on an object that is not an Array, Map, or bool")
         };
@@ -466,13 +470,22 @@ impl HyObj {
     }
 
     #[no_mangle]
-    pub fn hy_new_chan(buffer_sz : int) -> Box<HyObj> {
+    pub fn hy_new_sync_chan(buffer_sz : int) -> Box<HyObj> {
         let (sendr, recvr) = sync_channel(buffer_sz as uint);
 
         box HyObj {
-            typ : HyChannel(sendr, recvr, buffer_sz)
+            typ : HySyncChannel(sendr, recvr, buffer_sz)
         }
-    }   
+    }
+
+    #[no_mangle]
+    pub fn hy_new_async_chan() -> Box<HyObj> {
+        let (sendr, recvr) = channel();
+
+        box HyObj {
+            typ : HyAsyncChannel(sendr, recvr)
+        }
+    }      
 
     #[no_mangle]
     pub fn hy_new_func(func : proc(HyObjSlice) : Send -> Box<HyObj>, name : *const i8) -> Box<HyObj> {

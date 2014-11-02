@@ -67,7 +67,9 @@ declare %HyObj* @hy_new_undefined()
 
 declare %HyObj* @hy_new_null()
 
-declare %HyObj* @hy_new_chan(i64)
+declare %HyObj* @hy_new_sync_chan(i64)
+
+declare %HyObj* @hy_new_async_chan()
 
 declare %HyObj* @hy_new_map()
 
@@ -305,24 +307,33 @@ function_def_bridge2:                             ; preds = %function_def_bridge
   %obj_clone43 = call %HyObj* @hy_obj_clone(%HyObj* %add)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice42, %HyObj* %obj_clone43)
   %println_tmp44 = call %HyObj* @println(%HyObjSlice* %param_slice42)
-  %hy_chan = call %HyObj* @hy_new_chan(i64 0)
+  %hy_sync_chan = call %HyObj* @hy_new_sync_chan(i64 0)
   %chan = alloca %HyObj*
-  store %HyObj* %hy_chan, %HyObj** %chan
+  store %HyObj* %hy_sync_chan, %HyObj** %chan
   %param_slice45 = alloca %HyObjSlice
   call void @hy_obj_slice_init(%HyObjSlice* %param_slice45, i64 1)
   %chan46 = load %HyObj** %chan
   %obj_clone47 = call %HyObj* @hy_obj_clone(%HyObj* %chan46)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice45, %HyObj* %obj_clone47)
   %println_tmp48 = call %HyObj* @println(%HyObjSlice* %param_slice45)
-  %hy_chan49 = call %HyObj* @hy_new_chan(i64 1234)
+  %hy_sync_chan49 = call %HyObj* @hy_new_sync_chan(i64 1234)
   %chan50 = alloca %HyObj*
-  store %HyObj* %hy_chan49, %HyObj** %chan50
+  store %HyObj* %hy_sync_chan49, %HyObj** %chan50
   %param_slice51 = alloca %HyObjSlice
   call void @hy_obj_slice_init(%HyObjSlice* %param_slice51, i64 1)
   %chan52 = load %HyObj** %chan50
   %obj_clone53 = call %HyObj* @hy_obj_clone(%HyObj* %chan52)
   call void @hy_obj_slice_push(%HyObjSlice* %param_slice51, %HyObj* %obj_clone53)
   %println_tmp54 = call %HyObj* @println(%HyObjSlice* %param_slice51)
+  %hy_async_chan = call %HyObj* @hy_new_async_chan()
+  %async_chan = alloca %HyObj*
+  store %HyObj* %hy_async_chan, %HyObj** %async_chan
+  %param_slice55 = alloca %HyObjSlice
+  call void @hy_obj_slice_init(%HyObjSlice* %param_slice55, i64 1)
+  %async_chan56 = load %HyObj** %async_chan
+  %obj_clone57 = call %HyObj* @hy_obj_clone(%HyObj* %async_chan56)
+  call void @hy_obj_slice_push(%HyObjSlice* %param_slice55, %HyObj* %obj_clone57)
+  %println_tmp58 = call %HyObj* @println(%HyObjSlice* %param_slice55)
   ret i32 0
 }
 

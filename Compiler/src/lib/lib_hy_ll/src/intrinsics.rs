@@ -222,7 +222,10 @@ fn declare_runtime_functions(builder : &mut Builder) {
         "hy_new_null", vec![], hy_obj_ref
     );
     builder.declare_function(    
-        "hy_new_chan", vec![i64], hy_obj_ref
+        "hy_new_sync_chan", vec![i64], hy_obj_ref
+    );
+    builder.declare_function(    
+        "hy_new_async_chan", vec![], hy_obj_ref
     );
     builder.declare_function(    
         "hy_new_map", vec![], hy_obj_ref

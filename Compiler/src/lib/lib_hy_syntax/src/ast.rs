@@ -62,7 +62,9 @@ pub enum Expr_ {
     RegexLit(String),
 
     //1.buffer size
-    ChanLit(int),
+    SyncChanLit(int),
+
+    AsyncChanLit,
 
     //1.value
     IdentExpr(Ident),
@@ -174,12 +176,22 @@ pub mod RegexLit {
     }
 }
 
-pub mod ChanLit {
-    use self::super::{Expr, ChanLit};
+pub mod SyncChanLit {
+    use self::super::{Expr, SyncChanLit};
 
     pub fn new(buff_sz : int) -> Box<Expr> {
         box Expr {
-            node : ChanLit(buff_sz)
+            node : SyncChanLit(buff_sz)
+        }
+    }
+}
+
+pub mod AsyncChanLit {
+    use self::super::{Expr, AsyncChanLit};
+
+    pub fn new() -> Box<Expr> {
+        box Expr {
+            node : AsyncChanLit
         }
     }
 }

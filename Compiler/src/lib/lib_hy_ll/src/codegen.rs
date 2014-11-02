@@ -126,7 +126,8 @@ impl ExprGenerator for Expr {
             ArrayLit(ref exprs) => array_to_value(exprs, builder),
             MapLit(ref keys, ref vals) => map_to_value(keys, vals, builder),
             RegexLit(ref pattern) => regex_to_value(pattern.as_slice(), builder),
-            ChanLit(buff_sz) => chan_to_value(buff_sz, builder),
+            SyncChanLit(buff_sz) => sync_chan_to_value(buff_sz, builder),
+            AsyncChanLit => async_chan_to_value(builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -314,16 +315,28 @@ fn regex_to_gen_value(pattern : &str, builder : &mut Builder) -> Value {
 }
 
 ///////////////////////////////////////
-//            Chan Generation        //
+//         SyncChan Generation       //
 ///////////////////////////////////////
 
-fn chan_to_value(buff_sz : int, builder : &mut Builder) -> Value {
+fn sync_chan_to_value(buff_sz : int, builder : &mut Builder) -> Value {
     let buff_sz = builder.int64(buff_sz);
-    builder.call("hy_new_chan", vec![buff_sz], "hy_chan")
+    builder.call("hy_new_sync_chan", vec![buff_sz], "hy_sync_chan")
 }
 
-fn chan_to_gen_value(buff_sz : int, builder : &mut Builder) -> Value {
-    chan_to_value(buff_sz, builder)
+fn sync_chan_to_gen_value(buff_sz : int, builder : &mut Builder) -> Value {
+    sync_chan_to_value(buff_sz, builder)
+}
+
+///////////////////////////////////////
+//         AsyncChan Generation      //
+///////////////////////////////////////
+
+fn async_chan_to_value(builder : &mut Builder) -> Value {
+    builder.call("hy_new_async_chan", vec![], "hy_async_chan")
+}
+
+fn async_chan_to_gen_value(builder : &mut Builder) -> Value {
+    async_chan_to_value(builder)
 }
 
 ///////////////////////////////////////
