@@ -126,7 +126,7 @@ impl Token {
 
 impl Show for Token {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        let info = format!("{:?} at {}:{}", self.typ, self.line, self.col);
+        let info = format!("{} at {}:{}", self.typ, self.line, self.col);
         write!(f, "{{\n  {}\n  text: '{}'\n}}", info, self.text)
     }
 }

@@ -7,6 +7,7 @@ test: $(LIBS)
 
 hy_obj:
 	rustc ./src/lib/lib_hy_obj/src/HyObj.rs
+	rustc --emit ir ./src/lib/lib_hy_obj/src/HyObj.rs
 
 hydra:
 	cargo build

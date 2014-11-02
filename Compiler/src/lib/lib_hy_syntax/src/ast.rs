@@ -61,6 +61,9 @@ pub enum Expr_ {
     //1.pattern
     RegexLit(String),
 
+    //1.buffer size
+    ChanLit(int),
+
     //1.value
     IdentExpr(Ident),
 
@@ -167,6 +170,16 @@ pub mod RegexLit {
     pub fn new(pattern : String) -> Box<Expr> {
         box Expr {
             node : RegexLit(pattern)
+        }
+    }
+}
+
+pub mod ChanLit {
+    use self::super::{Expr, ChanLit};
+
+    pub fn new(buff_sz : int) -> Box<Expr> {
+        box Expr {
+            node : ChanLit(buff_sz)
         }
     }
 }

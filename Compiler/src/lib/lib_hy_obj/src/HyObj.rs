@@ -5,26 +5,28 @@
 
 extern crate regex;
 extern crate alloc;
+extern crate core;
 
 use alloc::heap;
 
-use std::comm::{channel, Sender, Receiver};
+use std::comm::{sync_channel, SyncSender, Receiver};
 use std::collections::TreeMap;
 use std::c_str::CString;
 use std::mem;
 use std::ptr;
+use std::sync;
 
 use regex::Regex;
 
-static UNDEFINED : &'static HyObj = &HyObj { typ : HyUndefined };
-static NULL      : &'static HyObj = &HyObj { typ : HyNull };
-static TRUE      : &'static HyObj = &HyObj { typ : HyBool(true) };
-static FALSE     : &'static HyObj = &HyObj { typ : HyBool(false) };
+// static UNDEFINED : HyObj = unsafe{ HyObj { typ : HyUndefined } };
+// static NULL      : HyObj = HyObj { typ : HyNull };
+// static TRUE      : HyObj = HyObj { typ : HyBool(true) };
+// static FALSE     : HyObj = HyObj { typ : HyBool(false) };
 
 pub enum HyObjType {
     HyGenerator(proc(HyObjSlice, *const HyGenCtxt) : Send -> bool, *const HyGenCtxt),
     HyFunction(proc(HyObjSlice) : Send -> Box<HyObj>, *const i8),
-    HyChannel(Sender<Box<HyObj>>, Receiver<Box<HyObj>>),
+    HyChannel(SyncSender<Box<HyObj>>, Receiver<Box<HyObj>>, int),
     HyMap(TreeMap<String, Box<HyObj>>),
     HyArray(Vec<Box<HyObj>>),
     HyTuple(Vec<Box<HyObj>>),
@@ -40,6 +42,8 @@ pub enum HyObjType {
 pub struct HyObj {
     pub typ : HyObjType
 }
+
+// impl Sync for HyObj {}
 
 pub struct HyObjSlice {
     pub objs : *mut *mut HyObj,
@@ -233,10 +237,20 @@ impl HyObj {
                 let mut s = String::new();
                 unsafe {
                     let c_str = CString::new(ptr, false);
-                    s.push_bytes(c_str.as_bytes());
+                    s.as_mut_vec().push_all(c_str.as_bytes());
                 };
 
                 print!("{} [function]", s);
+            },
+            HyChannel(ref sendr, ref recvr, buffer_sz) => {
+                match buffer_sz {
+                    0 => {
+                        print!("<-->");
+                    },
+                    _ => {
+                        print!("<-{}->", buffer_sz);
+                    }
+                };
             },
             _ => print!("Called print on an object that is not an Array, Map, or bool")
         };
@@ -382,7 +396,7 @@ impl HyObj {
         let mut s = String::new();
         unsafe {
             let c_str = CString::new(buf, false);
-            s.push_bytes(c_str.as_bytes());
+            s.as_mut_vec().push_all(c_str.as_bytes());
         };
         box HyObj {
             typ : HyString(s)
@@ -420,13 +434,17 @@ impl HyObj {
     #[no_mangle]
     pub fn hy_new_bool(b : bool) -> Box<HyObj> {
         unsafe { 
-            mem::transmute(
-                if b {
-                    TRUE
-                } else {
-                    FALSE
+            if b {
+                // mem::transmute(&TRUE)
+                box HyObj {
+                    typ : HyBool(true)
                 }
-            )
+            } else {
+                // mem::transmute(&FALSE)
+                box HyObj {
+                    typ : HyBool(false)
+                }
+            }
         }
     }
 
@@ -448,11 +466,11 @@ impl HyObj {
     }
 
     #[no_mangle]
-    pub fn hy_new_chan() -> Box<HyObj> {
-        let (sendr, recvr) = channel();
+    pub fn hy_new_chan(buffer_sz : int) -> Box<HyObj> {
+        let (sendr, recvr) = sync_channel(buffer_sz as uint);
 
         box HyObj {
-            typ : HyChannel(sendr, recvr)
+            typ : HyChannel(sendr, recvr, buffer_sz)
         }
     }   
 
@@ -486,12 +504,18 @@ impl HyObj {
 
     #[no_mangle]
     pub fn hy_new_undefined() -> Box<HyObj> {
-        unsafe{ mem::transmute(UNDEFINED) }
+        // unsafe{ mem::transmute(&UNDEFINED) }
+        box HyObj {
+            typ : HyUndefined
+        }
     }
 
     #[no_mangle]
     pub fn hy_new_null() -> Box<HyObj> {
-        unsafe{ mem::transmute(NULL) }
+        // unsafe{ mem::transmute(&NULL) }
+        box HyObj {
+            typ : HyNull
+        }
     }
 
     ///////////////////////////////////////

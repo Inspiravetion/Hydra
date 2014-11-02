@@ -126,6 +126,7 @@ impl ExprGenerator for Expr {
             ArrayLit(ref exprs) => array_to_value(exprs, builder),
             MapLit(ref keys, ref vals) => map_to_value(keys, vals, builder),
             RegexLit(ref pattern) => regex_to_value(pattern.as_slice(), builder),
+            ChanLit(buff_sz) => chan_to_value(buff_sz, builder),
             IdentExpr(ref ident) => ident_expr_to_value(ident, builder),
             BinaryExpr(ref lhs, ref op, ref rhs) => bin_expr_to_value(lhs, op, rhs, builder),
             PrefixUnaryExpr(ref op, ref expr) => prfx_unary_expr_to_value(op, expr, builder),
@@ -310,6 +311,19 @@ fn regex_to_value(pattern : &str, builder : &mut Builder) -> Value {
 
 fn regex_to_gen_value(pattern : &str, builder : &mut Builder) -> Value {
     regex_to_value(pattern, builder)
+}
+
+///////////////////////////////////////
+//            Chan Generation        //
+///////////////////////////////////////
+
+fn chan_to_value(buff_sz : int, builder : &mut Builder) -> Value {
+    let buff_sz = builder.int64(buff_sz);
+    builder.call("hy_new_chan", vec![buff_sz], "hy_chan")
+}
+
+fn chan_to_gen_value(buff_sz : int, builder : &mut Builder) -> Value {
+    chan_to_value(buff_sz, builder)
 }
 
 ///////////////////////////////////////
@@ -614,7 +628,7 @@ fn loop_ctrl_stmt_gen_code(typ : TokenType, builder : &mut Builder){
                 None => {}
             };
         },
-        _ => fail!("Created a LoopControlStmt with an incompatable keyword {:?}", typ)
+        _ => fail!("Created a LoopControlStmt with an incompatable keyword {}", typ)
     }
 }
 
@@ -882,7 +896,7 @@ fn return_stmt_gen_code(ret_exprs : &Exprs, builder : &mut Builder){
 
     } else if len == 1 {
         //return the first expression
-        let val = ret_exprs.get(0).to_value(builder);
+        let val = ret_exprs[0].to_value(builder);
         builder.ret(val);
 
     } else {

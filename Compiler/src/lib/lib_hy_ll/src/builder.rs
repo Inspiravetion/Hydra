@@ -5,7 +5,7 @@ use libc::{c_uint, c_ulonglong, puts};
 use generator::{Generator, RANGE_GEN_ID, RANGE_GEN_INIT, RANGE_GEN_NEXT};
 use generator;
 use lltype::*;
-use std::owned::Box;
+// use std::owned::Box;
 use std::io::{File, BufferedReader};
 use std::str;
 
@@ -850,11 +850,6 @@ impl Builder {
 
     pub fn type_of(&mut self, val : Value) -> Type {
         u!(llvm::LLVMTypeOf(val))
-    }
-
-    pub fn type_to_str(&mut self, typ : Type) {
-        let type_str = u!(llvm::LLVMTypeToString(typ)); 
-        u!(puts(type_str));
     }
 
     /*

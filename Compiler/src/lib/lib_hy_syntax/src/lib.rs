@@ -13,7 +13,7 @@
 #![allow(non_camel_case_types)]
 #![allow(dead_assignment)]
 
-extern crate debug;
+// extern crate debug;
 
 pub mod token;
 pub mod scanner;

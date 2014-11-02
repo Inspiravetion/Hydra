@@ -121,13 +121,13 @@ pub trait HydraParser : HydraBaseParser {
 ///abc or abc.def or a.b.c, d.e.f
 ///TODO: merge prop_path and prop_paths to return one of these so 
 ///prefix...and eventually postfix...unary operators can be parsed
-enum IdentPrefix {
+pub enum IdentPrefix {
     SingleIdent(Ident),
     SingleIdentList(Vec<Ident>),
     MultiIdentList(Vec<Vec<Ident>>)
 }
 
-trait HydraBaseParser {
+pub trait HydraBaseParser {
     
     ///Returns the current token
     fn tok(&mut self) -> Token;
@@ -183,7 +183,7 @@ trait HydraBaseParser {
         if !self.next_is(typ) {
             let tok = self.tok();
             fail!(
-                "\n\nExpected {:?} at '{}' => {}:{}\n\n",
+                "\n\nExpected {} at '{}' => {}:{}\n\n",
                 typ,
                 tok.text,
                 tok.line, 
@@ -593,7 +593,7 @@ trait HydraBaseParser {
         let expr2 = match self.basic_expr_opt(){
             Some(e) => e, 
             None => fail!(
-                "Trailing {:?} at {}:{}",
+                "Trailing {} at {}:{}",
                 op1.typ,
                 op1.line, 
                 op1.col
@@ -678,6 +678,9 @@ trait HydraBaseParser {
                     Div_Op => {
                         Some(self.regex_lit())
                     },
+                    Chan_Recv => {
+                        Some(self.chan_lit())
+                    },
                     Identifier => {
                         Some(self.ident_or_func_call())
                     }
@@ -715,6 +718,19 @@ trait HydraBaseParser {
         self.expect(Div_Op);
 
         RegexLit::new(pattern)
+    }
+
+    fn chan_lit(&mut self) -> Box<Expr> {
+        self.next();
+        let mut buff_sz = 0;
+
+        if self.next_is(Int_Literal) {
+            buff_sz = from_str::<int>(self.tok().text.as_slice()).unwrap();
+        }
+
+        self.expect(Chan_Send);
+
+        ChanLit::new(buff_sz)
     }
 
     fn map_lit(&mut self) -> Box<Expr> {

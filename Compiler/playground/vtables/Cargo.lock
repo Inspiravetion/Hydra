@@ -1,0 +1,27 @@
+[root]
+name = "vtable"
+version = "0.0.1"
+dependencies = [
+ "phf 0.0.0",
+ "phf_mac 0.0.0",
+]
+
+[[package]]
+name = "phf"
+version = "0.0.0"
+dependencies = [
+ "xxhash 0.0.1 (git+https://github.com/Jurily/rust-xxhash#b1361187f6480f80551e49b248f61b8ccf6d2c53)",
+]
+
+[[package]]
+name = "phf_mac"
+version = "0.0.0"
+dependencies = [
+ "xxhash 0.0.1 (git+https://github.com/Jurily/rust-xxhash#b1361187f6480f80551e49b248f61b8ccf6d2c53)",
+]
+
+[[package]]
+name = "xxhash"
+version = "0.0.1"
+source = "git+https://github.com/Jurily/rust-xxhash#b1361187f6480f80551e49b248f61b8ccf6d2c53"
+

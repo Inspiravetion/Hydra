@@ -17,8 +17,8 @@
 extern crate rustc;
 extern crate libc;
 extern crate collections;
-extern crate syntax = "hy_syntax";
-extern crate debug;
+extern crate "hy_syntax" as syntax;
+// extern crate debug;
 
 macro_rules! u (
     ($e:expr) => ( unsafe { $e }; )

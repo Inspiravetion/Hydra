@@ -24,3 +24,9 @@ var regex = /a.*sdf(a)+sdf/;
 println(regex);
 
 println(add);
+
+var chan = <-->;
+println(chan);
+
+var chan = <-1234->;
+println(chan);

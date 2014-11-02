@@ -1,0 +1,13 @@
+[package]
+
+name    = "vtable" 
+version = "0.0.1"
+authors = [ "Charlie Lipford <charlie.lipford.code@gmail.com>" ]
+
+[dependencies.phf]
+
+path = "lib/rust-phf/phf"
+
+[dependencies.phf_mac]
+
+path = "lib/rust-phf/phf_mac"

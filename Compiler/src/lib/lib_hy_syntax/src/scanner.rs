@@ -130,7 +130,7 @@ impl<B: Buffer> Scanner<B> {
 
     fn consume(&mut self, c : char) {
         self.change_pos(c);
-        self.text_buff.push_char(c);
+        self.text_buff.push(c);
     }
 
     fn consume_while(&mut self, condition : |char| -> bool) {
@@ -140,7 +140,7 @@ impl<B: Buffer> Scanner<B> {
                     if condition(c) {
                         self.consume(c);
                     } else {
-                        self.peek_buff.push_char(c);
+                        self.peek_buff.push(c);
                         break;
                     }
                 }
@@ -170,7 +170,7 @@ impl<B: Buffer> Scanner<B> {
                 }
             }
         } else {
-            Some(self.peek_buff.pop_char().unwrap())
+            Some(self.peek_buff.pop().unwrap())
         };
 
         if result.is_some() {
@@ -192,7 +192,7 @@ impl<B: Buffer> Scanner<B> {
                         self.consume(target);
                         true
                     } else {
-                        self.peek_buff.push_char(next_char);
+                        self.peek_buff.push(next_char);
                         false
                     }
                 }, 
@@ -203,7 +203,7 @@ impl<B: Buffer> Scanner<B> {
             let next_char = self.peek_buff.as_slice().char_at(l);
 
             if next_char == target {
-                self.peek_buff.pop_char();
+                self.peek_buff.pop();
                 self.consume(target);
                 true
             } else {
@@ -474,7 +474,7 @@ macro_rules! test_types(
                 let t = tokens.get(i);
                 match t.typ {
                     token::$tok_typ => {}, 
-                    _ => fail!("Expected token at {} to be {:?} but it was {}", i + 1, token::$tok_typ, t.typ)
+                    _ => fail!("Expected token at {} to be {} but it was {}", i + 1, token::$tok_typ, t.typ)
                 }
                 i += 1;
             )+
