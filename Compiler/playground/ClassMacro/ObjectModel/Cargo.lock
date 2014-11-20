@@ -1,0 +1,27 @@
+[root]
+name = "hyobj"
+version = "0.0.1"
+dependencies = [
+ "phf 0.0.0",
+ "phf_mac 0.0.0",
+]
+
+[[package]]
+name = "phf"
+version = "0.0.0"
+dependencies = [
+ "xxhash 0.0.1 (git+https://github.com/Jurily/rust-xxhash)",
+]
+
+[[package]]
+name = "phf_mac"
+version = "0.0.0"
+dependencies = [
+ "xxhash 0.0.1 (git+https://github.com/Jurily/rust-xxhash)",
+]
+
+[[package]]
+name = "xxhash"
+version = "0.0.1"
+source = "git+https://github.com/Jurily/rust-xxhash#6027ce91f9164f2f936149547f789103b1b671e6"
+

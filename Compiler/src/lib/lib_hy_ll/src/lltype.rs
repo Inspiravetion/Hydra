@@ -4,7 +4,8 @@ use rustc::lib::llvm::{
     ModuleRef, 
     BuilderRef, 
     ValueRef,
-    BasicBlockRef
+    BasicBlockRef,
+    MemoryBufferRef
 };
 
 pub type Package     = ModuleRef;
@@ -13,3 +14,4 @@ pub type Value       = ValueRef;
 pub type Type        = TypeRef;
 pub type LLVMBuilder = BuilderRef;
 pub type Block       = BasicBlockRef;
+pub type MemBuff     = MemoryBufferRef;

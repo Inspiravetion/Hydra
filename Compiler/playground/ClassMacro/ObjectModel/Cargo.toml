@@ -1,0 +1,13 @@
+[package]
+
+name = "hyobj"
+version = "0.0.1"
+authors = ["Inspiravetion <charlie.lipford.code@gmail.com>"]
+
+[dependencies.phf]
+
+path = "../../VTables/lib/rust-phf/phf"
+
+[dependencies.phf_mac]
+
+path = "../../VTables/lib/rust-phf/phf_mac"

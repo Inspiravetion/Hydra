@@ -13,6 +13,8 @@ use std::str;
 #[link(name = "LLVMCodeGen")]
 extern {
     // fn LLVMLinkInMCJIT();
+    fn LLVMGetBitcodeModule(buff : MemBuff, out_pkg : &Package, out_message : *const *const i8) -> Bool; 
+
     fn LLVMGetTypeByName(pkg : Package, typ_name : *const i8) -> Type;
     // LLVMGetNamedFunction();
 }
@@ -157,7 +159,7 @@ impl LoopScope {
 }
 
 impl Builder {
-    pub fn new() -> Builder {
+    pub fn new(pkg : &str) -> Builder {
         let context = u!(llvm::LLVMContextCreate());
         let builder = u!(llvm::LLVMCreateBuilderInContext(context));
 
@@ -172,7 +174,7 @@ impl Builder {
             loop_scope : LoopScope::new()
         };
 
-        b.create_package("hydra");
+        b.create_package(pkg);
         b.add_builtin_types();
 
         // b.link_in_std();
@@ -180,9 +182,17 @@ impl Builder {
         b
     }
 
-    pub fn get_type_from_pkg(pkg : Package, typ_name : &str) -> Option<Type> {
+    pub fn new_from_bitcode(pkg : &str, path : &str) -> Builder {
+        let builder = Builder::new(pkg);
+
+        builder.pull_in_bitcode(path);
+
+        builder
+    }
+
+    pub fn get_type_by_name(self, typ_name : &str) -> Option<Type> {
         unsafe { 
-            let typ = LLVMGetTypeByName(pkg, chars(typ_name)); 
+            let typ = LLVMGetTypeByName(self.curr_pkg.unwrap(), chars(typ_name)); 
             if typ.is_null() {
                 None
             } else {
@@ -240,6 +250,25 @@ impl Builder {
             },
             None => fail!("Tried to link in std before creating package")
         };
+    }
+
+    pub fn with_mem_buff(self, path : &str, cb : |MemBuff|){
+        let buff = u!(
+            path.with_c_str(|c_str : *const i8|{
+                llvm::LLVMRustCreateMemoryBufferWithContentsOfFile(c_str as *const c_char)
+            })
+        );
+
+        cb(buff);
+
+        u!(llvm::LLVMDisposeMemoryBuffer(buff));
+    }
+        
+    pub fn pull_in_bitcode(self, path : &str) {
+        self.with_mem_buff(path, |buff : MemBuff|{
+            //TODO...figure out how to better handle that out_message pointer
+            u!(llvm::LLVMGetBitcodeModule(buff, self.curr_pkg.as_ref().unwrap(), 0 as *const *const i8)); 
+        });
     }
 
     pub fn open_loop_scope(&mut self, continu : Block, brk : Block) {

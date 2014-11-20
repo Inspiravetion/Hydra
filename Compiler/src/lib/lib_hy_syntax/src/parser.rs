@@ -104,6 +104,7 @@ pub trait HydraParser : HydraBaseParser {
     fn parse_sync(&mut self) -> AST {
         let mut stmts = Vec::new();
 
+        //TODO: Change this to seperate imports, exports, class definitions, function definitions and top level stmts 
         self.for_each_stmt(|stmt : Box<Stmt>|{
             stmts.push(stmt);
         });
